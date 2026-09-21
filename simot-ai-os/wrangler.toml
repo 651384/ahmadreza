@@ -1,0 +1,21 @@
+name = "simot-ai-os-gateway"
+main = "src/worker.js"
+compatibility_date = "2026-09-21"
+
+[vars]
+SIMOT_RUNTIME_VERSION = "0.1.0"
+SIMOT_DEFAULT_STATE = "MANUAL"
+
+[[d1_databases]]
+binding = "SIMOT_DB"
+database_name = "simot-ai-os"
+database_id = "REPLACE_AFTER_D1_CREATION"
+
+[[queues.producers]]
+binding = "SIMOT_QUEUE"
+queue = "simot-events"
+
+[[queues.consumers]]
+queue = "simot-events"
+max_batch_size = 10
+max_batch_timeout = 5
