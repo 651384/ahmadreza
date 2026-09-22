@@ -30,7 +30,7 @@ jobs:
           URL: https://simot-ai-os-gateway.vahid-ahmadreza.workers.dev
         run: |
           set -euo pipefail
-          curl --fail --silent --show-error             -X POST             -H "content-type: application/json"             -d '{"update_id":999999,"message":{"chat":{"id":1},"from":{"id":2},"text":"smoke"}}'             "$URL/telegram/webhook" -o telegram.json -w "%{http_code}" > telegram.status
+          curl --silent --show-error             -X POST             -H "content-type: application/json"             -d '{"update_id":999999,"message":{"chat":{"id":1},"from":{"id":2},"text":"smoke"}}'             "$URL/telegram/webhook" -o telegram.json -w "%{http_code}" > telegram.status
           test "$(cat telegram.status)" = "503"
           node - <<'NODE'
           const fs = require("fs");
