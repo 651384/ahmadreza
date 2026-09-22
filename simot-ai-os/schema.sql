@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS events (
   error_message TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_events_msg_id ON events(msg_id);
+CREATE INDEX IF NOT EXISTS idx_events_corr_id ON events(corr_id);
 CREATE INDEX IF NOT EXISTS idx_events_status ON events(status);
 
 CREATE TABLE IF NOT EXISTS provider_health (
@@ -24,6 +25,8 @@ CREATE TABLE IF NOT EXISTS provider_health (
 
 CREATE TABLE IF NOT EXISTS idempotency (
   msg_id TEXT PRIMARY KEY,
+  corr_id TEXT,
   first_seen_at TEXT NOT NULL,
   result_status TEXT NOT NULL
 );
+CREATE INDEX IF NOT EXISTS idx_idempotency_corr_id ON idempotency(corr_id);
