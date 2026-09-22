@@ -44,3 +44,11 @@ test("capability registry is explicit", () => {
   assert.ok(registry.some(x => x.worker_id === "SIMOT-AI-02"));
   assert.ok(registry.every(x => Array.isArray(x.tools)));
 });
+
+import { MASTER_ORCHESTRATION_CONTRACT } from "../src/master-orchestration-policy.js";
+
+test("Master contract preserves strict authority", () => {
+  assert.equal(MASTER_ORCHESTRATION_CONTRACT.role, "SIMOT-MASTER");
+  assert.ok(MASTER_ORCHESTRATION_CONTRACT.principles.includes("STRICT_AUTHORITY"));
+  assert.ok(MASTER_ORCHESTRATION_CONTRACT.forbidden_bypass.includes("APPROVAL_GATE"));
+});
