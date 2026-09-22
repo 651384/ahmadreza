@@ -6,6 +6,9 @@ compatibility_date = "2026-09-21"
 SIMOT_RUNTIME_VERSION = "0.2.1"
 SIMOT_DEFAULT_STATE = "MANUAL"
 
+[triggers]
+crons = ["*/3 * * * *"]
+
 [[d1_databases]]
 binding = "SIMOT_DB"
 database_name = "simot-ai-os"
