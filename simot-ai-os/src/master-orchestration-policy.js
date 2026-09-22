@@ -119,3 +119,11 @@ export function listCapabilities() {
     authority: [...cap.authority]
   }));
 }
+
+export const MASTER_ORCHESTRATION_CONTRACT = Object.freeze({
+  role: "SIMOT-MASTER",
+  mode: "ORCHESTRATOR",
+  principles: ["MAXIMUM_CAPABILITY","STRICT_AUTHORITY","REFERENCE_FIRST","FAIL_CLOSED"],
+  stages: ["INTAKE","CONTEXT_RETRIEVAL","DECOMPOSE","ROUTE","AUTHORITY_GATE","TOOL_GATE","DISPATCH","VERIFY","AGGREGATE","WRITE_BACK","AUDIT"],
+  forbidden_bypass: ["WORKER_AUTHORITY","APPROVAL_GATE","HUMAN_ONLY","SOT_BOUNDARY","PROVIDER_POLICY"]
+});
