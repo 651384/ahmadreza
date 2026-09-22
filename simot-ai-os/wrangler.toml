@@ -9,7 +9,7 @@ SIMOT_DEFAULT_STATE = "MANUAL"
 [[d1_databases]]
 binding = "SIMOT_DB"
 database_name = "simot-ai-os"
-database_id = "REPLACE_AFTER_D1_CREATION"
+database_id = "6bb8ae5c-df7d-4c4b-bf0d-bdd73857a480"
 
 [[queues.producers]]
 binding = "SIMOT_QUEUE"
