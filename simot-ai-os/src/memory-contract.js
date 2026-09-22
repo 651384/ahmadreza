@@ -45,9 +45,9 @@ export function validateMemoryRef(input = {}) {
 
 export function buildMinimalMemoryContext(refs = []) {
   return refs.map(input => {
-    const { ref } = validateMemoryRef(input).ok
-      ? validateMemoryRef(input)
-      : { ref: normalizeMemoryRef(input) };
+    const validation = validateMemoryRef(input);
+    if (!validation.ok) throw new Error(validation.error);
+    const { ref } = validation;
     return {
       memory_ref: ref.memory_ref,
       source_system: ref.source_system,
