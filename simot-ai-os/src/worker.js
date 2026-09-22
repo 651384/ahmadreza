@@ -23,9 +23,10 @@ function validateEnvelope(body) {
   if (!body || typeof body !== "object" || Array.isArray(body)) return "INVALID_BODY";
 
   const required = [
-    "MSG-ID","CORR-ID","REPLY-TO","FROM","TO","TYPE","PRIORITY","AUTHORITY",
-    "STATUS","SCOPE","EXPECTED-ACTION","CONFIDENTIALITY","PAYLOAD-FORMAT",
-    "PART","RESULT-STATUS","NEXT-ACTION","WRITE-BACK","CONFIDENCE","VERIFICATION"
+    "MSG-ID","CORR-ID","REPLY-TO","THREAD-ID","FROM","TO","TYPE","PRIORITY","AUTHORITY",
+    "STATUS","SCOPE","SOT-REFS","TASK-REFS","RECORD-REFS","EXPECTED-ACTION","DEADLINE",
+    "CONFIDENTIALITY","PAYLOAD-FORMAT","PART","RESULT-STATUS","NEXT-ACTION","WRITE-BACK",
+    "ESCALATION","CONFIDENCE","VERIFICATION"
   ];
   for (const k of required) {
     if (body[k] === undefined || body[k] === null || body[k] === "") return "MISSING_" + k;
@@ -184,6 +185,18 @@ export default {
       const t = now();
 
       try {
+        const frameError = parseFrame(body);
+        if (frameError.error) {
+          await recordEvent(env, {
+            id: crypto.randomUUID(), msg_id: msgId || "UNKNOWN", corr_id: corrId,
+            type: body["TYPE"] || "ERROR", status: "REJECTED",
+            created_at: t, updated_at: t, payload_json: JSON.stringify(safeBody(body)),
+            error_code: frameError.error, error_message: "SIMOT-MSG v2 framing validation failed"
+          });
+          message.ack();
+          continue;
+        }
+
         const err = validateEnvelope(body);
         if (err) {
           await recordEvent(env, {
