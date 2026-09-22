@@ -32,6 +32,8 @@ function validateEnvelope(body) {
   }
 
   if (!RECIPIENT_RE.test(String(body["TO"]))) return "WRONG_RECIPIENT";
+  if (body["TO"] === "SIMOT-MASTER" && body["FROM"] !== "SIMOT-AI-01" && !/^SIMOT-AI-[0-9]{2}$/.test(String(body["FROM"]))) return "INVALID_SENDER_FOR_MASTER";
+  if (/^SIMOT-AI-[0-9]{2}$/.test(String(body["TO"])) && body["FROM"] !== "SIMOT-MASTER") return "INVALID_SENDER_FOR_WORKER";
   if (!TYPES.has(body["TYPE"])) return "INVALID_TYPE";
   if (!PRIORITIES.has(body["PRIORITY"])) return "INVALID_PRIORITY";
   if (!AUTHORITIES.has(body["AUTHORITY"])) return "INVALID_AUTHORITY";
@@ -208,7 +210,7 @@ export default {
           "UPDATE idempotency SET result_status = ? WHERE msg_id = ?"
         ).bind("WAITING", msgId).run();
 
-        message.retry();
+        message.ack();
       } catch (error) {
         await recordEvent(env, {
           id: crypto.randomUUID(), msg_id: msgId || "UNKNOWN", corr_id: corrId,
