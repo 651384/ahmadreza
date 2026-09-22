@@ -37,3 +37,8 @@ test("minimal context strips large content", () => {
   assert.equal("name" in minimal, false);
   assert.equal("size_bytes" in minimal, false);
 });
+
+
+test("minimal context fails closed on invalid reference", () => {
+  assert.throws(() => buildMinimalMemoryContext([{memory_ref:"BAD"}]), /MISSING_MEMORY_SOURCE/);
+});
