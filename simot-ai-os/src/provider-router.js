@@ -19,8 +19,8 @@ export function assertFreeOnly(provider) {
   if (provider.verified_free !== true) {
     throw new ProviderRouterError("FREE_STATUS_UNVERIFIED", "Provider free status is not verified at activation time.");
   }
-  if (provider.payment_enabled === true) {
-    throw new ProviderRouterError("PAYMENT_ENABLED", "Provider payment must be disabled before activation.");
+  if (provider.payment_enabled !== false) {
+    throw new ProviderRouterError("PAYMENT_STATE_UNVERIFIED", "Provider payment-disabled state must be explicitly verified before activation.");
   }
   return true;
 }
@@ -62,7 +62,7 @@ export function createRouter(registry) {
       );
     },
     async health() {
-      return registry.map((provider) => ({
+      return (Array.isArray(registry) ? registry : []).map((provider) => ({
         provider: provider.id,
         status: provider.enabled === true && provider.verified_free === true ? "ELIGIBLE" : "UNAVAILABLE"
       }));
