@@ -30,8 +30,8 @@ test("blocks commitments before dispatch", () => {
     authority:"APPROVAL_REQUIRED",
     worker_id:"SIMOT-AI-02"
   });
-  assert.equal(result.status, "REJECTED");
-  assert.equal(result.error_code, "WORKER_CAPABILITY_MISMATCH");
+  assert.equal(result.status, "BLOCKED");
+  assert.equal(result.error_code, "COMMITMENT_GATE");
 });
 
 test("does not guess missing routing inputs", () => {
