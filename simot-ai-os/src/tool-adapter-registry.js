@@ -9,6 +9,8 @@ const ADAPTERS = Object.freeze([
       "search_drive_items",
       "list_drive_item_children",
       "get_drive_item",
+      "fetch",
+      "fetch_raw_file",
       "list_item_versions"
     ],
     mode: "READ",
@@ -130,5 +132,7 @@ export const TOOL_ADAPTER_REGISTRY_CONTRACT = Object.freeze({
   default_authority: "INFORMATIONAL",
   fail_closed: true,
   reference_first: true,
-  write_activation_requires_separate_gate: true
+  write_activation_requires_separate_gate: true,
+  raw_binary_retrieval: true,
+  image_processing_requires_downstream_capability: true
 });
