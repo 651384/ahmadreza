@@ -3,13 +3,16 @@ main = "src/worker.js"
 compatibility_date = "2026-09-21"
 
 [vars]
-SIMOT_RUNTIME_VERSION = "0.1.0"
+SIMOT_RUNTIME_VERSION = "0.2.1"
 SIMOT_DEFAULT_STATE = "MANUAL"
+
+[triggers]
+crons = ["*/3 * * * *"]
 
 [[d1_databases]]
 binding = "SIMOT_DB"
 database_name = "simot-ai-os"
-database_id = "REPLACE_AFTER_D1_CREATION"
+database_id = "6bb8ae5c-df7d-4c4b-bf0d-bdd73857a480"
 
 [[queues.producers]]
 binding = "SIMOT_QUEUE"
@@ -19,3 +22,5 @@ queue = "simot-events"
 queue = "simot-events"
 max_batch_size = 10
 max_batch_timeout = 5
+max_retries = 3
+dead_letter_queue = "simot-events-dlq"

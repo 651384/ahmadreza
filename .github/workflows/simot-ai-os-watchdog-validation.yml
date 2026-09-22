@@ -1,0 +1,36 @@
+name: SIMOT AI OS Watchdog Validation
+
+on:
+  push:
+    branches:
+      - simot-ai-ai-os/watchdog-control-plane
+      - simot-ai-os/watchdog-control-plane
+    paths:
+      - "simot-ai-os/**"
+      - ".github/workflows/simot-ai-os-watchdog-validation.yml"
+  pull_request:
+    paths:
+      - "simot-ai-os/**"
+      - ".github/workflows/simot-ai-os-watchdog-validation.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: simot-ai-os
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run deterministic tests
+        run: npm test
+      - name: Validate Wrangler configuration
+        run: npx --yes wrangler@latest deploy --dry-run --outdir=.wrangler-dry-run
