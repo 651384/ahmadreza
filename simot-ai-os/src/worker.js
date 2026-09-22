@@ -210,7 +210,7 @@ export default {
         }
 
         // Provider execution/router is intentionally not implemented in this foundation.
-        // Do not claim completion. Leave the message retryable until an execution handler exists.
+        // Do not claim completion. Record WAITING as recoverable state; ACK prevents endless queue retries until an execution handler exists.
         await recordEvent(env, {
           id: crypto.randomUUID(), msg_id: msgId, corr_id: corrId,
           type: body["TYPE"], status: "WAITING",
