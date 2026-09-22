@@ -77,7 +77,7 @@ if(url.pathname==="/controller/heartbeat"&&request.method==="POST"){
   try{
     await ensureWatchdogTables(env);
     const t=now();
-    await env.SIMOT_DB.prepare("INSERT INTO controller_heartbeat(id,status,instance_id,last_heartbeat_at,current_operation,state_version) VALUES(1,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET status=excluded.status,instance_id=excluded.instance_id,last_heartbeat_at=excluded.last_heartbeat_at,current_operation=excluded.current_operation,state_version=excluded.state_version")
+    await env.SIMOT_DB.prepare("INSERT INTO controller_heartbeat(id,status,instance_id,last_heartbeat_at,current_operation,state_version) VALUES(1,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET status=excluded.status,instance_id=excluded.instance_id,last_heartbeat_at=excluded.last_heartbeat_at,current_operation=excluded.current_operation,state_version=excluded.state_version")
       .bind(heartbeat.status,heartbeat.instance_id,t,heartbeat.current_operation,heartbeat.state_version).run();
     return json({ok:true,status:heartbeat.status,last_heartbeat_at:t});
   }catch(error){return json({ok:false,error:"HEARTBEAT_PERSIST_FAILED"},503);}
