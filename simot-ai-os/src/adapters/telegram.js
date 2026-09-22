@@ -27,13 +27,14 @@ export function normalizeTelegramUpdate(update) {
   const source = update[updateType];
   const message = source?.message || source;
   const text = textOfMessage(message);
+  const sender = source?.from || message?.from;
 
   return {
     channel: "TELEGRAM",
     update_type: updateType,
     external_update_id: String(update.update_id ?? ""),
     chat_id: message?.chat?.id != null ? String(message.chat.id) : null,
-    sender_id: message?.from?.id != null ? String(message.from.id) : null,
+    sender_id: sender?.id != null ? String(sender.id) : null,
     text,
     raw: update
   };
