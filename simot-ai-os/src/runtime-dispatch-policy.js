@@ -76,7 +76,13 @@ export function planRuntimeDispatch(input = {}) {
       restricted_party_concern: input.restricted_party_concern
     });
 
-    if (workerPlan.decision !== "ALLOWED") return workerPlan;
+    if (workerPlan.decision !== "ALLOWED") {
+      return {
+        status: workerPlan.decision,
+        ...workerPlan
+      };
+    }
+
     return {
       status: "PENDING",
       worker_id: masterPlan.worker_id,
