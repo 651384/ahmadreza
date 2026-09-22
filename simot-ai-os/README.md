@@ -5,7 +5,7 @@ Serverless runtime foundation for SIMOT-MASTER and bounded Workers. The runtime 
 ## Current phase
 SIMOT-MSG v2 gateway foundation + channel-adapter contract layer. The runtime validates the controlled envelope, performs duplicate protection, records operational state in D1, and queues accepted messages.
 
-Telegram adapter foundation is present at `src/adapters/telegram.js`. It normalizes supported Telegram update shapes and constructs a provider-neutral outbound `sendMessage` request shape. The adapter is currently isolated from live Worker transport/authentication and does not store or invoke a bot token.
+Telegram adapter and controlled webhook boundary are present. `src/adapters/telegram.js` normalizes supported Telegram update shapes, maps them into the SIMOT-MSG v2 envelope, and constructs a provider-neutral outbound `sendMessage` request shape. The Worker exposes `/telegram/webhook` only when the secret `TELEGRAM_WEBHOOK_SECRET` is configured; requests must supply the matching `X-Telegram-Bot-Api-Secret-Token` header. The webhook stores no token in source and does not call the Telegram Bot API.
 
 Provider/model execution is intentionally not enabled in this package yet. Messages reaching the queue without an execution handler remain explicitly **WAITING** and are not reported as completed.
 
