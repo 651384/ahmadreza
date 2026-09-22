@@ -1,0 +1,31 @@
+name: SIMOT AI OS Validation
+
+on:
+  push:
+    branches:
+      - simot-ai-os/runtime-v2-gateway
+  pull_request:
+    paths:
+      - "simot-ai-os/**"
+      - ".github/workflows/simot-ai-os-validation.yml"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: simot-ai-os
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run deterministic tests
+        run: npm test
+
+      - name: Validate Wrangler configuration
+        run: npx wrangler deploy --dry-run --config wrangler.toml
