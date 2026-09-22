@@ -3,7 +3,9 @@
 Serverless runtime foundation for SIMOT-MASTER and bounded Workers. The runtime is intentionally independent of Codex and of any single developer tool.
 
 ## Current phase
-SIMOT-MSG v2 gateway foundation. The runtime validates the controlled envelope, performs duplicate protection, records operational state in D1, and queues accepted messages.
+SIMOT-MSG v2 gateway foundation + channel-adapter contract layer. The runtime validates the controlled envelope, performs duplicate protection, records operational state in D1, and queues accepted messages.
+
+Telegram adapter foundation is present at `src/adapters/telegram.js`. It normalizes supported Telegram update shapes and constructs a provider-neutral outbound `sendMessage` request shape. The adapter is currently isolated from live Worker transport/authentication and does not store or invoke a bot token.
 
 Provider/model execution is intentionally not enabled in this package yet. Messages reaching the queue without an execution handler remain explicitly **WAITING** and are not reported as completed.
 
