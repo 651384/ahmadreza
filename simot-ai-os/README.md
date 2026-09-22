@@ -18,5 +18,5 @@ The message envelope is an application-level protocol, not cryptographic authent
 ## Current limitations
 - Cloudflare D1 and Queue resources are not provisioned by this repository.
 - `wrangler.toml` contains a placeholder D1 ID until an approved D1 resource exists.
-- Provider router/execution is not implemented.
+- Provider router execution is not enabled; a free-only normalized router foundation now exists in `src/provider-router.js` and fails closed unless free status, data-class eligibility and payment-disabled conditions are verified.
 - Production deployment requires runtime configuration and acceptance tests against the actual Cloudflare environment.
