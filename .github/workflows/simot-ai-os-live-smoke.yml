@@ -1,0 +1,40 @@
+name: SIMOT AI OS Live Smoke
+
+on:
+  push:
+    branches:
+      - simot-ai-os/runtime-v2-gateway
+  workflow_dispatch:
+
+jobs:
+  live-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify live health endpoint
+        env:
+          URL: https://simot-ai-os-gateway.vahid-ahmadreza.workers.dev
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --retry 5 --retry-delay 3 "$URL/health" -o health.json
+          node - <<'NODE'
+          const fs = require("fs");
+          const body = JSON.parse(fs.readFileSync("health.json", "utf8"));
+          if (body.service !== "simot-ai-os-gateway") throw new Error("Unexpected service");
+          if (body.version !== "0.2.1") throw new Error("Unexpected runtime version");
+          if (body.state !== "MANUAL") throw new Error("Unexpected runtime state");
+          console.log(JSON.stringify(body));
+          NODE
+
+      - name: Verify Telegram webhook remains fail-closed
+        env:
+          URL: https://simot-ai-os-gateway.vahid-ahmadreza.workers.dev
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error             -X POST             -H "content-type: application/json"             -d '{"update_id":999999,"message":{"chat":{"id":1},"from":{"id":2},"text":"smoke"}}'             "$URL/telegram/webhook" -o telegram.json -w "%{http_code}" > telegram.status
+          test "$(cat telegram.status)" = "503"
+          node - <<'NODE'
+          const fs = require("fs");
+          const body = JSON.parse(fs.readFileSync("telegram.json", "utf8"));
+          if (body.error !== "TELEGRAM_WEBHOOK_NOT_CONFIGURED") throw new Error("Telegram webhook is not fail-closed");
+          console.log(JSON.stringify(body));
+          NODE
