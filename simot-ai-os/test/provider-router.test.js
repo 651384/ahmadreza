@@ -51,3 +51,36 @@ test("fails closed when no eligible provider exists", () => {
     (error) => error.code === "NO_FREE_PROVIDER"
   );
 });
+
+test("health marks providers eligible only when the full free-only policy passes", async () => {
+  const { createRouter } = await import("../src/provider-router.js");
+  const health = await createRouter([
+    {
+      id: "eligible",
+      enabled: true,
+      access_class: "API_FREE",
+      verified_free: true,
+      payment_enabled: false
+    },
+    {
+      id: "paid-state",
+      enabled: true,
+      access_class: "API_FREE",
+      verified_free: true,
+      payment_enabled: true
+    },
+    {
+      id: "disabled",
+      enabled: false,
+      access_class: "API_FREE",
+      verified_free: true,
+      payment_enabled: false
+    }
+  ]).health();
+
+  assert.deepEqual(health, [
+    { provider: "eligible", status: "ELIGIBLE" },
+    { provider: "paid-state", status: "UNAVAILABLE", reason: "PAYMENT_STATE_UNVERIFIED" },
+    { provider: "disabled", status: "UNAVAILABLE", reason: "DISABLED" }
+  ]);
+});
