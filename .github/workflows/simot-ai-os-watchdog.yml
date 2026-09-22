@@ -1,0 +1,44 @@
+name: SIMOT AI OS Watchdog
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  watchdog:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check live runtime and watchdog state
+        env:
+          BASE_URL: https://simot-ai-os-gateway.vahid-ahmadreza.workers.dev
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --retry 3 --retry-delay 2 "$BASE_URL/health" -o health.json
+          curl --fail --silent --show-error --retry 3 --retry-delay 2 "$BASE_URL/watchdog/status" -o watchdog.json
+          node - <<'NODE'
+          const fs = require("fs");
+          const health = JSON.parse(fs.readFileSync("health.json", "utf8"));
+          const watchdog = JSON.parse(fs.readFileSync("watchdog.json", "utf8"));
+          if (health.service !== "simot-ai-os-gateway") throw new Error("Unexpected service");
+          if (!watchdog.ok) throw new Error("Watchdog status unavailable");
+          console.log(JSON.stringify({health, watchdog}));
+          NODE
+
+      - name: Record recovery signal in Issue #3
+        if: ${{ success() }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WATCHDOG_FILE: watchdog.json
+        run: |
+          set -euo pipefail
+          state="$(node -p "JSON.parse(require('fs').readFileSync(process.env.WATCHDOG_FILE,'utf8')).state?.state || 'UNKNOWN'")"
+          action="$(node -p "JSON.parse(require('fs').readFileSync(process.env.WATCHDOG_FILE,'utf8')).state?.action || 'UNKNOWN'")"
+          if [ "$state" = "RECOVERY_REQUIRED" ] || [ "$state" = "STALE" ]; then
+            gh issue comment 3 --repo "${GITHUB_REPOSITORY}" --body "WATCHDOG SIGNAL — state=$state action=$action. This workflow is observational/recovery-signaling only; it does not bypass human gates, merge PRs, insert secrets, or activate providers."
+          fi
