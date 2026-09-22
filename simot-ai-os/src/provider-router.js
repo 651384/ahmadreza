@@ -62,10 +62,17 @@ export function createRouter(registry) {
       );
     },
     async health() {
-      return (Array.isArray(registry) ? registry : []).map((provider) => ({
-        provider: provider.id,
-        status: provider.enabled === true && provider.verified_free === true ? "ELIGIBLE" : "UNAVAILABLE"
-      }));
+      return (Array.isArray(registry) ? registry : []).map((provider) => {
+        if (provider?.enabled !== true) {
+          return { provider: provider?.id, status: "UNAVAILABLE", reason: "DISABLED" };
+        }
+        try {
+          assertFreeOnly(provider);
+          return { provider: provider.id, status: "ELIGIBLE" };
+        } catch (error) {
+          return { provider: provider?.id, status: "UNAVAILABLE", reason: error.code || "INELIGIBLE" };
+        }
+      });
     }
   };
 }
