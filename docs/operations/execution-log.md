@@ -34,3 +34,9 @@
 4. Verify Queue/DLQ lifecycle.
 5. Review and resolve PR #5 now that the underlying deployment drift is corrected.
 6. Continue remaining SIMOT-AI OS acceptance gates and record every result here and in Issue #3.
+
+
+## RUN 0020 — Worker activation deployment trigger
+- Cloud-first runtime activation code is merged to master.
+- Cloudflare production is expected to follow the canonical master branch; a fresh master commit is used to trigger and verify the final deployment.
+- Live verification before this trigger showed `/health` ACTIVE but `/workers/status` still on the earlier deployed commit, so deployment parity remains OPEN until the new build is observed.
