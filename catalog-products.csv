@@ -1,0 +1,14 @@
+id,name,category,subcategory,sourcePage,image,status
+mechanical-bed-parak,Parak Mechanical Hospital Bed,Hospital beds,Mechanical,1,catalog/assets/mechanical-bed.png,documented
+overbed-table-ghaza,Ghaza Overbed Table,Patient room furniture,Overbed tables,1,catalog/assets/overbed-table.png,documented
+bedside-cabinet,Bedside Cabinet,Patient room furniture,Bedside cabinets,1,catalog/assets/bedside-cabinet.png,documented
+bed-step,Bedside Step,Patient room furniture,Bedside steps,1,catalog/assets/bed-step.png,documented
+bed-electric-2-vip,VIP Electric Hospital Bed - 2 Motor,Hospital beds,Electric 2 motor,2,catalog/assets/bed-1.png,documented
+bed-electric-3-vip,VIP Electric Hospital Bed - 3 Motor,Hospital beds,Electric 3 motor,2,catalog/assets/bed-2.png,documented
+bed-electric-4-icu-vip,VIP Electric ICU/CCU Bed - 4 Motor,Hospital beds,Electric 4 motor ICU/CCU,2,catalog/assets/bed-3.png,documented
+bed-electric-2-rail,Electric Hospital Bed with Simple Side Rails - 2 Motor,Hospital beds,Electric 2 motor,2,catalog/assets/bed-4.png,documented
+bed-electric-3-rail,Electric Hospital Bed with Simple Side Rails - 3 Motor,Hospital beds,Electric 3 motor,2,catalog/assets/bed-5.png,documented
+bed-electric-4-icu-rail,Electric ICU/CCU Bed with Simple Side Rails - 4 Motor,Hospital beds,Electric 4 motor ICU/CCU,2,catalog/assets/bed-6.png,documented
+bed-electric-2-simple,Simple Electric Hospital Bed - 2 Motor,Hospital beds,Electric 2 motor,2,catalog/assets/bed-7.png,documented
+bed-electric-3-simple,Simple Electric Hospital Bed - 3 Motor,Hospital beds,Electric 3 motor,2,catalog/assets/bed-8.png,documented
+bed-electric-4-icu-simple,Simple Electric ICU/CCU Bed - 4 Motor,Hospital beds,Electric 4 motor ICU/CCU,2,catalog/assets/bed-9.png,documented
