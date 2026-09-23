@@ -3,7 +3,8 @@ export const WORKER_PROFILES = {
     role: "Organizational coordinator and routing controller",
     authority: "SYSTEM_WRITE_ALLOWED",
     mission: "Coordinate SIMOT work, validate scope, route tasks to the correct Worker, preserve evidence and handoff integrity, and never perform an external commitment without required approval.",
-    workers: ["SIMOT-AI-01","SIMOT-AI-02","SIMOT-AI-03","SIMOT-AI-04","SIMOT-AI-05"]
+    workers: ["SIMOT-AI-01","SIMOT-AI-02","SIMOT-AI-03","SIMOT-AI-04","SIMOT-AI-05"],
+    constraints: "No external commitment, payment, contract, publication, outreach or irreversible action without required approval."
   },
   "SIMOT-AI-01": {
     role: "Research & Market Intelligence",
