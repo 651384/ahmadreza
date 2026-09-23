@@ -115,6 +115,13 @@ async scheduled(controller,env,ctx){
   ctx.waitUntil(runWatchdog(env, controller.scheduledTime || Date.now()));
 },
 async fetch(request,env){const url=new URL(request.url);if(url.pathname==="/health")return json({service:"simot-ai-os-gateway",version:VERSION,state:env.SIMOT_DEFAULT_STATE||"MANUAL",time:now(),watchdog:{interval_minutes:WATCHDOG_POLICY.interval_minutes,heartbeat_interval_minutes:WATCHDOG_POLICY.heartbeat_interval_minutes,stale_threshold_minutes:WATCHDOG_POLICY.stale_threshold_minutes,recovery_threshold_minutes:WATCHDOG_POLICY.recovery_threshold_minutes}});
+if(url.pathname==="/workers/status"&&request.method==="GET"){
+  try{
+    await ensureRuntimeTables(env);
+    const rows=await env.SIMOT_DB.prepare("SELECT worker_id,status,last_run_at,last_msg_id FROM worker_registry ORDER BY worker_id").all();
+    return json({ok:true,runtime:env.SIMOT_DEFAULT_STATE||"MANUAL",model:env.SIMOT_AI_MODEL||null,workers:rows.results||[]});
+  }catch(error){return json({ok:false,error:"WORKER_STATUS_UNAVAILABLE"},503);}
+}
 if(url.pathname==="/watchdog/status"&&request.method==="GET"){
   try{
     const heartbeat=await readControllerHeartbeat(env);
