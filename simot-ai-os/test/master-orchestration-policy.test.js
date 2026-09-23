@@ -45,6 +45,35 @@ test("capability registry is explicit", () => {
   assert.ok(registry.every(x => Array.isArray(x.tools)));
 });
 
+test("capability registry covers every executable non-master worker", () => {
+  const registry = new Set(listCapabilities().map(x => x.worker_id));
+  for (const id of ["SIMOT-AI-01","SIMOT-AI-02","SIMOT-AI-03","SIMOT-AI-04","SIMOT-AI-05"]) {
+    assert.ok(registry.has(id), "missing capability entry: " + id);
+  }
+});
+
+test("routes sales qualification to AI-05", () => {
+  const result = planMasterRoute({
+    domain: "SALES",
+    action: "QUALIFICATION",
+    authority: "EXECUTE_WITHIN_ROLE"
+  });
+  assert.equal(result.status, "PENDING");
+  assert.equal(result.worker_id, "SIMOT-AI-05");
+  assert.equal(result.execution, "BOUNDED");
+});
+
+test("AI-05 external contact stays behind the commitment gate", () => {
+  const result = planMasterRoute({
+    domain: "SALES",
+    action: "EXTERNAL_CONTACT",
+    authority: "APPROVAL_REQUIRED",
+    worker_id: "SIMOT-AI-05"
+  });
+  assert.equal(result.status, "BLOCKED");
+  assert.equal(result.error_code, "COMMITMENT_GATE");
+});
+
 import { MASTER_ORCHESTRATION_CONTRACT } from "../src/master-orchestration-policy.js";
 
 test("Master contract preserves strict authority", () => {

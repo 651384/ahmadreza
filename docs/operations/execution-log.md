@@ -42,3 +42,24 @@
 - Live verification before this trigger showed `/health` ACTIVE but `/workers/status` still on the earlier deployed commit, so deployment parity remains OPEN until the new build is observed.
 
 - E2E smoke mode now explicitly suppresses inter-worker routing to prevent test fan-out.
+
+## RUN 0021 — Cloud-native controller, AI-05 routing, CI/doc reconciliation
+**Date:** 2026-09-23  
+**State:** IMPLEMENTED (pending live deployment verification)
+
+### Changes
+- Runtime v0.3.0 → v0.4.0.
+- Cloud-native controller: `SIMOT_CONTROLLER_MODE=CLOUD` in `wrangler.toml`; the cron `scheduled()` handler now emits a `CLOUD-CRON:*` controller heartbeat via `planCloudHeartbeat()` (`src/watchdog.js`) before each watchdog run. External ACTIVE controllers are never overwritten; external IDLE or absent controllers are taken over. `/watchdog/status` now reports `controller_mode`.
+- SIMOT-AI-05 added to `WORKER_CAPABILITIES` in `master-orchestration-policy.js` (SALES/BUSINESS_DEVELOPMENT/PROSPECTING/ACCOUNT); `EXTERNAL_CONTACT` remains hard-blocked by COMMITMENT_GATE.
+- Live-smoke workflow no longer asserts a hardcoded version (was stale at 0.2.1); it now checks deployed `/health` version against `SIMOT_RUNTIME_VERSION` in `wrangler.toml`, with polling for Cloudflare Builds propagation, and accepts 401 as fail-closed for the Telegram probe.
+- Removed dead nested workflow `simot-ai-os/.github/workflows/runtime-validation.yml` (never executed at that path; redundant with root validation workflow).
+- README and cloud-first architecture doc reconciled with the deployed architecture (D1/Queues provisioned, Workers AI execution active under daily quota guard).
+- Arena integration: NOT implemented — no documented callable Arena API exists; decision recorded in `simot-ai-os/docs/arena-integration-status.md`.
+
+### Safety
+No secrets added or changed. All fail-closed gates (Telegram webhook, heartbeat secret, provider free-only router, commitment gate, AI daily quota) preserved and covered by tests.
+
+### Open verification (requires deployment of this commit)
+1. Observe live `/health` version 0.4.0 after Cloudflare Builds deploys master.
+2. Observe live `/watchdog/status` transitioning from `controller_status: IDLE` to `ACTIVE` with `instance_id` prefix `CLOUD-CRON:` within one 3-minute cron cycle.
+3. Confirm GitHub live-smoke and worker-E2E workflows pass against the new deployment.

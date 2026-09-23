@@ -3,8 +3,13 @@ main = "src/worker.js"
 compatibility_date = "2026-09-21"
 
 [vars]
-SIMOT_RUNTIME_VERSION = "0.3.0"
+SIMOT_RUNTIME_VERSION = "0.4.0"
 SIMOT_DEFAULT_STATE = "ACTIVE"
+# CLOUD: the deployed Worker cron emits its own controller heartbeat, removing
+# any dependency on a local/external controller process. EXTERNAL (or unset)
+# preserves the previous behavior where only POST /controller/heartbeat feeds
+# the watchdog.
+SIMOT_CONTROLLER_MODE = "CLOUD"
 SIMOT_AI_MODEL = "@cf/zai-org/glm-4.7-flash"
 SIMOT_AI_MAX_REQUESTS_PER_DAY = "200"
 SIMOT_AI_MAX_INPUT_CHARS = "6000"
