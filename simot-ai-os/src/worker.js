@@ -104,7 +104,7 @@ async function executeWorkerMessage(env,body){
   const result=await env.AI.run(model,{prompt,max_tokens:Number(env.SIMOT_AI_MAX_OUTPUT_TOKENS||500),temperature:0.1,seed:7});
   const text=extractAIText(result);
   let parsed; try{parsed=JSON.parse(text);}catch{parsed={result_status:"COMPLETED",summary:text,findings:[],evidence:[],gaps:["Model returned non-JSON output; manual normalization required."],confidence:"LOW",verification:"AI-INFERRED",next_action:"NORMALIZE_AND_REVIEW",route_to:"SIMOT-MASTER"};}
-  const route=EXECUTABLE_WORKERS.includes(parsed.route_to)?parsed.route_to:(parsed.route_to==="SIMOT-MASTER"?"SIMOT-MASTER":"NONE");
+  const route=body["SCOPE"]==="E2E_SMOKE"?"NONE":(EXECUTABLE_WORKERS.includes(parsed.route_to)?parsed.route_to:(parsed.route_to==="SIMOT-MASTER"?"SIMOT-MASTER":"NONE"));
   return {worker_id:workerId,model,result:parsed,route_to:route,quota};
 }
 function safeBody(body){const copy={...body};if(copy.SECRET)delete copy.SECRET;if(copy["API-KEY"])delete copy["API-KEY"];if(copy["PRIVATE-KEY"])delete copy["PRIVATE-KEY"];if(copy.PASSWORD)delete copy.PASSWORD;return copy;}
