@@ -40,3 +40,5 @@
 - Cloud-first runtime activation code is merged to master.
 - Cloudflare production is expected to follow the canonical master branch; a fresh master commit is used to trigger and verify the final deployment.
 - Live verification before this trigger showed `/health` ACTIVE but `/workers/status` still on the earlier deployed commit, so deployment parity remains OPEN until the new build is observed.
+
+- E2E smoke mode now explicitly suppresses inter-worker routing to prevent test fan-out.
