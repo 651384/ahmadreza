@@ -3,6 +3,7 @@ name: SIMOT AI OS Live Smoke
 on:
   push:
     branches:
+      - master
       - simot-ai-os/runtime-v2-gateway
   workflow_dispatch:
 
@@ -21,7 +22,25 @@ jobs:
           const body = JSON.parse(fs.readFileSync("health.json", "utf8"));
           if (body.service !== "simot-ai-os-gateway") throw new Error("Unexpected service");
           if (body.version !== "0.2.1") throw new Error("Unexpected runtime version");
-          if (body.state !== "MANUAL") throw new Error("Unexpected runtime state");
+          if (body.state !== "ACTIVE") throw new Error("Unexpected runtime state");
+          console.log(JSON.stringify(body));
+          NODE
+
+
+      - name: Verify worker registry is active
+        env:
+          URL: https://simot-ai-os-gateway.vahid-ahmadreza.workers.dev
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --retry 5 --retry-delay 3 "$URL/workers/status" -o workers.json
+          node - <<'NODE'
+          const fs = require("fs");
+          const body = JSON.parse(fs.readFileSync("workers.json", "utf8"));
+          const ids = new Set((body.workers || []).filter(x => x.status === "ACTIVE").map(x => x.worker_id));
+          for (const id of ["SIMOT-MASTER","SIMOT-AI-01","SIMOT-AI-02","SIMOT-AI-03","SIMOT-AI-04","SIMOT-AI-05"]) {
+            if (!ids.has(id)) throw new Error("Worker not active: " + id);
+          }
+          if (body.runtime !== "ACTIVE") throw new Error("Runtime is not ACTIVE");
           console.log(JSON.stringify(body));
           NODE
 

@@ -3,6 +3,7 @@ name: SIMOT AI OS Validation
 on:
   push:
     branches:
+      - master
       - simot-ai-os/runtime-v2-gateway
   pull_request:
     paths:

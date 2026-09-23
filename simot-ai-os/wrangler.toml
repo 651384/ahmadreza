@@ -3,8 +3,15 @@ main = "src/worker.js"
 compatibility_date = "2026-09-21"
 
 [vars]
-SIMOT_RUNTIME_VERSION = "0.2.1"
-SIMOT_DEFAULT_STATE = "MANUAL"
+SIMOT_RUNTIME_VERSION = "0.3.0"
+SIMOT_DEFAULT_STATE = "ACTIVE"
+SIMOT_AI_MODEL = "@cf/zai-org/glm-4.7-flash"
+SIMOT_AI_MAX_REQUESTS_PER_DAY = "200"
+SIMOT_AI_MAX_INPUT_CHARS = "6000"
+SIMOT_AI_MAX_OUTPUT_TOKENS = "500"
+
+[ai]
+binding = "AI"
 
 [triggers]
 crons = ["*/3 * * * *"]
