@@ -1,7 +1,7 @@
 import { normalizeTelegramUpdate, buildTelegramEnvelope } from "./adapters/telegram.js";
-import { evaluateWatchdog, normalizeHeartbeat, WATCHDOG_POLICY, buildWatchdogRecord } from "./watchdog.js";
+import { evaluateWatchdog, normalizeHeartbeat, WATCHDOG_POLICY, buildWatchdogRecord, planCloudHeartbeat, CLOUD_CONTROLLER } from "./watchdog.js";
 import { getWorkerProfile, EXECUTABLE_WORKERS } from "./worker_profiles.js";
-const VERSION = "0.3.0";
+const VERSION = "0.4.0";
 // Cloudflare Builds trigger marker — no runtime behavior change.
 // Build configuration is managed by Cloudflare Workers Builds.
 const RECIPIENT_RE = /^(SIMOT-MASTER|SIMOT-AI-[0-9]{2})$/;
@@ -35,6 +35,24 @@ async function persistWatchdogState(env, record){
   await ensureWatchdogTables(env);
   await env.SIMOT_DB.prepare("INSERT INTO watchdog_state(id,checked_at,state,action,controller_status,age_ms,reason) VALUES(1,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET checked_at=excluded.checked_at,state=excluded.state,action=excluded.action,controller_status=excluded.controller_status,age_ms=excluded.age_ms,reason=excluded.reason")
     .bind(record.checked_at,record.state,record.action,record.controller_status,record.age_ms,record.reason).run();
+}
+async function persistControllerHeartbeat(env, heartbeat, at){
+  await ensureWatchdogTables(env);
+  await env.SIMOT_DB.prepare("INSERT INTO controller_heartbeat(id,status,instance_id,last_heartbeat_at,current_operation,state_version) VALUES(1,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET status=excluded.status,instance_id=excluded.instance_id,last_heartbeat_at=excluded.last_heartbeat_at,current_operation=excluded.current_operation,state_version=excluded.state_version")
+    .bind(heartbeat.status,heartbeat.instance_id,at,heartbeat.current_operation,heartbeat.state_version).run();
+}
+async function maybeEmitCloudHeartbeat(env, scheduledAt = Date.now()){
+  if(String(env.SIMOT_CONTROLLER_MODE||"").toUpperCase()!=="CLOUD")return {emit:false,reason:"CONTROLLER_MODE_NOT_CLOUD"};
+  const existing = await readControllerHeartbeat(env);
+  const plan = planCloudHeartbeat({
+    existing,
+    instanceId: CLOUD_CONTROLLER.instance_prefix+":"+(env.SIMOT_RUNTIME_VERSION||VERSION),
+    stateVersion: env.SIMOT_RUNTIME_VERSION||VERSION
+  });
+  if(plan.emit){
+    await persistControllerHeartbeat(env, plan.heartbeat, new Date(scheduledAt).toISOString());
+  }
+  return plan;
 }
 async function runWatchdog(env, scheduledAt = Date.now()){
   const heartbeat = await readControllerHeartbeat(env);
@@ -112,7 +130,11 @@ async function recordEvent(env,event){await env.SIMOT_DB.prepare("INSERT INTO ev
 export default {
 async scheduled(controller,env,ctx){
   if(!env.SIMOT_DB){ controller.noRetry?.(); return; }
-  ctx.waitUntil(runWatchdog(env, controller.scheduledTime || Date.now()));
+  const scheduledAt = controller.scheduledTime || Date.now();
+  ctx.waitUntil((async()=>{
+    await maybeEmitCloudHeartbeat(env, scheduledAt);
+    await runWatchdog(env, scheduledAt);
+  })());
 },
 async fetch(request,env){const url=new URL(request.url);if(url.pathname==="/health")return json({service:"simot-ai-os-gateway",version:VERSION,state:env.SIMOT_DEFAULT_STATE||"MANUAL",time:now(),watchdog:{interval_minutes:WATCHDOG_POLICY.interval_minutes,heartbeat_interval_minutes:WATCHDOG_POLICY.heartbeat_interval_minutes,stale_threshold_minutes:WATCHDOG_POLICY.stale_threshold_minutes,recovery_threshold_minutes:WATCHDOG_POLICY.recovery_threshold_minutes}});
 if(url.pathname==="/workers/status"&&request.method==="GET"){
@@ -127,7 +149,7 @@ if(url.pathname==="/watchdog/status"&&request.method==="GET"){
     const heartbeat=await readControllerHeartbeat(env);
     await ensureWatchdogTables(env);
     const state=await env.SIMOT_DB.prepare("SELECT checked_at,state,action,controller_status,age_ms,reason FROM watchdog_state WHERE id=1").first();
-    return json({ok:true,policy:WATCHDOG_POLICY,heartbeat:heartbeat||null,state:state||null});
+    return json({ok:true,policy:WATCHDOG_POLICY,controller_mode:String(env.SIMOT_CONTROLLER_MODE||"EXTERNAL").toUpperCase(),heartbeat:heartbeat||null,state:state||null});
   }catch(error){return json({ok:false,error:"WATCHDOG_STATUS_UNAVAILABLE"},503);}
 }
 if(url.pathname==="/controller/heartbeat"&&request.method==="POST"){

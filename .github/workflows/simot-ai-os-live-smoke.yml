@@ -11,21 +11,33 @@ jobs:
   live-smoke:
     runs-on: ubuntu-latest
     steps:
-      - name: Verify live health endpoint
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify live health endpoint matches repository runtime version
         env:
           URL: https://simot-ai-os-gateway.vahid-ahmadreza.workers.dev
         run: |
           set -euo pipefail
-          curl --fail --silent --show-error --retry 5 --retry-delay 3 "$URL/health" -o health.json
-          node - <<'NODE'
+          expected="$(grep -oP 'SIMOT_RUNTIME_VERSION\s*=\s*"\K[^"]+' simot-ai-os/wrangler.toml)"
+          echo "Expected runtime version from wrangler.toml: $expected"
+          # Poll to tolerate Cloudflare Builds deployment propagation after a push.
+          for attempt in $(seq 1 20); do
+            curl --fail --silent --show-error --retry 5 --retry-delay 3 "$URL/health" -o health.json
+            live="$(node -p "JSON.parse(require('fs').readFileSync('health.json','utf8')).version")"
+            echo "Attempt $attempt: live version = $live"
+            if [ "$live" = "$expected" ]; then break; fi
+            sleep 15
+          done
+          node - "$expected" <<'NODE'
           const fs = require("fs");
+          const expected = process.argv[2];
           const body = JSON.parse(fs.readFileSync("health.json", "utf8"));
           if (body.service !== "simot-ai-os-gateway") throw new Error("Unexpected service");
-          if (body.version !== "0.2.1") throw new Error("Unexpected runtime version");
+          if (body.version !== expected) throw new Error(`Deployed version ${body.version} does not match repository version ${expected}`);
           if (body.state !== "ACTIVE") throw new Error("Unexpected runtime state");
           console.log(JSON.stringify(body));
           NODE
-
 
       - name: Verify worker registry is active
         env:
@@ -49,11 +61,17 @@ jobs:
           URL: https://simot-ai-os-gateway.vahid-ahmadreza.workers.dev
         run: |
           set -euo pipefail
-          curl --silent --show-error             -X POST             -H "content-type: application/json"             -d '{"update_id":999999,"message":{"chat":{"id":1},"from":{"id":2},"text":"smoke"}}'             "$URL/telegram/webhook" -o telegram.json -w "%{http_code}" > telegram.status
-          test "$(cat telegram.status)" = "503"
+          curl --silent --show-error \
+            -X POST \
+            -H "content-type: application/json" \
+            -d '{"update_id":999999,"message":{"chat":{"id":1},"from":{"id":2},"text":"smoke"}}' \
+            "$URL/telegram/webhook" -o telegram.json -w "%{http_code}" > telegram.status
+          status="$(cat telegram.status)"
+          test "$status" = "503" || test "$status" = "401"
           node - <<'NODE'
           const fs = require("fs");
           const body = JSON.parse(fs.readFileSync("telegram.json", "utf8"));
-          if (body.error !== "TELEGRAM_WEBHOOK_NOT_CONFIGURED") throw new Error("Telegram webhook is not fail-closed");
+          const failClosed = body.error === "TELEGRAM_WEBHOOK_NOT_CONFIGURED" || body.error === "TELEGRAM_WEBHOOK_UNAUTHORIZED";
+          if (!failClosed) throw new Error("Telegram webhook is not fail-closed");
           console.log(JSON.stringify(body));
           NODE
