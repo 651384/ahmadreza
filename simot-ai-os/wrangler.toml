@@ -3,7 +3,8 @@ main = "src/worker.js"
 compatibility_date = "2026-09-21"
 
 [vars]
-SIMOT_RUNTIME_VERSION = "0.4.1"
+SIMOT_RUNTIME_VERSION = "0.4.2"
+SIMOT_EXECUTION_STANDARD_VERSION = "2.1.0"
 SIMOT_DEFAULT_STATE = "ACTIVE"
 # CLOUD: the deployed Worker cron emits its own controller heartbeat, removing
 # any dependency on a local/external controller process. EXTERNAL (or unset)
