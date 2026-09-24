@@ -178,7 +178,7 @@ async scheduled(controller,env,ctx){
   })());
 },
 async fetch(request,env){const url=new URL(request.url);if(url.pathname==="/cloudflare/management/status"&&request.method==="GET"){
-  try{await ensureCloudflareManagementTable(env);const row=await env.SIMOT_DB.prepare("SELECT checked_at,status,account_id,token_status,resources_json,error_code FROM cloudflare_management_probe WHERE id=1").first();return json({ok:true,management:row?{...row,resources:row.resources_json?JSON.parse(row.resources_json):null}:null});}catch(error){return json({ok:false,error:"CLOUDFLARE_MANAGEMENT_STATUS_UNAVAILABLE"},503);}
+  try{await ensureCloudflareManagementTable(env);const row=await env.SIMOT_DB.prepare("SELECT checked_at,status,account_id,token_status,resources_json,error_code FROM cloudflare_management_probe WHERE id=1").first();return json({ok:true,management:row?{...row,resources:row.resources_json?JSON.parse(row.resources_json):null,token_format_ok:typeof env.CLOUDFLARE_MANAGEMENT_API_TOKEN==="string" && env.CLOUDFLARE_MANAGEMENT_API_TOKEN.startsWith("cfat_")}:null});}catch(error){return json({ok:false,error:"CLOUDFLARE_MANAGEMENT_STATUS_UNAVAILABLE"},503);}
 }
 if(url.pathname==="/health")return json({service:"simot-ai-os-gateway",version:VERSION,state:env.SIMOT_DEFAULT_STATE||"MANUAL",time:now(),watchdog:{interval_minutes:WATCHDOG_POLICY.interval_minutes,heartbeat_interval_minutes:WATCHDOG_POLICY.heartbeat_interval_minutes,stale_threshold_minutes:WATCHDOG_POLICY.stale_threshold_minutes,recovery_threshold_minutes:WATCHDOG_POLICY.recovery_threshold_minutes}});
 if(url.pathname==="/workers/status"&&request.method==="GET"){
