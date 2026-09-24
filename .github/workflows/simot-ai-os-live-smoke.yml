@@ -1,4 +1,5 @@
 name: SIMOT AI OS Live Smoke
+# Control-plane verification uses the account-owned token verify endpoint.
 
 on:
   push:
@@ -11,21 +12,51 @@ jobs:
   live-smoke:
     runs-on: ubuntu-latest
     steps:
-      - name: Verify live health endpoint
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify live health endpoint matches repository runtime version
         env:
           URL: https://simot-ai-os-gateway.vahid-ahmadreza.workers.dev
         run: |
           set -euo pipefail
-          curl --fail --silent --show-error --retry 5 --retry-delay 3 "$URL/health" -o health.json
-          node - <<'NODE'
+          expected="$(grep -oP 'SIMOT_RUNTIME_VERSION\s*=\s*"\K[^"]+' simot-ai-os/wrangler.toml)"
+          echo "Expected runtime version from wrangler.toml: $expected"
+          # Poll to tolerate Cloudflare Builds deployment propagation after a push.
+          for attempt in $(seq 1 20); do
+            curl --fail --silent --show-error --retry 5 --retry-delay 3 "$URL/health" -o health.json
+            live="$(node -p "JSON.parse(require('fs').readFileSync('health.json','utf8')).version")"
+            echo "Attempt $attempt: live version = $live"
+            if [ "$live" = "$expected" ]; then break; fi
+            sleep 15
+          done
+          node - "$expected" <<'NODE'
           const fs = require("fs");
+          const expected = process.argv[2];
           const body = JSON.parse(fs.readFileSync("health.json", "utf8"));
           if (body.service !== "simot-ai-os-gateway") throw new Error("Unexpected service");
-          if (body.version !== "0.2.1") throw new Error("Unexpected runtime version");
+          if (body.version !== expected) throw new Error(`Deployed version ${body.version} does not match repository version ${expected}`);
           if (body.state !== "ACTIVE") throw new Error("Unexpected runtime state");
           console.log(JSON.stringify(body));
           NODE
 
+      - name: Verify locked execution standard and control-plane manifest
+        env:
+          URL: https://simot-ai-os-gateway.vahid-ahmadreza.workers.dev
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --retry 5 --retry-delay 3 "$URL/control-plane/manifest" -o manifest.json
+          node - <<'NODE'
+          const fs = require("fs");
+          const body = JSON.parse(fs.readFileSync("manifest.json", "utf8"));
+          if (!body.ok) throw new Error("Control-plane manifest unavailable");
+          if (body.standard_id !== "SOT-ARCH-LOCAL-PC-001") throw new Error("Unexpected standard id");
+          if (body.manifest.execution_standard.version !== "2.1.0") throw new Error("Unexpected execution standard version");
+          if (body.manifest.execution_standard.control_plane !== "CLOUDFLARE") throw new Error("Unexpected control plane");
+          if (body.manifest.execution_standard.local_pc_dependency !== false) throw new Error("Local PC dependency is not false");
+          if (!body.manifest.instructions.some(x => x.id === "INST-001" && x.enforcement === "RUNTIME_GATE")) throw new Error("Mandatory preflight rule missing");
+          console.log(JSON.stringify({standard_id:body.standard_id, version:body.manifest.execution_standard.version, control_plane:body.manifest.execution_standard.control_plane}));
+          NODE
 
       - name: Verify worker registry is active
         env:
@@ -44,16 +75,44 @@ jobs:
           console.log(JSON.stringify(body));
           NODE
 
+
+      - name: Verify Cloudflare management control plane
+        env:
+          URL: https://simot-ai-os-gateway.vahid-ahmadreza.workers.dev
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --retry 5 --retry-delay 3 "$URL/cloudflare/management/status" -o management.json
+          node - <<'NODE'
+          const fs = require("fs");
+          const body = JSON.parse(fs.readFileSync("management.json", "utf8"));
+          console.log("Cloudflare management response:", JSON.stringify(body));
+          const m = body.management;
+          if (!body.ok || !m) throw new Error("Cloudflare management status unavailable");
+          if (m.status !== "VERIFIED") throw new Error("Cloudflare management is not VERIFIED: " + m.status);
+          if (m.token_status !== "active") throw new Error("Cloudflare management token is not active");
+          const required = ["token","workers","d1","queues","workflows","secrets"];
+          for (const key of required) {
+            if (m.resources?.[key]?.success !== true) throw new Error("Cloudflare resource check failed: " + key);
+          }
+          console.log(JSON.stringify({status:m.status, token_status:m.token_status, checked_at:m.checked_at}));
+          NODE
+
       - name: Verify Telegram webhook remains fail-closed
         env:
           URL: https://simot-ai-os-gateway.vahid-ahmadreza.workers.dev
         run: |
           set -euo pipefail
-          curl --silent --show-error             -X POST             -H "content-type: application/json"             -d '{"update_id":999999,"message":{"chat":{"id":1},"from":{"id":2},"text":"smoke"}}'             "$URL/telegram/webhook" -o telegram.json -w "%{http_code}" > telegram.status
-          test "$(cat telegram.status)" = "503"
+          curl --silent --show-error \
+            -X POST \
+            -H "content-type: application/json" \
+            -d '{"update_id":999999,"message":{"chat":{"id":1},"from":{"id":2},"text":"smoke"}}' \
+            "$URL/telegram/webhook" -o telegram.json -w "%{http_code}" > telegram.status
+          status="$(cat telegram.status)"
+          test "$status" = "503" || test "$status" = "401"
           node - <<'NODE'
           const fs = require("fs");
           const body = JSON.parse(fs.readFileSync("telegram.json", "utf8"));
-          if (body.error !== "TELEGRAM_WEBHOOK_NOT_CONFIGURED") throw new Error("Telegram webhook is not fail-closed");
+          const failClosed = body.error === "TELEGRAM_WEBHOOK_NOT_CONFIGURED" || body.error === "TELEGRAM_WEBHOOK_UNAUTHORIZED";
+          if (!failClosed) throw new Error("Telegram webhook is not fail-closed");
           console.log(JSON.stringify(body));
           NODE

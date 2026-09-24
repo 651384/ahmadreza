@@ -23,6 +23,21 @@ The system is considered cloud-independent only when:
 6. Health, webhook, queue, D1 and recovery behavior are observable without a local IDE.
 7. A local computer can be offline without stopping the deployed runtime.
 
+## Cloud-native controller (added 2026-09-23)
+The controller heartbeat no longer depends on any external/local process. With
+`SIMOT_CONTROLLER_MODE=CLOUD` (default in `wrangler.toml`), the Worker's own
+`*/3 * * * *` cron emits a `CLOUD-CRON:*` controller heartbeat before each
+watchdog evaluation. An external ACTIVE controller is never overwritten, so an
+abandoned external controller still degrades to STALE/RECOVERY_REQUIRED and is
+signaled by the GitHub Actions watchdog. This closes acceptance criterion 7 for
+the control plane: a powered-off laptop cannot leave the watchdog permanently
+IDLE.
+
+## Arena boundary
+No Arena runtime integration exists; see
+`simot-ai-os/docs/arena-integration-status.md`. GitHub remains the only
+boundary between Arena-assisted development and the runtime.
+
 ## Current verified evidence
 - Repository: `651384/ahmadreza`
 - Runtime package: `simot-ai-os/`

@@ -1,0 +1,76 @@
+name: SIMOT AI OS Worker E2E
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  worker-e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send deterministic SIMOT-MSG v2 smoke task
+        env:
+          URL: https://simot-ai-os-gateway.vahid-ahmadreza.workers.dev
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, time, urllib.request, urllib.error, datetime
+          base=os.environ["URL"]
+          mid="E2E-GHA-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d-%H%M%S")
+          body={
+            "FRAME-START":"<<<SIMOT-MSG v2 | START>>>",
+            "MSG-ID":mid,"CORR-ID":mid,"REPLY-TO":"NONE","THREAD-ID":mid,
+            "FROM":"SIMOT-AI-01","TO":"SIMOT-MASTER","TYPE":"REQUEST",
+            "PRIORITY":"IMPORTANT","AUTHORITY":"ANALYSIS_ONLY","STATUS":"NEW",
+            "SCOPE":"E2E_SMOKE","SOT-REFS":"NONE","TASK-REFS":"NONE","RECORD-REFS":"NONE",
+            "EXPECTED-ACTION":"RESEARCH_OR_ROUTING","DEADLINE":"NONE","CONFIDENTIALITY":"INTERNAL",
+            "PAYLOAD-FORMAT":"JSON","PART":"1/1","RESULT-STATUS":"PENDING",
+            "NEXT-ACTION":"ROUTE_TO_MASTER","WRITE-BACK":"REQUIRED","ESCALATION":"NONE",
+            "CONFIDENCE":"VERIFIED","VERIFICATION":"INTERNAL",
+            "FRAME-END":f"<<<SIMOT-MSG v2 | END | MSG-ID={mid}>>>",
+            "PAYLOAD":{"test":"E2E","purpose":"activate_and_verify_worker_pipeline"}
+          }
+          req=urllib.request.Request(base+"/webhook",data=json.dumps(body).encode(),headers={"content-type":"application/json","User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/131.0 Safari/537.36"},method="POST")
+          try:
+            with urllib.request.urlopen(req) as r:
+              result=json.load(r)
+          except urllib.error.HTTPError as e:
+            print("WEBHOOK_HTTP", e.code, e.read().decode())
+            raise
+          print("WEBHOOK", result)
+          assert result.get("accepted") is True or result.get("duplicate") is True
+          status=None
+          for _ in range(18):
+            time.sleep(5)
+            with urllib.request.urlopen(urllib.request.Request(base+"/workers/status",headers={"User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/131.0 Safari/537.36"})) as r:
+              status=json.load(r)
+            print("STATUS", status)
+            master=[w for w in status.get("workers",[]) if w.get("worker_id")=="SIMOT-MASTER"]
+            if master and master[0].get("last_msg_id")==mid:
+              break
+          master=[w for w in status.get("workers",[]) if w.get("worker_id")=="SIMOT-MASTER"][0]
+          assert master["last_msg_id"]==mid, "SIMOT-MASTER did not process the smoke task"
+          assert master["status"]=="ACTIVE"
+          with urllib.request.urlopen(req) as r:
+            duplicate=json.load(r)
+          print("DUPLICATE", duplicate)
+          assert duplicate.get("duplicate") is True
+          PY
+
+      - name: Verify all registered workers remain ACTIVE
+        env:
+          URL: https://simot-ai-os-gateway.vahid-ahmadreza.workers.dev
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error "$URL/workers/status" -o workers.json
+          python - <<'PY'
+          import json
+          b=json.load(open("workers.json"))
+          ids={"SIMOT-MASTER","SIMOT-AI-01","SIMOT-AI-02","SIMOT-AI-03","SIMOT-AI-04","SIMOT-AI-05"}
+          got={x["worker_id"] for x in b["workers"] if x["status"]=="ACTIVE"}
+          assert ids <= got, (ids-got)
+          assert b["runtime"]=="ACTIVE"
+          print(json.dumps(b))
+          PY
