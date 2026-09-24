@@ -17,6 +17,9 @@ SIMOT_AI_MAX_INPUT_CHARS = "6000"
 SIMOT_AI_MAX_OUTPUT_TOKENS = "500"
 CLOUDFLARE_ACCOUNT_ID = "28c48936d40df4c64bffc755f6c0ee7f"
 
+[version_metadata]
+binding = "CF_VERSION_METADATA"
+
 [ai]
 binding = "AI"
 
