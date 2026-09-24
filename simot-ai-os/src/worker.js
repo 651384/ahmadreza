@@ -107,6 +107,28 @@ async function runCloudflareManagementProbe(env){
     return {ok:false,status:"FAILED",error:error?.message||"PROBE_FAILED"};
   }
 }
+async function cloudflareBuildRequest(env,path,options={}){
+  const accountId=env.CLOUDFLARE_ACCOUNT_ID;
+  if(!env.CLOUDFLARE_MANAGEMENT_API_TOKEN||!accountId)throw new Error("CLOUDFLARE_MANAGEMENT_NOT_CONFIGURED");
+  const response=await fetch("https://api.cloudflare.com/client/v4/accounts/"+accountId+path,{method:options.method||"GET",headers:{"Authorization":"Bearer "+env.CLOUDFLARE_MANAGEMENT_API_TOKEN,"accept":"application/json","content-type":"application/json"},body:options.body?JSON.stringify(options.body):undefined});
+  const payload=await response.json().catch(()=>null);
+  return {http_status:response.status,success:payload?.success===true,result:payload?.result??null,errors:Array.isArray(payload?.errors)?payload.errors.slice(0,5):[]};
+}
+async function cloudflareBuildSnapshot(env){
+  const scripts=await cloudflareBuildRequest(env,"/workers/scripts");
+  const worker=Array.isArray(scripts.result)?scripts.result.find(x=>x?.id==="simot-ai-os-gateway"):null;
+  if(!worker?.tag)return {ok:false,error:"CLOUDFLARE_WORKER_TAG_NOT_FOUND"};
+  const triggers=await cloudflareBuildRequest(env,"/builds/workers/"+worker.tag+"/triggers");
+  const builds=await cloudflareBuildRequest(env,"/builds/workers/"+worker.tag+"/builds");
+  return {ok:scripts.success&&triggers.success&&builds.success,worker:{id:worker.id,tag:worker.tag},triggers:triggers.result||[],builds:builds.result||[]};
+}
+async function triggerCloudflareBuild(env,body){
+  const snapshot=await cloudflareBuildSnapshot(env);
+  if(!snapshot.ok)throw new Error("CLOUDFLARE_BUILD_SNAPSHOT_FAILED");
+  const production=(snapshot.triggers||[]).find(t=>Array.isArray(t.branch_includes)&&t.branch_includes.includes(body.branch||"master"));
+  if(!production?.trigger_uuid)throw new Error("CLOUDFLARE_PRODUCTION_TRIGGER_NOT_FOUND");
+  return cloudflareBuildRequest(env,"/builds/triggers/"+production.trigger_uuid+"/builds",{method:"POST",body:{branch:body.branch||"master",...(body.commit_hash?{commit_hash:body.commit_hash}:{})}});
+}
 async function cloudflareManagementSnapshot(env){
   const accountId=env.CLOUDFLARE_ACCOUNT_ID;
   if(!env.CLOUDFLARE_MANAGEMENT_API_TOKEN||!accountId)return {ok:false,error:"CLOUDFLARE_MANAGEMENT_NOT_CONFIGURED"};
@@ -170,6 +192,11 @@ async function ensureAutonomousTaskTable(env){
       .bind(task.id,task.name,task.priority,task.domain,task.status,task.execution,0,null,at,null,null,at).run();
   }
 }
+function autonomousBackoffMinutes(attempts,status){
+  const n=Math.max(1,Number(attempts||1));
+  if(status==="BLOCKED")return Math.min(60,Math.max(5,2**Math.min(n,5)));
+  return Math.min(30,2**Math.min(n-1,5));
+}
 function autonomousTaskEnvelope(task){
   const msgId="AUTO-"+task.task_id+"-"+Date.now();
   return {
@@ -194,7 +221,7 @@ async function dispatchNextAutonomousTask(env){
   const at=now();
   await env.SIMOT_QUEUE.send(task);
   await env.SIMOT_DB.prepare("UPDATE autonomous_tasks SET status='IN_PROGRESS',attempts=attempts+1,last_run_at=?,next_run_at=?,last_result=?,blocker=NULL,updated_at=? WHERE task_id=?")
-    .bind(at,new Date(Date.now()+15*60*1000).toISOString(),"DISPATCHED_TO_CLOUD_WORKER",at,row.task_id).run();
+    .bind(at,new Date(Date.now()+autonomousBackoffMinutes(row.attempts+1,"IN_PROGRESS")*60*1000).toISOString(),"DISPATCHED_TO_CLOUD_WORKER",at,row.task_id).run();
   return {dispatched:true,task_id:row.task_id,attempt:row.attempts+1};
 }
 async function updateAutonomousTaskResult(env,body,result){
@@ -207,7 +234,7 @@ async function updateAutonomousTaskResult(env,body,result){
   const blocker=finalStatus==="COMPLETED"?null:(Array.isArray(result?.gaps)&&result.gaps.length?String(result.gaps[0]):gate.reasons.join(","));
   const next=finalStatus==="COMPLETED"?String(result?.next_action||"COMPLETED"):String(result?.next_action||"REVIEW");
   await env.SIMOT_DB.prepare("UPDATE autonomous_tasks SET status=?,next_run_at=?,last_result=?,blocker=?,updated_at=? WHERE task_id=?")
-    .bind(finalStatus,finalStatus==="COMPLETED"?null:new Date(Date.now()+15*60*1000).toISOString(),next,blocker,now(),taskId).run();
+    .bind(finalStatus,finalStatus==="COMPLETED"?null:new Date(Date.now()+autonomousBackoffMinutes((await env.SIMOT_DB.prepare("SELECT attempts FROM autonomous_tasks WHERE task_id=?").bind(taskId).first())?.attempts||1,finalStatus)*60*1000).toISOString(),next,blocker,now(),taskId).run();
 }
 async function ensureRuntimeTables(env){
   if(!env.SIMOT_DB) throw new Error("RUNTIME_NOT_CONFIGURED");
@@ -286,6 +313,14 @@ try { if(env.SIMOT_DB) await mandatoryPreflight(env,"HTTP:"+url.pathname); else 
 }
 if(url.pathname==="/cloudflare/management/snapshot"&&request.method==="GET"){
   try{return json(await cloudflareManagementSnapshot(env));}catch(error){return json({ok:false,error:"CLOUDFLARE_MANAGEMENT_SNAPSHOT_UNAVAILABLE"},503);}
+}
+if(url.pathname==="/cloudflare/builds/status"&&request.method==="GET"){
+  try{return json(await cloudflareBuildSnapshot(env));}catch(error){return json({ok:false,error:"CLOUDFLARE_BUILDS_STATUS_UNAVAILABLE"},503);}
+}
+if(url.pathname==="/cloudflare/builds/trigger"&&request.method==="POST"){
+  if(!env.CLOUDFLARE_MANAGEMENT_API_TOKEN)return json({ok:false,error:"CLOUDFLARE_MANAGEMENT_TOKEN_NOT_CONFIGURED"},503);
+  let body;try{body=await request.json()}catch{return json({ok:false,error:"INVALID_JSON"},400)}
+  try{return json(await triggerCloudflareBuild(env,body));}catch(error){return json({ok:false,error:error?.message||"CLOUDFLARE_BUILD_TRIGGER_FAILED"},503);}
 }
 if(url.pathname==="/control-plane/manifest"&&request.method==="GET")return json({ok:true,manifest:CONTROL_PLANE_MANIFEST,standard_id:EXECUTION_STANDARD_ID});
 if(url.pathname==="/health")return json({service:"simot-ai-os-gateway",version:VERSION,state:env.SIMOT_DEFAULT_STATE||"MANUAL",time:now(),watchdog:{interval_minutes:WATCHDOG_POLICY.interval_minutes,heartbeat_interval_minutes:WATCHDOG_POLICY.heartbeat_interval_minutes,stale_threshold_minutes:WATCHDOG_POLICY.stale_threshold_minutes,recovery_threshold_minutes:WATCHDOG_POLICY.recovery_threshold_minutes}});
