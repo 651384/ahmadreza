@@ -157,6 +157,56 @@ async function runWatchdog(env, scheduledAt = Date.now()){
   };
 }
 
+async function ensureAutonomousTaskTable(env){
+  if(!env.SIMOT_DB) throw new Error("RUNTIME_NOT_CONFIGURED");
+  await env.SIMOT_DB.batch([
+    env.SIMOT_DB.prepare("CREATE TABLE IF NOT EXISTS autonomous_tasks (task_id TEXT PRIMARY KEY, name TEXT NOT NULL, priority TEXT NOT NULL, domain TEXT NOT NULL, status TEXT NOT NULL, execution TEXT NOT NULL, attempts INTEGER NOT NULL DEFAULT 0, last_run_at TEXT, next_run_at TEXT, last_result TEXT, blocker TEXT, updated_at TEXT NOT NULL)"),
+    env.SIMOT_DB.prepare("CREATE INDEX IF NOT EXISTS idx_autonomous_tasks_due ON autonomous_tasks(status,next_run_at)")
+  ]);
+  const at=now();
+  for(const task of (CONTROL_PLANE_MANIFEST.task_registry||[])){
+    await env.SIMOT_DB.prepare("INSERT INTO autonomous_tasks(task_id,name,priority,domain,status,execution,attempts,last_run_at,next_run_at,last_result,blocker,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(task_id) DO UPDATE SET name=excluded.name,priority=excluded.priority,domain=excluded.domain,execution=excluded.execution,updated_at=excluded.updated_at")
+      .bind(task.id,task.name,task.priority,task.domain,task.status,task.execution,0,null,at,null,null,at).run();
+  }
+}
+function autonomousTaskEnvelope(task){
+  const msgId="AUTO-"+task.task_id+"-"+Date.now();
+  return {
+    "FRAME-START":"<<<SIMOT-MSG v2 | START>>>",
+    "FRAME-END":"<<<SIMOT-MSG v2 | END | MSG-ID="+msgId+">>>",
+    "MSG-ID":msgId,"CORR-ID":msgId,"REPLY-TO":"NONE","THREAD-ID":task.task_id,
+    "FROM":"SIMOT-MASTER","TO":"SIMOT-MASTER","TYPE":"COMMAND","PRIORITY":task.priority==="CRITICAL"?"CRITICAL":task.priority==="HIGH"?"IMPORTANT":"ROUTINE",
+    "AUTHORITY":"EXECUTE_WITHIN_ROLE","STATUS":"NEW","SCOPE":"AUTONOMOUS_TASK",
+    "SOT-REFS":["CONTROL_PLANE_MANIFEST",task.task_id],"TASK-REFS":[task.task_id],"RECORD-REFS":[],
+    "EXPECTED-ACTION":"Inspect task state, perform what is executable in Cloudflare, record evidence or exact blocker, and define next action.",
+    "DEADLINE":new Date(Date.now()+55*60*1000).toISOString(),"CONFIDENTIALITY":"INTERNAL","PAYLOAD-FORMAT":"JSON",
+    "PART":"1/1","RESULT-STATUS":"PENDING","NEXT-ACTION":"EXECUTE_AUTONOMOUS_TASK","WRITE-BACK":"REQUIRED",
+    "ESCALATION":"SIMOT-MASTER","CONFIDENCE":"HIGH","VERIFICATION":"INTERNAL",
+    "PAYLOAD":{task_id:task.task_id,name:task.name,priority:task.priority,domain:task.domain}
+  };
+}
+async function dispatchNextAutonomousTask(env){
+  await ensureAutonomousTaskTable(env);
+  const row=await env.SIMOT_DB.prepare("SELECT task_id,name,priority,domain,status,attempts,next_run_at FROM autonomous_tasks WHERE status IN ('PENDING','BLOCKED','IN_PROGRESS') AND (next_run_at IS NULL OR next_run_at<=?) ORDER BY CASE priority WHEN 'CRITICAL' THEN 1 WHEN 'HIGH' THEN 2 WHEN 'MEDIUM' THEN 3 ELSE 4 END, attempts, task_id LIMIT 1").bind(now()).first();
+  if(!row || !env.SIMOT_QUEUE)return {dispatched:false,reason:"NO_DUE_TASK"};
+  const task=autonomousTaskEnvelope(row);
+  const at=now();
+  await env.SIMOT_QUEUE.send(task);
+  await env.SIMOT_DB.prepare("UPDATE autonomous_tasks SET status='IN_PROGRESS',attempts=attempts+1,last_run_at=?,next_run_at=?,last_result=?,blocker=NULL,updated_at=? WHERE task_id=?")
+    .bind(at,new Date(Date.now()+15*60*1000).toISOString(),"DISPATCHED_TO_CLOUD_WORKER",at,row.task_id).run();
+  return {dispatched:true,task_id:row.task_id,attempt:row.attempts+1};
+}
+async function updateAutonomousTaskResult(env,body,result){
+  const taskId=Array.isArray(body["TASK-REFS"])?body["TASK-REFS"][0]:null;
+  if(!taskId)return;
+  await ensureAutonomousTaskTable(env);
+  const status=String(result?.result_status||"").toUpperCase();
+  const finalStatus=status==="COMPLETED"?"COMPLETED":status==="BLOCKED"?"BLOCKED":status==="FAILED"?"BLOCKED":"IN_PROGRESS";
+  const blocker=Array.isArray(result?.gaps)&&result.gaps.length?String(result.gaps[0]):null;
+  const next=String(result?.next_action||"REVIEW");
+  await env.SIMOT_DB.prepare("UPDATE autonomous_tasks SET status=?,next_run_at=?,last_result=?,blocker=?,updated_at=? WHERE task_id=?")
+    .bind(finalStatus,finalStatus==="COMPLETED"?null:new Date(Date.now()+15*60*1000).toISOString(),next,blocker,now(),taskId).run();
+}
 async function ensureRuntimeTables(env){
   if(!env.SIMOT_DB) throw new Error("RUNTIME_NOT_CONFIGURED");
   await env.SIMOT_DB.batch([
@@ -220,7 +270,7 @@ async scheduled(controller,env,ctx){
   ctx.waitUntil((async()=>{
     await maybeEmitCloudHeartbeat(env, scheduledAt);
     await runWatchdog(env, scheduledAt);
-    await runCloudflareManagementProbe(env);
+    await runCloudflareManagementProbe(env);\n    await dispatchNextAutonomousTask(env);
   })());
 },
 async fetch(request,env){const url=new URL(request.url);
@@ -236,6 +286,14 @@ if(url.pathname==="/cloudflare/management/snapshot"&&request.method==="GET"){
 }
 if(url.pathname==="/control-plane/manifest"&&request.method==="GET")return json({ok:true,manifest:CONTROL_PLANE_MANIFEST,standard_id:EXECUTION_STANDARD_ID});
 if(url.pathname==="/health")return json({service:"simot-ai-os-gateway",version:VERSION,state:env.SIMOT_DEFAULT_STATE||"MANUAL",time:now(),watchdog:{interval_minutes:WATCHDOG_POLICY.interval_minutes,heartbeat_interval_minutes:WATCHDOG_POLICY.heartbeat_interval_minutes,stale_threshold_minutes:WATCHDOG_POLICY.stale_threshold_minutes,recovery_threshold_minutes:WATCHDOG_POLICY.recovery_threshold_minutes}});
+if(url.pathname==="/tasks/status"&&request.method==="GET"){
+  try{
+    await ensureAutonomousTaskTable(env);
+    const rows=await env.SIMOT_DB.prepare("SELECT task_id,name,priority,domain,status,execution,attempts,last_run_at,next_run_at,last_result,blocker,updated_at FROM autonomous_tasks ORDER BY CASE priority WHEN 'CRITICAL' THEN 1 WHEN 'HIGH' THEN 2 WHEN 'MEDIUM' THEN 3 ELSE 4 END, task_id").all();
+    const summary=await env.SIMOT_DB.prepare("SELECT status,COUNT(*) AS count FROM autonomous_tasks GROUP BY status").all();
+    return json({ok:true,summary:summary.results||[],tasks:rows.results||[]});
+  }catch(error){return json({ok:false,error:"AUTONOMOUS_TASK_STATUS_UNAVAILABLE"},503);}
+}
 if(url.pathname==="/workers/status"&&request.method==="GET"){
   try{
     await ensureRuntimeTables(env);
@@ -287,4 +345,4 @@ return json({ok:false,error:"HANDOFF_FAILED",msg_id:msgId,corr_id:msgId},503);
 }
 }
 if(url.pathname==="/webhook"&&request.method==="POST"){if(!env.SIMOT_DB||!env.SIMOT_QUEUE)return json({ok:false,error:"RUNTIME_NOT_CONFIGURED",state:"MANUAL"},503);let body;try{body=await request.json()}catch{return json({ok:false,error:"INVALID_JSON"},400)}const frameError=parseFrame(body);if(frameError.error)return json({ok:false,error:frameError.error},400);const envelopeError=validateEnvelope(body);if(envelopeError)return json({ok:false,error:envelopeError},400);const msgId=body["MSG-ID"];const existing=await env.SIMOT_DB.prepare("SELECT msg_id, result_status FROM idempotency WHERE msg_id = ?").bind(msgId).first();if(existing)return json({ok:true,duplicate:true,msg_id:msgId,result_status:existing.result_status});const t=now();try{await env.SIMOT_DB.prepare("INSERT INTO idempotency(msg_id,first_seen_at,result_status,corr_id) VALUES(?,?,?,?)").bind(msgId,t,"ACCEPTED_FOR_EXECUTION",body["CORR-ID"]).run();await recordEvent(env,{id:crypto.randomUUID(),msg_id:msgId,corr_id:body["CORR-ID"],type:body["TYPE"],status:"ACCEPTED_FOR_EXECUTION",created_at:t,updated_at:t,payload_json:JSON.stringify(safeBody(body))});await env.SIMOT_QUEUE.send(body);await env.SIMOT_DB.prepare("UPDATE idempotency SET result_status = ? WHERE msg_id = ?").bind("QUEUED",msgId).run();return json({ok:true,accepted:true,msg_id:msgId,corr_id:body["CORR-ID"],status:"QUEUED"});}catch(error){await env.SIMOT_DB.prepare("UPDATE idempotency SET result_status = ? WHERE msg_id = ?").bind("FAILED",msgId).run().catch(()=>{});return json({ok:false,error:"HANDOFF_FAILED",msg_id:msgId,corr_id:body["CORR-ID"]},503);}}return json({ok:false,error:"NOT_FOUND"},404);},async queue(batch,env){if(!env.SIMOT_DB)throw new Error("RUNTIME_NOT_CONFIGURED");
-  await mandatoryPreflight(env,"QUEUE");for(const message of batch.messages){const body=message.body||{};const msgId=body["MSG-ID"];const corrId=body["CORR-ID"]||null;const t=now();try{const frameError=parseFrame(body);if(frameError.error){await recordEvent(env,{id:crypto.randomUUID(),msg_id:msgId||"UNKNOWN",corr_id:corrId,type:body["TYPE"]||"ERROR",status:"REJECTED",created_at:t,updated_at:t,payload_json:JSON.stringify(safeBody(body)),error_code:frameError.error,error_message:"SIMOT-MSG v2 framing validation failed"});message.ack();continue;}const err=validateEnvelope(body);if(err){await recordEvent(env,{id:crypto.randomUUID(),msg_id:msgId||"UNKNOWN",corr_id:corrId,type:body["TYPE"]||"ERROR",status:"REJECTED",created_at:t,updated_at:t,payload_json:JSON.stringify(safeBody(body)),error_code:err,error_message:"SIMOT-MSG v2 validation failed"});message.ack();continue;}if(body["TO"]==="SIMOT-MASTER"||/^SIMOT-AI-[0-9]{2}$/.test(String(body["TO"]))){const execution=await executeWorkerMessage(env,body);const resultJson=JSON.stringify(execution.result);await recordEvent(env,{id:crypto.randomUUID(),msg_id:msgId,corr_id:corrId,type:"RESULT",status:"COMPLETED",created_at:t,updated_at:now(),payload_json:JSON.stringify(safeBody({worker_id:execution.worker_id,model:execution.model,result:execution.result,route_to:execution.route_to})),error_code:null,error_message:null});await ensureRuntimeTables(env);await env.SIMOT_DB.prepare("UPDATE worker_registry SET last_run_at=?,last_msg_id=?,last_result=? WHERE worker_id=?").bind(now(),msgId,resultJson,execution.worker_id).run();await env.SIMOT_DB.prepare("UPDATE idempotency SET result_status=? WHERE msg_id=?").bind("COMPLETED",msgId).run();if(execution.route_to!=="NONE"&&execution.route_to!==body["TO"]){const nextId=msgId+"-"+execution.route_to;const next={...body,"FRAME-END":"<<<SIMOT-MSG v2 | END | MSG-ID="+nextId+">>>","MSG-ID":nextId,"CORR-ID":corrId||nextId,"REPLY-TO":msgId,"THREAD-ID":body["THREAD-ID"]||nextId,"FROM":execution.worker_id,"TO":execution.route_to,"STATUS":"NEW","RESULT-STATUS":"PENDING","NEXT-ACTION":"EXECUTE_ROUTED_WORKER","WRITE-BACK":"REQUIRED","PAYLOAD":execution.result};await env.SIMOT_QUEUE.send(next);}message.ack();continue;}await recordEvent(env,{id:crypto.randomUUID(),msg_id:msgId||"UNKNOWN",corr_id:corrId,type:body["TYPE"]||"ERROR",status:"WAITING",created_at:t,updated_at:t,payload_json:JSON.stringify(safeBody(body)),error_code:"NO_EXECUTION_TARGET",error_message:"No executable worker target was declared."});message.ack();}catch(error){await recordEvent(env,{id:crypto.randomUUID(),msg_id:msgId||"UNKNOWN",corr_id:corrId,type:body["TYPE"]||"ERROR",status:"FAILED",created_at:t,updated_at:t,payload_json:JSON.stringify(safeBody(body)),error_code:error?.message||"QUEUE_PROCESSING_ERROR",error_message:String(error?.message||error)}).catch(()=>{});await env.SIMOT_DB.prepare("UPDATE idempotency SET result_status=? WHERE msg_id=?").bind("FAILED",msgId).run().catch(()=>{});message.retry();}}}};
+  await mandatoryPreflight(env,"QUEUE");for(const message of batch.messages){const body=message.body||{};const msgId=body["MSG-ID"];const corrId=body["CORR-ID"]||null;const t=now();try{const frameError=parseFrame(body);if(frameError.error){await recordEvent(env,{id:crypto.randomUUID(),msg_id:msgId||"UNKNOWN",corr_id:corrId,type:body["TYPE"]||"ERROR",status:"REJECTED",created_at:t,updated_at:t,payload_json:JSON.stringify(safeBody(body)),error_code:frameError.error,error_message:"SIMOT-MSG v2 framing validation failed"});message.ack();continue;}const err=validateEnvelope(body);if(err){await recordEvent(env,{id:crypto.randomUUID(),msg_id:msgId||"UNKNOWN",corr_id:corrId,type:body["TYPE"]||"ERROR",status:"REJECTED",created_at:t,updated_at:t,payload_json:JSON.stringify(safeBody(body)),error_code:err,error_message:"SIMOT-MSG v2 validation failed"});message.ack();continue;}if(body["TO"]==="SIMOT-MASTER"||/^SIMOT-AI-[0-9]{2}$/.test(String(body["TO"]))){const execution=await executeWorkerMessage(env,body);const resultJson=JSON.stringify(execution.result);await recordEvent(env,{id:crypto.randomUUID(),msg_id:msgId,corr_id:corrId,type:"RESULT",status:"COMPLETED",created_at:t,updated_at:now(),payload_json:JSON.stringify(safeBody({worker_id:execution.worker_id,model:execution.model,result:execution.result,route_to:execution.route_to})),error_code:null,error_message:null});await ensureRuntimeTables(env);await env.SIMOT_DB.prepare("UPDATE worker_registry SET last_run_at=?,last_msg_id=?,last_result=? WHERE worker_id=?").bind(now(),msgId,resultJson,execution.worker_id).run();\nawait updateAutonomousTaskResult(env,body,execution.result);await env.SIMOT_DB.prepare("UPDATE idempotency SET result_status=? WHERE msg_id=?").bind("COMPLETED",msgId).run();if(execution.route_to!=="NONE"&&execution.route_to!==body["TO"]){const nextId=msgId+"-"+execution.route_to;const next={...body,"FRAME-END":"<<<SIMOT-MSG v2 | END | MSG-ID="+nextId+">>>","MSG-ID":nextId,"CORR-ID":corrId||nextId,"REPLY-TO":msgId,"THREAD-ID":body["THREAD-ID"]||nextId,"FROM":execution.worker_id,"TO":execution.route_to,"STATUS":"NEW","RESULT-STATUS":"PENDING","NEXT-ACTION":"EXECUTE_ROUTED_WORKER","WRITE-BACK":"REQUIRED","PAYLOAD":execution.result};await env.SIMOT_QUEUE.send(next);}message.ack();continue;}await recordEvent(env,{id:crypto.randomUUID(),msg_id:msgId||"UNKNOWN",corr_id:corrId,type:body["TYPE"]||"ERROR",status:"WAITING",created_at:t,updated_at:t,payload_json:JSON.stringify(safeBody(body)),error_code:"NO_EXECUTION_TARGET",error_message:"No executable worker target was declared."});message.ack();}catch(error){await recordEvent(env,{id:crypto.randomUUID(),msg_id:msgId||"UNKNOWN",corr_id:corrId,type:body["TYPE"]||"ERROR",status:"FAILED",created_at:t,updated_at:t,payload_json:JSON.stringify(safeBody(body)),error_code:error?.message||"QUEUE_PROCESSING_ERROR",error_message:String(error?.message||error)}).catch(()=>{});await env.SIMOT_DB.prepare("UPDATE idempotency SET result_status=? WHERE msg_id=?").bind("FAILED",msgId).run().catch(()=>{});message.retry();}}}};
