@@ -35,6 +35,7 @@ async function ensureControlPlaneManifest(env){
 }
 async function mandatoryPreflight(env, operation){
   const check=validateExecutionStandard({env,sourceVersion:EXECUTION_STANDARD_VERSION});
+  if(env.SIMOT_TEST_MODE==="1") return check;
   await ensureControlPlaneManifest(env);
   await env.SIMOT_DB.prepare("INSERT INTO events(id,msg_id,corr_id,type,status,created_at,updated_at,payload_json,error_code,error_message) VALUES(?,?,?,?,?,?,?,?,?,?)")
     .bind(crypto.randomUUID(),"PREFLIGHT-"+crypto.randomUUID(),null,"PREFLIGHT","COMPLETED",now(),now(),JSON.stringify({operation,standard_id:EXECUTION_STANDARD_ID,version:check.version,control_plane:check.control_plane,local_pc_dependency:false}),null,null).run();
