@@ -14,6 +14,7 @@ SIMOT_AI_MODEL = "@cf/zai-org/glm-4.7-flash"
 SIMOT_AI_MAX_REQUESTS_PER_DAY = "200"
 SIMOT_AI_MAX_INPUT_CHARS = "6000"
 SIMOT_AI_MAX_OUTPUT_TOKENS = "500"
+CLOUDFLARE_ACCOUNT_ID = "28c48936d40df4c64bffc755f6c0ee7f"
 
 [ai]
 binding = "AI"
@@ -38,4 +39,3 @@ max_batch_size = 10
 max_batch_timeout = 5
 max_retries = 3
 dead_letter_queue = "simot-events-dlq"
-\n[vars]\nCLOUDFLARE_ACCOUNT_ID = "28c48936d40df4c64bffc755f6c0ee7f"\n
