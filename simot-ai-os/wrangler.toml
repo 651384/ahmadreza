@@ -19,7 +19,9 @@ SIMOT_AI_MAX_OUTPUT_TOKENS = "500"
 binding = "AI"
 
 [triggers]
-crons = ["*/3 * * * *"]
+# Autonomous control-plane heartbeat + watchdog: every minute.
+# Cloudflare Cron executes scheduled() in UTC and does not depend on a local PC.
+crons = ["* * * * *"]
 
 [[d1_databases]]
 binding = "SIMOT_DB"
