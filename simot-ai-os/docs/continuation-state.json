@@ -1,0 +1,64 @@
+{
+  "schema_version": "1.0",
+  "updated_at": "2026-09-24",
+  "project": "SIMOT AI OS",
+  "repository": "651384/ahmadreza",
+  "branch": "master",
+  "runtime": {
+    "worker": "simot-ai-os-gateway",
+    "version": "0.4.0",
+    "controller_mode": "CLOUD",
+    "cloudflare_worker_url": "https://simot-ai-os-gateway.vahid-ahmadreza.workers.dev",
+    "d1": "simot-ai-os",
+    "queue": "simot-events",
+    "dead_letter_queue": "simot-events-dlq",
+    "ai_model": "@cf/zai-org/glm-4.7-flash",
+    "cron": "* * * * *"
+  },
+  "verified": {
+    "cloud_runtime": true,
+    "cron_controller": true,
+    "d1_state": true,
+    "queue": true,
+    "workers_ai": true,
+    "watchdog": true,
+    "webhook": true,
+    "message_validation": true,
+    "idempotency": true,
+    "github_ci": true,
+    "e2e": true,
+    "live_smoke": true,
+    "pc_independence_core": true
+  },
+  "workers": [
+    "SIMOT-MASTER",
+    "SIMOT-AI-01",
+    "SIMOT-AI-02",
+    "SIMOT-AI-03",
+    "SIMOT-AI-04",
+    "SIMOT-AI-05"
+  ],
+  "last_verified_commit": "d30c27e8531c402b4188d37bcc1c086c0c07ded5",
+  "last_verified_e2e_run": "35978391989",
+  "known_gap": "No direct Cloudflare Management connector is available in the current AI tool environment.",
+  "security_constraints": [
+    "Do not modify Cloudflare Access/WAF/security policies without explicit authorization.",
+    "Do not commit secrets.",
+    "Fail closed on uncertain authorization or execution state.",
+    "Do not duplicate an uncertain action."
+  ],
+  "phase": {
+    "infrastructure_autonomy": "OPERATIONAL",
+    "business_autonomy": "PARTIAL"
+  },
+  "next_priorities": [
+    "Implement durable business task definitions and orchestration.",
+    "Establish persistent business source-of-truth structures.",
+    "Specialize worker profiles and routing.",
+    "Harden retry/DLQ/recovery behavior.",
+    "Add observability and operational dashboards.",
+    "Add only the external integrations required by concrete business workflows.",
+    "Verify end-to-end autonomous continuation after each major increment."
+  ],
+  "continuation_rule": "On every session, read this state and the Master Operating Specification, inspect current runtime/repository state, then execute the highest-priority safe unfinished task and write back the result."
+}
