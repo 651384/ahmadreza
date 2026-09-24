@@ -67,7 +67,7 @@ async function runCloudflareManagementProbe(env){
     let tokenStatus="unknown";
     for(const [name,response] of checks){
       let payload=null;try{payload=await response.json()}catch{}
-      resources[name]={http_status:response.status,success:payload?.success===true,error_count:Array.isArray(payload?.errors)?payload.errors.length:0};
+      resources[name]={http_status:response.status,success:payload?.success===true,error_count:Array.isArray(payload?.errors)?payload.errors.length:0,errors:Array.isArray(payload?.errors)?payload.errors.slice(0,3).map(e=>({code:e?.code||null,message:e?.message||null})):[]};
       if(name==="token"&&payload?.success===true)tokenStatus=payload?.result?.status||"unknown";
     }
     const allOk=checks.every(([_,r])=>r.ok);
