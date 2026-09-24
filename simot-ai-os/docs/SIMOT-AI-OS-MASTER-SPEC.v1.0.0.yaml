@@ -1,0 +1,432 @@
+schema_version: "1.0.0"
+spec_id: "SIMOT-AI-OS-MASTER"
+status: "CANONICAL_OPERATING_BASELINE"
+effective_from: "2026-09-24"
+purpose: "Single machine-readable source of operating rules, architecture, authority, memory, recovery, standards, and backlog for SIMOT AI OS."
+non_regression_rule: "This specification overrides informal chat memory. Before every material action, reconcile current SOTs and runtime evidence against this specification. Never restart from assumptions."
+
+identity:
+  company: "Modern Silk Road Trading Co. (SIMOT)"
+  system: "SIMOT AI OS"
+  master: "SIMOT-MASTER"
+  runtime: "Cloud-first, serverless, event-driven"
+  primary_goal: "Detect -> decide -> execute -> verify -> recover -> log -> continue"
+  pc_dependency: "NONE_FOR_NORMAL_OPERATION"
+  windows_role: "development/admin/emergency bridge only"
+
+architecture:
+  layers:
+    L0: "Governance, security, authority, human gates"
+    L1: "SIMOT-MASTER orchestration"
+    L2: "AI-01 Research, AI-02 Import/Technical Trade, AI-03 Marketing/BD, AI-04 Export/Commercial, AI-05 AI/Technology/Automation"
+    L3: "SIMOT-MSG v2.1 protocol"
+    L4: "Cloud runtime: Worker + D1 + Queue + DLQ + Scheduler + AI binding"
+    L5: "Reference-first persistent memory and runtime state"
+    L6: "Tool adapter bus with capability/authority/read-back/idempotency contracts"
+    L7: "Channels: Telegram disabled-safe; controlled email/webhook; WhatsApp optional"
+    L8: "Business systems: GitHub, Notion, Asana, SharePoint, HubSpot, Automations, Canva, Gamma, Miro, Descript, HeyGen, Apollo, LinkedIn, monday, Todoist, Railway and other authorized tools"
+  target:
+    chatgpt_role: "interface/operator, not runtime dependency"
+    cloud_role: "independent execution/control plane"
+    required_behavior_if_chatgpt_unavailable: "cloud detects, decides within authority, executes safe work, verifies, recovers, logs, and continues"
+
+source_of_truth:
+  precedence:
+    - "Explicit human approval for gated actions"
+    - "Authoritative live runtime evidence"
+    - "GitHub canonical source/review/CI"
+    - "Notion architecture/policy/decision SOT"
+    - "Asana execution/task SOT"
+    - "SharePoint SIMOT-AI-OS/MEMORY evidence/input/output/index"
+    - "GitHub Issue #3 high-frequency execution timeline"
+    - "Chat/conversation memory is non-canonical"
+  domains:
+    code: "GitHub"
+    architecture_policy: "Notion"
+    execution_tasks: "Asana"
+    runtime: "Cloudflare"
+    evidence_memory: "SharePoint"
+    operational_timeline: "GitHub Issue #3"
+  rule: "Never treat one failed access path as proof that the underlying source/resource does not exist."
+
+access_state_model:
+  NOT_FOUND: "authoritative source was queried and entity does not exist"
+  ACCESS_DENIED: "source exists but permission denied"
+  TOOL_UNAVAILABLE: "required connector/tool is absent"
+  PATH_UNAVAILABLE: "connector exists but executable path is unavailable"
+  SOURCE_UNAVAILABLE: "authoritative source itself is unavailable"
+  UNVERIFIED: "insufficient evidence to claim current state"
+  VERIFIED: "fresh authoritative read-back supports claim"
+
+execution_loop:
+  - "READ"
+  - "RECONCILE"
+  - "SELECT_EXACTLY_ONE_NEXT_VALID_STEP"
+  - "CHECK_AUTHORITY"
+  - "ACT"
+  - "VERIFY"
+  - "WRITE_BACK"
+  - "RECHECK"
+  - "CONTINUE"
+  rule: "Do not ask the user before executing safe autonomous work. First inspect tools, SOT, current state, permissions, and existing evidence."
+
+message_protocol:
+  name: "SIMOT-MSG"
+  version: "2.1"
+  required_fields:
+    - "MSG-ID"
+    - "CORR-ID"
+    - "THREAD-ID"
+    - "FROM"
+    - "TO"
+    - "TYPE"
+    - "AUTHORITY"
+    - "STATUS"
+    - "SCOPE"
+    - "SOT-REF"
+    - "TASK-REF"
+    - "RECORD-REF"
+    - "EXPECTED-ACTION"
+    - "CONFIDENTIALITY"
+    - "PAYLOAD-FORMAT"
+    - "PART"
+    - "RESULT-STATUS"
+    - "NEXT-ACTION"
+    - "WRITE-BACK"
+    - "ESCALATION"
+    - "CONFIDENCE"
+    - "VERIFICATION"
+    - "START"
+    - "END"
+  rules:
+    - "Large payloads move by durable reference, not inline prose."
+    - "IDs/references are preferred over repeated content."
+    - "Consequential handoffs must be traceable."
+    - "No parallel competing messaging protocol."
+
+lifecycle:
+  states:
+    - "ACCEPTED"
+    - "WAITING"
+    - "PENDING"
+    - "REJECTED"
+    - "FAILED"
+    - "ACK"
+    - "RESULT"
+    - "ERROR"
+    - "DEAD_LETTER"
+    - "RECOVERY_REQUIRED"
+    - "DONE"
+  completion:
+    required:
+      - "desired result achieved"
+      - "acceptance criteria satisfied"
+      - "evidence exists"
+      - "SOT write-back completed"
+    forbidden:
+      - "RUN-count completion"
+      - "attempt-count completion"
+      - "vanity completion"
+      - "assumption-based completion"
+
+failure_recovery:
+  protocol:
+    - "FAILURE"
+    - "EVIDENCE"
+    - "ROOT_CAUSE"
+    - "CORRECTIVE_ACTION"
+    - "RETRY"
+    - "VALIDATION"
+    - "DONE"
+  rules:
+    - "Failure is a state, never completion."
+    - "Preserve failure evidence and history."
+    - "Do not overwrite failure with a later success without retaining both records."
+    - "Retry only after identifying a valid corrective action."
+    - "If blocked by a human gate, enter WAITING/RECOVERY_REQUIRED with exact required action."
+
+authority:
+  default: "FAIL_CLOSED"
+  master_must_not:
+    - "manufacture permissions"
+    - "elevate authority"
+    - "bypass human gates"
+    - "silently switch providers"
+    - "silently enable paid services"
+    - "send external commercial commitments"
+    - "perform banking/payment/contract actions"
+    - "insert secrets"
+    - "merge or production-activate when human approval is required"
+  human_gate_required_for:
+    - "production activation when gated"
+    - "merge when designated"
+    - "secret/token insertion"
+    - "provider/model execution when gated"
+    - "paid services"
+    - "payments"
+    - "banking"
+    - "contracts"
+    - "external commercial communication"
+    - "irreversible actions"
+
+security:
+  secrets: "approved secret manager/runtime secrets only"
+  forbidden_storage:
+    - "GitHub source"
+    - "Notion plain text"
+    - "chat"
+    - "logs"
+    - "ordinary config"
+  least_privilege: true
+  provider_rules:
+    - "capability fit"
+    - "free API eligibility"
+    - "reliability"
+    - "latency"
+    - "quota"
+    - "secondary verification"
+  paid_provider_default: "PROHIBITED"
+  data_policy: "Do not send sensitive data to unauthorized providers."
+  provider_availability_is_not_authority: true
+
+tool_adapter_standard:
+  contract:
+    - "capability declaration"
+    - "authority declaration"
+    - "read-first"
+    - "idempotency"
+    - "minimal-diff mutation"
+    - "read-back verification"
+    - "fail-closed behavior"
+    - "structured evidence"
+  health_states:
+    - "CONNECTED"
+    - "AUTHENTICATED"
+    - "READ"
+    - "WRITE"
+    - "EXECUTE"
+    - "HUMAN_GATE"
+    - "FAILED"
+    - "RATE_LIMITED"
+  rule: "Tool existence, account connection, authorization, and execution authority are separate facts."
+
+memory:
+  canonical_root: "SIMOT-AI-OS/MEMORY"
+  folders:
+    - "INPUTS"
+    - "EVIDENCE"
+    - "OUTPUTS"
+    - "INDEX"
+  rules:
+    - "Reference-first"
+    - "Preserve identity, source, version, checksum when available"
+    - "Preserve confidentiality and verification state"
+    - "Preserve owner and related IDs"
+    - "Never persist short-lived connector download URLs as durable references"
+    - "Conversation storage is not canonical memory"
+  checkpoints:
+    - "checkpoint"
+    - "daily handoff"
+    - "change log"
+    - "decision log"
+    - "execution log"
+    - "artifact index"
+
+runtime:
+  worker: "simot-ai-os-gateway"
+  url: "https://simot-ai-os-gateway.vahid-ahmadreza.workers.dev"
+  bindings:
+    queue: "simot-events"
+    d1: "6bb8ae5c-df7d-4c4b-bf0d-bdd73857a480"
+    ai: "Cloudflare AI"
+  known_runtime_variables:
+    SIMOT_AI_MAX_INPUT_CHARS: "6000"
+    SIMOT_AI_MAX_OUTPUT_TOKENS: "500"
+    SIMOT_AI_MAX_REQUESTS_PER_DAY: "200"
+    SIMOT_AI_MODEL: "@cf/zai-org/glm-4.7-flash"
+    SIMOT_CONTROLLER_MODE: "CLOUD"
+    SIMOT_DEFAULT_STATE: "ACTIVE"
+    SIMOT_RUNTIME_VERSION: "0.4.0"
+  schedule:
+    target: "*/3 * * * *"
+    watchdog: "3m"
+  rule: "Live runtime claims require fresh authoritative read-back before being used for mutation decisions."
+
+watchdog:
+  target_cron: "3m"
+  controller_heartbeat: "1m while ACTIVE"
+  stale_threshold: "10m"
+  recovery_threshold: "15m"
+  source_files:
+    - "simot-ai-os/src/watchdog.js"
+    - "simot-ai-os/test/watchdog.test.js"
+    - ".github/workflows/simot-ai-os-watchdog.yml"
+    - ".github/workflows/simot-ai-os-watchdog-validation.yml"
+  acceptance:
+    - "live cron invocation proven"
+    - "heartbeat observed"
+    - "stale detection proven"
+    - "recovery signal proven"
+    - "failure signaling validated"
+    - "evidence written to SOT"
+
+current_repo:
+  repository: "651384/ahmadreza"
+  canonical_branch: "simot-ai-os/runtime-v2-gateway"
+  historical_verified_checkpoint: "135e48510c050f492338cfe360f8b7b376c8d882"
+  important_commits:
+    - "1d41b8c3c2b7f8c09431f79e349fa17df281d07c"
+    - "ebf60aee11325562e27bb994d00f2a87ed49ae31"
+    - "655789dfd8fcd039c0c382dbfb178c3b3243a4dc"
+  rule: "Canonical branch is the source; local Windows copies are never authoritative."
+
+known_open_work:
+  P0:
+    - id: "P0-01"
+      task: "Prove/activate live Cloudflare Watchdog cron"
+      acceptance: "fresh runtime evidence + scheduled invocation + heartbeat + recovery evidence"
+    - id: "P0-02"
+      task: "Reconcile GitHub canonical source against deployed Worker"
+      acceptance: "exact source/deployment mapping, version parity, no stale local authority"
+    - id: "P0-03"
+      task: "Complete Cloud Control Plane"
+      acceptance: "health, watchdog, heartbeat, queue, D1 state, execution log, recovery signals, cross-system reconciliation"
+    - id: "P0-04"
+      task: "Make Autonomous Continuation truly execute"
+      acceptance: "reads current SOTs, selects one valid next step, acts, verifies, writes evidence, recovers stale state"
+  P1:
+    - id: "P1-01"
+      task: "Complete AI-02 execution contract"
+      allowed: "analysis, preparation, RFQ preparation"
+      blocked: "supplier commitment, PO, payment, banking, contract, irreversible external contact"
+    - id: "P1-02"
+      task: "Repair PR #5 Preview Build failure and complete watchdog failure signaling"
+    - id: "P1-03"
+      task: "Verify Queue consumer, retry, DLQ, idempotency"
+    - id: "P1-04"
+      task: "Build production health/observability endpoints and structured metrics"
+  P2:
+    - id: "P2-01"
+      task: "Complete universal tool adapter layer and capability/authority matrix"
+    - id: "P2-02"
+      task: "Cross-tool SOT reconciliation"
+    - id: "P2-03"
+      task: "Tool connectivity health registry"
+  P3:
+    - id: "P3-01"
+      task: "Central Next-Action Engine"
+    - id: "P3-02"
+      task: "Automatic failure recovery"
+    - id: "P3-03"
+      task: "Automatic project memory/checkpoint system"
+  P4:
+    - id: "P4-01"
+      task: "Keep Telegram disabled-safe; enable only with secret + human gate"
+    - id: "P4-02"
+      task: "Keep external commercial communications human-gated"
+  P5:
+    - id: "P5-01"
+      task: "HubSpot commercial SOT/pipeline automation"
+    - id: "P5-02"
+      task: "AI-01 research pipeline"
+    - id: "P5-03"
+      task: "AI-03 marketing/BD pipeline"
+    - id: "P5-04"
+      task: "AI-04 export/opportunity pipeline"
+    - id: "P5-05"
+      task: "AI-05 technology/automation pipeline"
+
+operational_rule_for_future_sessions:
+  first_actions:
+    - "Load this specification"
+    - "Read Notion Implementation Control"
+    - "Read Autonomous Continuation Runbook"
+    - "Read latest Daily Handoff and Change Log"
+    - "Read Asana execution state"
+    - "Read GitHub Issue #3"
+    - "Read canonical GitHub branch + CI"
+    - "Read live runtime through an authoritative Cloudflare path if available"
+    - "Reconcile conflicts before acting"
+  before_asking_user:
+    - "inspect available tools"
+    - "identify SOT"
+    - "attempt safe autonomous resolution"
+    - "verify result"
+    - "ask only for the smallest genuine human-only gate"
+  when_access_fails:
+    - "classify exact access state"
+    - "preserve evidence"
+    - "do not infer source absence"
+    - "search for another authorized path"
+    - "if none exists, report the exact human action required"
+  never:
+    - "reset project context"
+    - "restart from generic architecture"
+    - "repeat already settled decisions as new decisions"
+    - "claim work is complete without evidence"
+    - "treat chat memory as SOT"
+    - "treat a local copy as canonical"
+    - "use RUN number as proof of completion"
+
+definition_of_done:
+  project_level:
+    - "cloud runtime operates independently of user PC"
+    - "control plane continuously reconciles state"
+    - "watchdog detects and recovers stale execution"
+    - "queue/retry/DLQ/idempotency are verified"
+    - "tool health registry is live"
+    - "next-action engine selects safe executable work"
+    - "memory/checkpoints are durable"
+    - "all consequential actions respect human gates"
+    - "AI-01..05 are bounded and connected to orchestration"
+    - "business-system SOTs reconcile automatically"
+  evidence_rule: "Every claim of DONE requires an authoritative evidence reference."
+
+limitations_and_human_dependencies:
+  current_known:
+    - "No direct Cloudflare administration connector is exposed in the current tool surface; this is PATH_UNAVAILABLE/UNVERIFIED, not proof that Cloudflare resources are absent."
+    - "Remote Desktop Commander may be available but requires an explicit authorized connection before it can act on the user's PC."
+    - "Notion AI search is plan-gated; keyword search remains available."
+    - "Production secrets/tokens cannot be invented or obtained implicitly."
+    - "Human approval remains mandatory for designated high-risk actions."
+  autonomous_without_pc:
+    - "GitHub source/review/CI work when connector permissions allow"
+    - "Notion architecture/memory updates when authorized"
+    - "Asana task orchestration"
+    - "SharePoint evidence/memory operations when authorized"
+    - "Automations"
+    - "analytics/reporting/documentation"
+    - "safe code review and repository changes through authorized GitHub paths"
+  requires_human:
+    - "credential/secret entry"
+    - "connecting unavailable account/tool"
+    - "human-gated production activation/merge"
+    - "paid provider/service activation"
+    - "payment/banking/contract"
+    - "irreversible commercial actions"
+    - "external commercial communication where gated"
+
+anti_regression:
+  - "One canonical specification"
+  - "One SOT hierarchy"
+  - "One execution loop"
+  - "One failure protocol"
+  - "One authority model"
+  - "One machine-readable protocol"
+  - "No silent policy forks"
+  - "Any architecture change requires version bump + rationale + evidence + SOT write-back"
+  - "Any contradiction must be resolved by authoritative current evidence, not conversation recall"
+
+change_control:
+  required_for_material_change:
+    - "change_id"
+    - "reason"
+    - "affected_components"
+    - "risk"
+    - "authority_check"
+    - "implementation_reference"
+    - "test_reference"
+    - "verification_reference"
+    - "SOT_writeback"
+  versioning: "semantic"
+  current_version: "1.0.0"
