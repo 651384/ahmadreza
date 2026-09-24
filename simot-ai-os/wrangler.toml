@@ -38,3 +38,4 @@ max_batch_size = 10
 max_batch_timeout = 5
 max_retries = 3
 dead_letter_queue = "simot-events-dlq"
+\n[vars]\nCLOUDFLARE_ACCOUNT_ID = "28c48936d40df4c64bffc755f6c0ee7f"\n
