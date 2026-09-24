@@ -233,6 +233,7 @@ try { if(env.SIMOT_DB) await mandatoryPreflight(env,"HTTP:"+url.pathname); else 
 if(url.pathname==="/cloudflare/management/snapshot"&&request.method==="GET"){
   try{return json(await cloudflareManagementSnapshot(env));}catch(error){return json({ok:false,error:"CLOUDFLARE_MANAGEMENT_SNAPSHOT_UNAVAILABLE"},503);}
 }
+if(url.pathname==="/control-plane/manifest"&&request.method==="GET")return json({ok:true,manifest:CONTROL_PLANE_MANIFEST,standard_id:EXECUTION_STANDARD_ID});
 if(url.pathname==="/health")return json({service:"simot-ai-os-gateway",version:VERSION,state:env.SIMOT_DEFAULT_STATE||"MANUAL",time:now(),watchdog:{interval_minutes:WATCHDOG_POLICY.interval_minutes,heartbeat_interval_minutes:WATCHDOG_POLICY.heartbeat_interval_minutes,stale_threshold_minutes:WATCHDOG_POLICY.stale_threshold_minutes,recovery_threshold_minutes:WATCHDOG_POLICY.recovery_threshold_minutes}});
 if(url.pathname==="/workers/status"&&request.method==="GET"){
   try{
