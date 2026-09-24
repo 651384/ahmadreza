@@ -1,4 +1,5 @@
 name: SIMOT AI OS Live Smoke
+# Control-plane verification uses the account-owned token verify endpoint.
 
 on:
   push:
