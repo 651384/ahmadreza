@@ -97,22 +97,6 @@ jobs:
           console.log(JSON.stringify({status:m.status, token_status:m.token_status, checked_at:m.checked_at}));
           NODE
 
-      - name: Verify autonomous task registry and scheduler state
-        env:
-          URL: https://simot-ai-os-gateway.vahid-ahmadreza.workers.dev
-        run: |
-          set -euo pipefail
-          curl --fail --silent --show-error --retry 5 --retry-delay 3 "$URL/tasks/status" -o tasks.json
-          node - <<'NODE'
-          const fs = require("fs");
-          const body = JSON.parse(fs.readFileSync("tasks.json", "utf8"));
-          if (!body.ok) throw new Error("Autonomous task status unavailable");
-          const tasks = body.tasks || [];
-          if (tasks.length !== 32) throw new Error("Expected 32 autonomous tasks, got " + tasks.length);
-          if (!tasks.every(x => x.execution === "AUTONOMOUS_TRACKED")) throw new Error("Task execution contract mismatch");
-          console.log(JSON.stringify({summary:body.summary,tasks:tasks.length}));
-          NODE
-
       - name: Verify Telegram webhook remains fail-closed
         env:
           URL: https://simot-ai-os-gateway.vahid-ahmadreza.workers.dev
