@@ -50,7 +50,7 @@ async function cloudflareManagementRequest(env,path){
   return fetch("https://api.cloudflare.com/client/v4"+path,{headers:{"Authorization":"Bearer "+env.CLOUDFLARE_MANAGEMENT_API_TOKEN,"accept":"application/json"}});
 }
 async function runCloudflareManagementProbe(env){
-  if(!env.CLOUDFLARE_MANAGEMENT_API_TOKEN||!env.CLOUDFLARE_ACCOUNT_ID)return {ok:false,error:"CLOUDFLARE_MANAGEMENT_NOT_CONFIGURED"};
+  if(!env.CLOUDFLARE_MANAGEMENT_API_TOKEN||!env.CLOUDFLARE_ACCOUNT_ID)return {ok:false,error:"CLOUDFLARE_MANAGEMENT_NOT_CONFIGURED",token_format_ok:typeof env.CLOUDFLARE_MANAGEMENT_API_TOKEN==="string" && env.CLOUDFLARE_MANAGEMENT_API_TOKEN.startsWith("cfat_")};
   await ensureCloudflareManagementTable(env);
   const existing=await env.SIMOT_DB.prepare("SELECT status FROM cloudflare_management_probe WHERE id=1").first();
   if(existing?.status==="VERIFIED")return {ok:true,skipped:true,status:"VERIFIED"};
