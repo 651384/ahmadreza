@@ -56,6 +56,27 @@ jobs:
           console.log(JSON.stringify(body));
           NODE
 
+
+      - name: Verify Cloudflare management control plane
+        env:
+          URL: https://simot-ai-os-gateway.vahid-ahmadreza.workers.dev
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --retry 5 --retry-delay 3 "$URL/cloudflare/management/status" -o management.json
+          node - <<'NODE'
+          const fs = require("fs");
+          const body = JSON.parse(fs.readFileSync("management.json", "utf8"));
+          const m = body.management;
+          if (!body.ok || !m) throw new Error("Cloudflare management status unavailable");
+          if (m.status !== "VERIFIED") throw new Error("Cloudflare management is not VERIFIED: " + m.status);
+          if (m.token_status !== "active") throw new Error("Cloudflare management token is not active");
+          const required = ["token","workers","d1","queues","workflows","secrets"];
+          for (const key of required) {
+            if (m.resources?.[key]?.success !== true) throw new Error("Cloudflare resource check failed: " + key);
+          }
+          console.log(JSON.stringify({status:m.status, token_status:m.token_status, checked_at:m.checked_at}));
+          NODE
+
       - name: Verify Telegram webhook remains fail-closed
         env:
           URL: https://simot-ai-os-gateway.vahid-ahmadreza.workers.dev
