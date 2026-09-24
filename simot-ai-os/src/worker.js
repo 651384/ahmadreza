@@ -41,6 +41,46 @@ async function persistControllerHeartbeat(env, heartbeat, at){
   await env.SIMOT_DB.prepare("INSERT INTO controller_heartbeat(id,status,instance_id,last_heartbeat_at,current_operation,state_version) VALUES(1,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET status=excluded.status,instance_id=excluded.instance_id,last_heartbeat_at=excluded.last_heartbeat_at,current_operation=excluded.current_operation,state_version=excluded.state_version")
     .bind(heartbeat.status,heartbeat.instance_id,at,heartbeat.current_operation,heartbeat.state_version).run();
 }
+async function ensureCloudflareManagementTable(env){
+  if(!env.SIMOT_DB) throw new Error("RUNTIME_NOT_CONFIGURED");
+  await env.SIMOT_DB.prepare("CREATE TABLE IF NOT EXISTS cloudflare_management_probe (id INTEGER PRIMARY KEY, checked_at TEXT NOT NULL, status TEXT NOT NULL, account_id TEXT, token_status TEXT, resources_json TEXT, error_code TEXT)").run();
+}
+async function cloudflareManagementRequest(env,path){
+  if(!env.CLOUDFLARE_MANAGEMENT_API_TOKEN) throw new Error("CLOUDFLARE_MANAGEMENT_TOKEN_NOT_CONFIGURED");
+  return fetch("https://api.cloudflare.com/client/v4"+path,{headers:{"Authorization":"Bearer "+env.CLOUDFLARE_MANAGEMENT_API_TOKEN,"accept":"application/json"}});
+}
+async function runCloudflareManagementProbe(env){
+  if(!env.CLOUDFLARE_MANAGEMENT_API_TOKEN||!env.CLOUDFLARE_ACCOUNT_ID)return {ok:false,error:"CLOUDFLARE_MANAGEMENT_NOT_CONFIGURED"};
+  await ensureCloudflareManagementTable(env);
+  const existing=await env.SIMOT_DB.prepare("SELECT status FROM cloudflare_management_probe WHERE id=1").first();
+  if(existing?.status==="VERIFIED")return {ok:true,skipped:true,status:"VERIFIED"};
+  const checkedAt=now();
+  try{
+    const accountId=env.CLOUDFLARE_ACCOUNT_ID;
+    const checks=[
+      ["token",await cloudflareManagementRequest(env,"/accounts/"+accountId+"/tokens/verify")],
+      ["workers",await cloudflareManagementRequest(env,"/accounts/"+accountId+"/workers/scripts")],
+      ["d1",await cloudflareManagementRequest(env,"/accounts/"+accountId+"/d1/database?per_page=10")],
+      ["queues",await cloudflareManagementRequest(env,"/accounts/"+accountId+"/queues")]
+    ];
+    const resources={};
+    let tokenStatus="unknown";
+    for(const [name,response] of checks){
+      let payload=null;try{payload=await response.json()}catch{}
+      resources[name]={http_status:response.status,success:payload?.success===true,error_count:Array.isArray(payload?.errors)?payload.errors.length:0};
+      if(name==="token"&&payload?.success===true)tokenStatus=payload?.result?.status||"unknown";
+    }
+    const allOk=checks.every(([_,r])=>r.ok);
+    const status=allOk&&tokenStatus==="active"?"VERIFIED":"PARTIAL";
+    await env.SIMOT_DB.prepare("INSERT INTO cloudflare_management_probe(id,checked_at,status,account_id,token_status,resources_json,error_code) VALUES(1,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET checked_at=excluded.checked_at,status=excluded.status,account_id=excluded.account_id,token_status=excluded.token_status,resources_json=excluded.resources_json,error_code=excluded.error_code")
+      .bind(checkedAt,status,accountId,tokenStatus,JSON.stringify(resources),allOk?null:"ONE_OR_MORE_CHECKS_FAILED").run();
+    return {ok:status==="VERIFIED",status,account_id:accountId,token_status:tokenStatus,resources};
+  }catch(error){
+    await env.SIMOT_DB.prepare("INSERT INTO cloudflare_management_probe(id,checked_at,status,account_id,token_status,resources_json,error_code) VALUES(1,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET checked_at=excluded.checked_at,status=excluded.status,account_id=excluded.account_id,error_code=excluded.error_code")
+      .bind(checkedAt,"FAILED",env.CLOUDFLARE_ACCOUNT_ID,null,null,error?.message||"PROBE_FAILED").run().catch(()=>{});
+    return {ok:false,status:"FAILED",error:error?.message||"PROBE_FAILED"};
+  }
+}
 async function maybeEmitCloudHeartbeat(env, scheduledAt = Date.now()){
   if(String(env.SIMOT_CONTROLLER_MODE||"").toUpperCase()!=="CLOUD")return {emit:false,reason:"CONTROLLER_MODE_NOT_CLOUD"};
   const existing = await readControllerHeartbeat(env);
@@ -133,10 +173,10 @@ async scheduled(controller,env,ctx){
   const scheduledAt = controller.scheduledTime || Date.now();
   ctx.waitUntil((async()=>{
     await maybeEmitCloudHeartbeat(env, scheduledAt);
-    await runWatchdog(env, scheduledAt);
+    await runWatchdog(env, scheduledAt);\n    await runCloudflareManagementProbe(env);
   })());
 },
-async fetch(request,env){const url=new URL(request.url);if(url.pathname==="/health")return json({service:"simot-ai-os-gateway",version:VERSION,state:env.SIMOT_DEFAULT_STATE||"MANUAL",time:now(),watchdog:{interval_minutes:WATCHDOG_POLICY.interval_minutes,heartbeat_interval_minutes:WATCHDOG_POLICY.heartbeat_interval_minutes,stale_threshold_minutes:WATCHDOG_POLICY.stale_threshold_minutes,recovery_threshold_minutes:WATCHDOG_POLICY.recovery_threshold_minutes}});
+async fetch(request,env){const url=new URL(request.url);if(url.pathname==="/cloudflare/management/status"&&request.method==="GET"){\n  try{await ensureCloudflareManagementTable(env);const row=await env.SIMOT_DB.prepare("SELECT checked_at,status,account_id,token_status,resources_json,error_code FROM cloudflare_management_probe WHERE id=1").first();return json({ok:true,management:row?{...row,resources:row.resources_json?JSON.parse(row.resources_json):null}:null});}catch(error){return json({ok:false,error:"CLOUDFLARE_MANAGEMENT_STATUS_UNAVAILABLE"},503);}\n}\nif(url.pathname==="/health")return json({service:"simot-ai-os-gateway",version:VERSION,state:env.SIMOT_DEFAULT_STATE||"MANUAL",time:now(),watchdog:{interval_minutes:WATCHDOG_POLICY.interval_minutes,heartbeat_interval_minutes:WATCHDOG_POLICY.heartbeat_interval_minutes,stale_threshold_minutes:WATCHDOG_POLICY.stale_threshold_minutes,recovery_threshold_minutes:WATCHDOG_POLICY.recovery_threshold_minutes}});
 if(url.pathname==="/workers/status"&&request.method==="GET"){
   try{
     await ensureRuntimeTables(env);
