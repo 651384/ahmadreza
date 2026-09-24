@@ -173,7 +173,8 @@ async scheduled(controller,env,ctx){
   const scheduledAt = controller.scheduledTime || Date.now();
   ctx.waitUntil((async()=>{
     await maybeEmitCloudHeartbeat(env, scheduledAt);
-    await runWatchdog(env, scheduledAt);\n    await runCloudflareManagementProbe(env);
+    await runWatchdog(env, scheduledAt);
+    await runCloudflareManagementProbe(env);
   })());
 },
 async fetch(request,env){const url=new URL(request.url);if(url.pathname==="/cloudflare/management/status"&&request.method==="GET"){\n  try{await ensureCloudflareManagementTable(env);const row=await env.SIMOT_DB.prepare("SELECT checked_at,status,account_id,token_status,resources_json,error_code FROM cloudflare_management_probe WHERE id=1").first();return json({ok:true,management:row?{...row,resources:row.resources_json?JSON.parse(row.resources_json):null}:null});}catch(error){return json({ok:false,error:"CLOUDFLARE_MANAGEMENT_STATUS_UNAVAILABLE"},503);}\n}\nif(url.pathname==="/health")return json({service:"simot-ai-os-gateway",version:VERSION,state:env.SIMOT_DEFAULT_STATE||"MANUAL",time:now(),watchdog:{interval_minutes:WATCHDOG_POLICY.interval_minutes,heartbeat_interval_minutes:WATCHDOG_POLICY.heartbeat_interval_minutes,stale_threshold_minutes:WATCHDOG_POLICY.stale_threshold_minutes,recovery_threshold_minutes:WATCHDOG_POLICY.recovery_threshold_minutes}});
