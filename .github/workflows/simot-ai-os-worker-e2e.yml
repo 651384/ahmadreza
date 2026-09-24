@@ -16,9 +16,9 @@ jobs:
         run: |
           set -euo pipefail
           python - <<'PY'
-          import json, os, time, urllib.request
+          import json, os, time, urllib.request, datetime
           base=os.environ["URL"]
-          mid="E2E-GHA-20260923-01"
+          mid="E2E-GHA-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d-%H%M%S")
           body={
             "FRAME-START":"<<<SIMOT-MSG v2 | START>>>",
             "MSG-ID":mid,"CORR-ID":mid,"REPLY-TO":"NONE","THREAD-ID":mid,
@@ -35,23 +35,26 @@ jobs:
           req=urllib.request.Request(base+"/webhook",data=json.dumps(body).encode(),headers={"content-type":"application/json"},method="POST")
           with urllib.request.urlopen(req) as r:
             result=json.load(r)
-          print(result)
+          print("WEBHOOK", result)
           assert result.get("accepted") is True or result.get("duplicate") is True
-          for _ in range(12):
+          status=None
+          for _ in range(18):
             time.sleep(5)
             with urllib.request.urlopen(base+"/workers/status") as r:
               status=json.load(r)
-            print(status)
-            if all(w.get("last_msg_id")==mid and w.get("last_run_at") for w in status.get("workers",[]) if w.get("worker_id")=="SIMOT-MASTER"):
+            print("STATUS", status)
+            master=[w for w in status.get("workers",[]) if w.get("worker_id")=="SIMOT-MASTER"]
+            if master and master[0].get("last_msg_id")==mid:
               break
           master=[w for w in status.get("workers",[]) if w.get("worker_id")=="SIMOT-MASTER"][0]
           assert master["last_msg_id"]==mid, "SIMOT-MASTER did not process the smoke task"
           assert master["status"]=="ACTIVE"
           with urllib.request.urlopen(req) as r:
             duplicate=json.load(r)
-          print(duplicate)
+          print("DUPLICATE", duplicate)
           assert duplicate.get("duplicate") is True
           PY
+
       - name: Verify all registered workers remain ACTIVE
         env:
           URL: https://simot-ai-os-gateway.vahid-ahmadreza.workers.dev
