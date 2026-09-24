@@ -66,6 +66,7 @@ jobs:
           node - <<'NODE'
           const fs = require("fs");
           const body = JSON.parse(fs.readFileSync("management.json", "utf8"));
+          console.log("Cloudflare management response:", JSON.stringify(body));
           const m = body.management;
           if (!body.ok || !m) throw new Error("Cloudflare management status unavailable");
           if (m.status !== "VERIFIED") throw new Error("Cloudflare management is not VERIFIED: " + m.status);
