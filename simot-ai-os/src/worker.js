@@ -59,7 +59,7 @@ async function runCloudflareManagementProbe(env){
   try{
     const accountId=env.CLOUDFLARE_ACCOUNT_ID;
     const checks=[
-      ["token",await cloudflareManagementRequest(env,"/user/tokens/verify")],
+      ["token",await cloudflareManagementRequest(env,"/accounts/"+accountId+"/tokens/verify")],
       ["workers",await cloudflareManagementRequest(env,"/accounts/"+accountId+"/workers/scripts")],
       ["d1",await cloudflareManagementRequest(env,"/accounts/"+accountId+"/d1/database?per_page=10")],
       ["queues",await cloudflareManagementRequest(env,"/accounts/"+accountId+"/queues")],
