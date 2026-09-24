@@ -3,14 +3,14 @@
 Serverless runtime for SIMOT-MASTER and bounded Workers on Cloudflare. The runtime is intentionally independent of Codex, Arena, and any single developer tool or local machine.
 
 ## Current phase
-Cloud-native execution runtime (v0.4.0). The gateway validates the SIMOT-MSG v2 envelope, performs duplicate protection, records operational state in Cloudflare D1, queues accepted messages on Cloudflare Queues, and executes worker messages through the Workers AI binding under a strict daily free-quota guard.
+Cloud-native execution runtime (v0.4.2). The gateway validates the SIMOT-MSG v2 envelope, performs duplicate protection, records operational state in Cloudflare D1, queues accepted messages on Cloudflare Queues, and executes worker messages through the Workers AI binding under a strict daily free-quota guard.
 
 ## Provisioned Cloudflare resources
 - Worker: `simot-ai-os-gateway` (deployed via Cloudflare Workers Builds Git integration from `master`).
 - D1 database: `simot-ai-os` (binding `SIMOT_DB`) — schema in `schema.sql`; runtime also auto-creates `ai_daily_usage` and `worker_registry`.
 - Queue: `simot-events` with dead-letter queue `simot-events-dlq` (binding `SIMOT_QUEUE`).
 - Workers AI binding `AI` (default model `@cf/zai-org/glm-4.7-flash`), capped by `SIMOT_AI_MAX_REQUESTS_PER_DAY` (default 200/day) enforced in D1 before every model call.
-- Cron trigger `*/3 * * * *` runs the watchdog and, in CLOUD controller mode, the cloud controller heartbeat.
+- Cron trigger `* * * * *` runs the watchdog and, in CLOUD controller mode, the cloud controller heartbeat.
 
 ## Worker execution
 Messages addressed to `SIMOT-MASTER` or `SIMOT-AI-01..05` are executed by the queue consumer using the profiles in `src/worker_profiles.js`. Inter-worker routing re-queues follow-up envelopes; `SCOPE=E2E_SMOKE` suppresses routing fan-out. Results, registry state, and idempotency status are persisted in D1 and observable at `/workers/status`.
@@ -42,3 +42,7 @@ The message envelope is an application-level protocol, not cryptographic authent
 - Deployment is performed by Cloudflare Workers Builds configured in the Cloudflare dashboard; the repository contains no push-based deploy credentials by design.
 - External tool adapters (Notion, HubSpot, OneDrive, Asana, etc.) exist as validated contracts only; no live tool credentials or calls are wired into the runtime.
 - **Developer-tool independence:** Codex/Arena are not runtime dependencies and are not required for operation, validation, source-of-truth management, or deployment. The system of record remains GitHub plus the approved SIMOT SOT.
+
+
+## Locked execution standard
+The runtime enforces **Execution Standard 2.1.0** before scheduled, HTTP, queue, and management execution. SOT invariant **SOT-ARCH-LOCAL-PC-001** permanently removes Local PC from the runtime dependency chain. The Cloudflare control plane owns runtime scheduling, state, queueing, watchdog, and worker execution. See `docs/EXECUTION_STANDARD.md`, `docs/SOT.md`, and `docs/CONTROL_PLANE_MANIFEST.md`.
