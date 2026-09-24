@@ -47,6 +47,28 @@ export const CONTROL_PLANE_MANIFEST = Object.freeze({
   projects: [
     { id: "PROJECT-001", name: "SIMOT AI OS", status: "ACTIVE", control_plane: "CLOUDFLARE" },
     { id: "PROJECT-002", name: "SIMOT Digital Catalog", status: "CONTROLLED", execution_dependency: "NONE" }
+  ],
+  architecture_components: [
+    { id: "ARCH-001", name: "Master Memory", status: "LOCKED" },
+    { id: "ARCH-002", name: "Data Governance v2.0", status: "LOCKED" },
+    { id: "ARCH-003", name: "Source of Truth", status: "LOCKED" },
+    { id: "ARCH-004", name: "Integration/Handoff Architecture v2.0", status: "LOCKED" },
+    { id: "ARCH-005", name: "SIMOT-MSG v2", status: "LOCKED" },
+    { id: "ARCH-006", name: "Watchdog + Cloud Controller", status: "ACTIVE" }
+  ],
+  system_scope: {
+    org_processes: 71,
+    main_data_entities: 34,
+    data_elements: 40,
+    controls_and_risks: 15,
+    end_to_end_value_chains: 12
+  },
+  workstreams: [
+    { id: "WS-001", name: "Cloudflare control-plane completion", priority: "CRITICAL", status: "ACTIVE" },
+    { id: "WS-002", name: "Autonomous watchdog/recovery", priority: "CRITICAL", status: "ACTIVE" },
+    { id: "WS-003", name: "Worker activation and routing", priority: "HIGH", status: "ACTIVE" },
+    { id: "WS-004", name: "External connector adapters", priority: "CONTROLLED", status: "NOT_LIVE" },
+    { id: "WS-005", name: "SIMOT Digital Catalog", priority: "CONTROLLED", status: "IN_PROGRESS" }
   ]
 });
 
