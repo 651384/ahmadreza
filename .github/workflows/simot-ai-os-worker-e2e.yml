@@ -16,7 +16,7 @@ jobs:
         run: |
           set -euo pipefail
           python - <<'PY'
-          import json, os, time, urllib.request, datetime
+          import json, os, time, urllib.request, urllib.error, datetime
           base=os.environ["URL"]
           mid="E2E-GHA-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d-%H%M%S")
           body={
@@ -33,8 +33,12 @@ jobs:
             "PAYLOAD":{"test":"E2E","purpose":"activate_and_verify_worker_pipeline"}
           }
           req=urllib.request.Request(base+"/webhook",data=json.dumps(body).encode(),headers={"content-type":"application/json"},method="POST")
-          with urllib.request.urlopen(req) as r:
-            result=json.load(r)
+          try:
+            with urllib.request.urlopen(req) as r:
+              result=json.load(r)
+          except urllib.error.HTTPError as e:
+            print("WEBHOOK_HTTP", e.code, e.read().decode())
+            raise
           print("WEBHOOK", result)
           assert result.get("accepted") is True or result.get("duplicate") is True
           status=None
