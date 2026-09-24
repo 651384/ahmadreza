@@ -52,8 +52,9 @@ async function cloudflareManagementRequest(env,path){
 async function runCloudflareManagementProbe(env){
   if(!env.CLOUDFLARE_MANAGEMENT_API_TOKEN||!env.CLOUDFLARE_ACCOUNT_ID)return {ok:false,error:"CLOUDFLARE_MANAGEMENT_NOT_CONFIGURED",token_format_ok:typeof env.CLOUDFLARE_MANAGEMENT_API_TOKEN==="string" && env.CLOUDFLARE_MANAGEMENT_API_TOKEN.startsWith("cfat_")};
   await ensureCloudflareManagementTable(env);
-  const existing=await env.SIMOT_DB.prepare("SELECT status FROM cloudflare_management_probe WHERE id=1").first();
-  if(existing?.status==="VERIFIED")return {ok:true,skipped:true,status:"VERIFIED"};
+  const existing=await env.SIMOT_DB.prepare("SELECT checked_at,status FROM cloudflare_management_probe WHERE id=1").first();
+  const existingAgeMs=existing?.checked_at ? Math.max(0,Date.now()-Date.parse(existing.checked_at)) : Infinity;
+  if(existing?.status==="VERIFIED" && existingAgeMs < 5*60*1000)return {ok:true,skipped:true,status:"VERIFIED",checked_at:existing.checked_at};
   const checkedAt=now();
   try{
     const accountId=env.CLOUDFLARE_ACCOUNT_ID;
@@ -200,7 +201,11 @@ async scheduled(controller,env,ctx){
   })());
 },
 async fetch(request,env){const url=new URL(request.url);if(url.pathname==="/cloudflare/management/status"&&request.method==="GET"){
-  try{await ensureCloudflareManagementTable(env);const row=await env.SIMOT_DB.prepare("SELECT checked_at,status,account_id,token_status,resources_json,error_code FROM cloudflare_management_probe WHERE id=1").first();return json({ok:true,management:row?{...row,resources:row.resources_json?JSON.parse(row.resources_json):null,token_format_ok:typeof env.CLOUDFLARE_MANAGEMENT_API_TOKEN==="string" && env.CLOUDFLARE_MANAGEMENT_API_TOKEN.startsWith("cfat_")}:null});}catch(error){return json({ok:false,error:"CLOUDFLARE_MANAGEMENT_STATUS_UNAVAILABLE"},503);}
+  try{
+    const probe=await runCloudflareManagementProbe(env);
+    const row=await env.SIMOT_DB.prepare("SELECT checked_at,status,account_id,token_status,resources_json,error_code FROM cloudflare_management_probe WHERE id=1").first();
+    return json({ok:probe.ok,management:row?{...row,resources:row.resources_json?JSON.parse(row.resources_json):null,token_format_ok:typeof env.CLOUDFLARE_MANAGEMENT_API_TOKEN==="string" && env.CLOUDFLARE_MANAGEMENT_API_TOKEN.startsWith("cfat_")}:probe});
+  }catch(error){return json({ok:false,error:"CLOUDFLARE_MANAGEMENT_STATUS_UNAVAILABLE"},503);}
 }
 if(url.pathname==="/cloudflare/management/snapshot"&&request.method==="GET"){
   try{return json(await cloudflareManagementSnapshot(env));}catch(error){return json({ok:false,error:"CLOUDFLARE_MANAGEMENT_SNAPSHOT_UNAVAILABLE"},503);}
