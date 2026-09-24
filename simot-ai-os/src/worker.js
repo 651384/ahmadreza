@@ -175,7 +175,7 @@ function autonomousTaskEnvelope(task){
     "FRAME-START":"<<<SIMOT-MSG v2 | START>>>",
     "FRAME-END":"<<<SIMOT-MSG v2 | END | MSG-ID="+msgId+">>>",
     "MSG-ID":msgId,"CORR-ID":msgId,"REPLY-TO":"NONE","THREAD-ID":task.task_id,
-    "FROM":"SIMOT-MASTER","TO":"SIMOT-MASTER","TYPE":"COMMAND","PRIORITY":task.priority==="CRITICAL"?"CRITICAL":task.priority==="HIGH"?"IMPORTANT":"ROUTINE",
+    "FROM":"SIMOT-AI-01","TO":"SIMOT-MASTER","TYPE":"COMMAND","PRIORITY":task.priority==="CRITICAL"?"CRITICAL":task.priority==="HIGH"?"IMPORTANT":"ROUTINE",
     "AUTHORITY":"EXECUTE_WITHIN_ROLE","STATUS":"NEW","SCOPE":"AUTONOMOUS_TASK",
     "SOT-REFS":["CONTROL_PLANE_MANIFEST",task.task_id],"TASK-REFS":[task.task_id],"RECORD-REFS":[],
     "EXPECTED-ACTION":"Inspect task state, perform what is executable in Cloudflare, record evidence or exact blocker, and define next action.",
