@@ -1,4 +1,4 @@
-const COMPLETION_GATE_VERSION = "1.0.0";
+export const COMPLETION_GATE_VERSION = "1.0.0";
 
 export function evaluateCompletionEvidence({ result, runtimeEvidence }) {
   const status = String(result?.result_status || "").toUpperCase();
