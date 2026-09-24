@@ -1,7 +1,7 @@
 import { normalizeTelegramUpdate, buildTelegramEnvelope } from "./adapters/telegram.js";
 import { evaluateWatchdog, normalizeHeartbeat, WATCHDOG_POLICY, buildWatchdogRecord, planCloudHeartbeat, CLOUD_CONTROLLER } from "./watchdog.js";
 import { getWorkerProfile, EXECUTABLE_WORKERS } from "./worker_profiles.js";
-const VERSION = "0.4.0";
+const VERSION = "0.4.1";
 // Cloudflare Builds trigger marker — no runtime behavior change.
 // Build configuration is managed by Cloudflare Workers Builds.
 const RECIPIENT_RE = /^(SIMOT-MASTER|SIMOT-AI-[0-9]{2})$/;
@@ -47,7 +47,7 @@ async function ensureCloudflareManagementTable(env){
 }
 async function cloudflareManagementRequest(env,path){
   if(!env.CLOUDFLARE_MANAGEMENT_API_TOKEN) throw new Error("CLOUDFLARE_MANAGEMENT_TOKEN_NOT_CONFIGURED");
-  return fetch("https://api.cloudflare.com/client/v4"+path,{headers:{"Authorization":"Bearer "+env.CLOUDFLARE_MANAGEMENT_API_TOKEN,"accept":"application/json"}});
+  return fetch("https://api.cloudflare.com/client/v4"+path,{headers:{"Authorization":"Bearer "+env.CLOUDFLARE_MANAGEMENT_API_TOKEN,"accept":"application/json","content-type":"application/json"}});
 }
 async function runCloudflareManagementProbe(env){
   if(!env.CLOUDFLARE_MANAGEMENT_API_TOKEN||!env.CLOUDFLARE_ACCOUNT_ID)return {ok:false,error:"CLOUDFLARE_MANAGEMENT_NOT_CONFIGURED",token_format_ok:typeof env.CLOUDFLARE_MANAGEMENT_API_TOKEN==="string" && env.CLOUDFLARE_MANAGEMENT_API_TOKEN.startsWith("cfat_")};
@@ -58,10 +58,12 @@ async function runCloudflareManagementProbe(env){
   try{
     const accountId=env.CLOUDFLARE_ACCOUNT_ID;
     const checks=[
-      ["token",await cloudflareManagementRequest(env,"/accounts/"+accountId+"/tokens/verify")],
+      ["token",await cloudflareManagementRequest(env,"/user/tokens/verify")],
       ["workers",await cloudflareManagementRequest(env,"/accounts/"+accountId+"/workers/scripts")],
       ["d1",await cloudflareManagementRequest(env,"/accounts/"+accountId+"/d1/database?per_page=10")],
-      ["queues",await cloudflareManagementRequest(env,"/accounts/"+accountId+"/queues")]
+      ["queues",await cloudflareManagementRequest(env,"/accounts/"+accountId+"/queues")],
+      ["workflows",await cloudflareManagementRequest(env,"/accounts/"+accountId+"/workflows?per_page=10")],
+      ["secrets",await cloudflareManagementRequest(env,"/accounts/"+accountId+"/workers/scripts/simot-ai-os-gateway/secrets")]
     ];
     const resources={};
     let tokenStatus="unknown";
@@ -80,6 +82,26 @@ async function runCloudflareManagementProbe(env){
       .bind(checkedAt,"FAILED",env.CLOUDFLARE_ACCOUNT_ID,null,null,error?.message||"PROBE_FAILED").run().catch(()=>{});
     return {ok:false,status:"FAILED",error:error?.message||"PROBE_FAILED"};
   }
+}
+async function cloudflareManagementSnapshot(env){
+  const accountId=env.CLOUDFLARE_ACCOUNT_ID;
+  if(!env.CLOUDFLARE_MANAGEMENT_API_TOKEN||!accountId)return {ok:false,error:"CLOUDFLARE_MANAGEMENT_NOT_CONFIGURED"};
+  const out={account_id:accountId,checked_at:now(),resources:{}};
+  const checks=[
+    ["workers","/accounts/"+accountId+"/workers/scripts?per_page=100"],
+    ["d1","/accounts/"+accountId+"/d1/database?per_page=100"],
+    ["queues","/accounts/"+accountId+"/queues"],
+    ["workflows","/accounts/"+accountId+"/workflows?per_page=100"],
+    ["secrets","/accounts/"+accountId+"/workers/scripts/simot-ai-os-gateway/secrets"]
+  ];
+  for(const [name,path] of checks){
+    try{
+      const r=await cloudflareManagementRequest(env,path);
+      const p=await r.json().catch(()=>null);
+      out.resources[name]={http_status:r.status,success:p?.success===true,count:Array.isArray(p?.result)?p.result.length:null,errors:Array.isArray(p?.errors)?p.errors.slice(0,3).map(e=>({code:e?.code||null,message:e?.message||null})):[]};
+    }catch(e){out.resources[name]={http_status:0,success:false,errors:[{code:"FETCH_FAILED",message:"request_failed"}]};}
+  }
+  return {ok:true,...out};
 }
 async function maybeEmitCloudHeartbeat(env, scheduledAt = Date.now()){
   if(String(env.SIMOT_CONTROLLER_MODE||"").toUpperCase()!=="CLOUD")return {emit:false,reason:"CONTROLLER_MODE_NOT_CLOUD"};
@@ -179,6 +201,9 @@ async scheduled(controller,env,ctx){
 },
 async fetch(request,env){const url=new URL(request.url);if(url.pathname==="/cloudflare/management/status"&&request.method==="GET"){
   try{await ensureCloudflareManagementTable(env);const row=await env.SIMOT_DB.prepare("SELECT checked_at,status,account_id,token_status,resources_json,error_code FROM cloudflare_management_probe WHERE id=1").first();return json({ok:true,management:row?{...row,resources:row.resources_json?JSON.parse(row.resources_json):null,token_format_ok:typeof env.CLOUDFLARE_MANAGEMENT_API_TOKEN==="string" && env.CLOUDFLARE_MANAGEMENT_API_TOKEN.startsWith("cfat_")}:null});}catch(error){return json({ok:false,error:"CLOUDFLARE_MANAGEMENT_STATUS_UNAVAILABLE"},503);}
+}
+if(url.pathname==="/cloudflare/management/snapshot"&&request.method==="GET"){
+  try{return json(await cloudflareManagementSnapshot(env));}catch(error){return json({ok:false,error:"CLOUDFLARE_MANAGEMENT_SNAPSHOT_UNAVAILABLE"},503);}
 }
 if(url.pathname==="/health")return json({service:"simot-ai-os-gateway",version:VERSION,state:env.SIMOT_DEFAULT_STATE||"MANUAL",time:now(),watchdog:{interval_minutes:WATCHDOG_POLICY.interval_minutes,heartbeat_interval_minutes:WATCHDOG_POLICY.heartbeat_interval_minutes,stale_threshold_minutes:WATCHDOG_POLICY.stale_threshold_minutes,recovery_threshold_minutes:WATCHDOG_POLICY.recovery_threshold_minutes}});
 if(url.pathname==="/workers/status"&&request.method==="GET"){
