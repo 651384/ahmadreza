@@ -32,7 +32,7 @@ jobs:
             "FRAME-END":f"<<<SIMOT-MSG v2 | END | MSG-ID={mid}>>>",
             "PAYLOAD":{"test":"E2E","purpose":"activate_and_verify_worker_pipeline"}
           }
-          req=urllib.request.Request(base+"/webhook",data=json.dumps(body).encode(),headers={"content-type":"application/json"},method="POST")
+          req=urllib.request.Request(base+"/webhook",data=json.dumps(body).encode(),headers={"content-type":"application/json","User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/131.0 Safari/537.36"},method="POST")
           try:
             with urllib.request.urlopen(req) as r:
               result=json.load(r)
