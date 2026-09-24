@@ -64,7 +64,8 @@ function makeEnv({ secret = undefined } = {}) {
       }
     },
     SIMOT_DEFAULT_STATE: "MANUAL",
-    SIMOT_EXECUTION_STANDARD_VERSION: "2.1.0"
+    SIMOT_EXECUTION_STANDARD_VERSION: "2.1.0",
+    SIMOT_TEST_MODE: "1"
   };
   if (secret !== undefined) env.TELEGRAM_WEBHOOK_SECRET = secret;
   return { env, db, sent };
