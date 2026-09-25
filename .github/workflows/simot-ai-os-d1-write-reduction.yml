@@ -1,0 +1,56 @@
+name: SIMOT AI OS D1 Write Reduction
+
+on:
+  push:
+    branches:
+      - simot-ai-os/d1-write-reduction
+
+permissions:
+  contents: write
+
+jobs:
+  reduce-hot-path-writes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: simot-ai-os/d1-write-reduction
+          fetch-depth: 1
+
+      - name: Patch unnecessary D1 hot-path writes
+        shell: python
+        run: |
+          from pathlib import Path
+          p = Path('simot-ai-os/src/worker.js')
+          s = p.read_text(encoding='utf-8')
+
+          old = '''async function ensureControlPlaneManifest(env){\n  if(!env.SIMOT_DB) throw new Error("RUNTIME_NOT_CONFIGURED");\n  await env.SIMOT_DB.batch([\n    env.SIMOT_DB.prepare("CREATE TABLE IF NOT EXISTS control_plane_manifest (key TEXT PRIMARY KEY, version TEXT NOT NULL, payload_json TEXT NOT NULL, updated_at TEXT NOT NULL)")\n  ]);\n  const at=now();\n  for(const [key,version,payload] of manifestRows()){\n    await env.SIMOT_DB.prepare("INSERT INTO control_plane_manifest(key,version,payload_json,updated_at) VALUES(?,?,?,?) ON CONFLICT(key) DO UPDATE SET version=excluded.version,payload_json=excluded.payload_json,updated_at=excluded.updated_at")\n      .bind(key,version,payload,at).run();\n  }\n}\nasync function mandatoryPreflight(env, operation){\n  const check=validateExecutionStandard({env,sourceVersion:EXECUTION_STANDARD_VERSION});\n  if(env.SIMOT_TEST_MODE==="1") return check;\n  await ensureControlPlaneManifest(env);\n  await env.SIMOT_DB.prepare("INSERT INTO events(id,msg_id,corr_id,type,status,created_at,updated_at,payload_json,error_code,error_message) VALUES(?,?,?,?,?,?,?,?,?,?)")\n    .bind(crypto.randomUUID(),"PREFLIGHT-"+crypto.randomUUID(),null,"PREFLIGHT","COMPLETED",now(),now(),JSON.stringify({operation,standard_id:EXECUTION_STANDARD_ID,version:check.version,control_plane:check.control_plane,local_pc_dependency:false}),null,null).run();\n  return check;\n}'''
+
+          new = '''async function ensureControlPlaneManifest(env){\n  if(!env.SIMOT_DB) throw new Error("RUNTIME_NOT_CONFIGURED");\n  await env.SIMOT_DB.prepare("CREATE TABLE IF NOT EXISTS control_plane_manifest (key TEXT PRIMARY KEY, version TEXT NOT NULL, payload_json TEXT NOT NULL, updated_at TEXT NOT NULL)").run();\n  const at=now();\n  for(const [key,version,payload] of manifestRows()){\n    const existing=await env.SIMOT_DB.prepare("SELECT version FROM control_plane_manifest WHERE key=?").bind(key).first();\n    if(!existing){\n      await env.SIMOT_DB.prepare("INSERT INTO control_plane_manifest(key,version,payload_json,updated_at) VALUES(?,?,?,?)").bind(key,version,payload,at).run();\n    }else if(String(existing.version)!==String(version)){\n      await env.SIMOT_DB.prepare("UPDATE control_plane_manifest SET version=?,payload_json=?,updated_at=? WHERE key=?").bind(version,payload,at,key).run();\n    }\n  }\n}\nasync function mandatoryPreflight(env, operation){\n  const check=validateExecutionStandard({env,sourceVersion:EXECUTION_STANDARD_VERSION});\n  if(env.SIMOT_TEST_MODE==="1") return check;\n  await ensureControlPlaneManifest(env);\n  // Successful preflight is a validation gate, not an audit event. Persisting a\n  // new D1 event on every scheduled/HTTP/queue invocation caused unnecessary\n  // row writes. Durable D1 audit events remain reserved for actual state\n  // transitions and task/message results.\n  return check;\n}'''
+
+          old_task = '''    await env.SIMOT_DB.prepare("INSERT INTO autonomous_tasks(task_id,name,priority,domain,status,execution,attempts,last_run_at,next_run_at,last_result,blocker,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(task_id) DO UPDATE SET name=excluded.name,priority=excluded.priority,domain=excluded.domain,execution=excluded.execution,updated_at=excluded.updated_at")\n      .bind(task.id,task.name,task.priority,task.domain,task.status,task.execution,0,null,at,null,null,at).run();'''
+          new_task = '''    // Seed registry rows only when absent. Existing task state is authoritative;\n    // the scheduler must not rewrite all 32 registry rows every minute.\n    await env.SIMOT_DB.prepare("INSERT OR IGNORE INTO autonomous_tasks(task_id,name,priority,domain,status,execution,attempts,last_run_at,next_run_at,last_result,blocker,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)")\n      .bind(task.id,task.name,task.priority,task.domain,task.status,task.execution,0,null,at,null,null,at).run();'''
+
+          if old not in s:
+              raise SystemExit('expected preflight block not found')
+          if old_task not in s:
+              raise SystemExit('expected autonomous task upsert not found')
+          s = s.replace(old, new, 1)
+          s = s.replace(old_task, new_task, 1)
+          p.write_text(s, encoding='utf-8')
+
+      - name: Deterministic syntax check
+        run: node --check simot-ai-os/src/worker.js
+
+      - name: Commit controlled change
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add simot-ai-os/src/worker.js
+          if git diff --cached --quiet; then
+            echo "No source change required; migration already applied."
+            exit 0
+          fi
+          git commit -m "fix: reduce unnecessary D1 hot-path writes"
+          git push origin HEAD:simot-ai-os/d1-write-reduction
