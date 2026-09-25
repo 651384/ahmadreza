@@ -25,21 +25,25 @@ function validateEnvelope(body) { if (!body || typeof body !== "object" || Array
 function parseFrame(body){if(!body||typeof body!=="object")return{error:"INVALID_BODY"};if(body["FRAME-START"]!=="<<<SIMOT-MSG v2 | START>>>")return{error:"INVALID_FRAME_START"};if(body["FRAME-END"]!=="<<<SIMOT-MSG v2 | END | MSG-ID="+body["MSG-ID"]+">>>")return{error:"INVALID_FRAME_END"};return{error:null};}
 async function ensureControlPlaneManifest(env){
   if(!env.SIMOT_DB) throw new Error("RUNTIME_NOT_CONFIGURED");
-  await env.SIMOT_DB.batch([
-    env.SIMOT_DB.prepare("CREATE TABLE IF NOT EXISTS control_plane_manifest (key TEXT PRIMARY KEY, version TEXT NOT NULL, payload_json TEXT NOT NULL, updated_at TEXT NOT NULL)")
-  ]);
+  await env.SIMOT_DB.prepare("CREATE TABLE IF NOT EXISTS control_plane_manifest (key TEXT PRIMARY KEY, version TEXT NOT NULL, payload_json TEXT NOT NULL, updated_at TEXT NOT NULL)").run();
   const at=now();
   for(const [key,version,payload] of manifestRows()){
-    await env.SIMOT_DB.prepare("INSERT INTO control_plane_manifest(key,version,payload_json,updated_at) VALUES(?,?,?,?) ON CONFLICT(key) DO UPDATE SET version=excluded.version,payload_json=excluded.payload_json,updated_at=excluded.updated_at")
-      .bind(key,version,payload,at).run();
+    const existing=await env.SIMOT_DB.prepare("SELECT version FROM control_plane_manifest WHERE key=?").bind(key).first();
+    if(!existing){
+      await env.SIMOT_DB.prepare("INSERT INTO control_plane_manifest(key,version,payload_json,updated_at) VALUES(?,?,?,?)").bind(key,version,payload,at).run();
+    }else if(String(existing.version)!==String(version)){
+      await env.SIMOT_DB.prepare("UPDATE control_plane_manifest SET version=?,payload_json=?,updated_at=? WHERE key=?").bind(version,payload,at,key).run();
+    }
   }
 }
 async function mandatoryPreflight(env, operation){
   const check=validateExecutionStandard({env,sourceVersion:EXECUTION_STANDARD_VERSION});
   if(env.SIMOT_TEST_MODE==="1") return check;
   await ensureControlPlaneManifest(env);
-  await env.SIMOT_DB.prepare("INSERT INTO events(id,msg_id,corr_id,type,status,created_at,updated_at,payload_json,error_code,error_message) VALUES(?,?,?,?,?,?,?,?,?,?)")
-    .bind(crypto.randomUUID(),"PREFLIGHT-"+crypto.randomUUID(),null,"PREFLIGHT","COMPLETED",now(),now(),JSON.stringify({operation,standard_id:EXECUTION_STANDARD_ID,version:check.version,control_plane:check.control_plane,local_pc_dependency:false}),null,null).run();
+  // Successful preflight is a validation gate, not an audit event. Persisting a
+  // new D1 event on every scheduled/HTTP/queue invocation caused unnecessary
+  // row writes. Durable D1 audit events remain reserved for actual state
+  // transitions and task/message results.
   return check;
 }
 async function ensureWatchdogTables(env){
@@ -166,7 +170,9 @@ async function ensureAutonomousTaskTable(env){
   ]);
   const at=now();
   for(const task of (CONTROL_PLANE_MANIFEST.task_registry||[])){
-    await env.SIMOT_DB.prepare("INSERT INTO autonomous_tasks(task_id,name,priority,domain,status,execution,attempts,last_run_at,next_run_at,last_result,blocker,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(task_id) DO UPDATE SET name=excluded.name,priority=excluded.priority,domain=excluded.domain,execution=excluded.execution,updated_at=excluded.updated_at")
+    // Seed registry rows only when absent. Existing task state is authoritative;
+    // the scheduler must not rewrite all 32 registry rows every minute.
+    await env.SIMOT_DB.prepare("INSERT OR IGNORE INTO autonomous_tasks(task_id,name,priority,domain,status,execution,attempts,last_run_at,next_run_at,last_result,blocker,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)")
       .bind(task.id,task.name,task.priority,task.domain,task.status,task.execution,0,null,at,null,null,at).run();
   }
 }
