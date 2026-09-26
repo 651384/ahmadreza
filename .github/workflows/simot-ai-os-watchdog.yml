@@ -15,6 +15,8 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Check live runtime and watchdog state
+        id: runtime
+        continue-on-error: true
         env:
           BASE_URL: https://simot-ai-os-gateway.vahid-ahmadreza.workers.dev
         run: |
@@ -30,15 +32,21 @@ jobs:
           console.log(JSON.stringify({health, watchdog}));
           NODE
 
-      - name: Record recovery signal in Issue #3
-        if: ${{ success() }}
+      - name: Record runtime verification
+        if: ${{ steps.runtime.outcome == 'success' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          WATCHDOG_FILE: watchdog.json
         run: |
           set -euo pipefail
-          state="$(node -p "JSON.parse(require('fs').readFileSync(process.env.WATCHDOG_FILE,'utf8')).state?.state || 'UNKNOWN'")"
-          action="$(node -p "JSON.parse(require('fs').readFileSync(process.env.WATCHDOG_FILE,'utf8')).state?.action || 'UNKNOWN'")"
-          if [ "$state" = "RECOVERY_REQUIRED" ] || [ "$state" = "STALE" ]; then
-            gh issue comment 3 --repo "${GITHUB_REPOSITORY}" --body "WATCHDOG SIGNAL — state=$state action=$action. This workflow is observational/recovery-signaling only; it does not bypass human gates, merge PRs, insert secrets, or activate providers."
-          fi
+          state="$(node -p "JSON.parse(require('fs').readFileSync('watchdog.json','utf8')).state?.state || 'UNKNOWN'")"
+          action="$(node -p "JSON.parse(require('fs').readFileSync('watchdog.json','utf8')).state?.action || 'UNKNOWN'")"
+          echo "WATCHDOG_RUNTIME_OK state=$state action=$action"
+
+      - name: Record recovery signal in Issue #3
+        if: ${{ steps.runtime.outcome != 'success' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          gh issue comment 3 --repo "${GITHUB_REPOSITORY}" --body "WATCHDOG SIGNAL — runtime health/status verification FAILED. This is an observational/recovery signal only; it does not bypass human gates, merge PRs, insert secrets, or activate providers."
+          exit 1
