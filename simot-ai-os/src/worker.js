@@ -208,7 +208,7 @@ async function updateAutonomousTaskResult(env,body,result){
   const gate=evaluateCompletionEvidence({result,runtimeEvidence:runtimeEvidence(env)});
   const status=String(result?.result_status||"").toUpperCase();
   const gateRejected=status==="COMPLETED"&&!gate.verified;
-  const finalStatus=status==="COMPLETED"&&gate.verified?"COMPLETED":gateRejected||status==="BLOCKED"||status==="FAILED"?"BLOCKED":"IN_PROGRESS";
+  const finalStatus=status==="COMPLETED"&&gate.verified?"COMPLETED":(status==="BLOCKED"||status==="FAILED"||status==="COMPLETED")?"BLOCKED":"IN_PROGRESS";
   const blocker=finalStatus==="COMPLETED"?null:(Array.isArray(result?.gaps)&&result.gaps.length?String(result.gaps[0]):gate.reasons.join(","));
   const dependencyReason=gateRejected
     ? (gate.reasons.includes("NO_EVIDENCE")||gate.reasons.includes("RESULT_NOT_VERIFIED")
@@ -272,7 +272,7 @@ async function executeWorkerMessage(env,body){
   const model=env.SIMOT_AI_MODEL||"@cf/zai-org/glm-4.7-flash";
   const result=await env.AI.run(model,{prompt,max_tokens:Number(env.SIMOT_AI_MAX_OUTPUT_TOKENS||500),temperature:0.1,seed:7});
   const text=extractAIText(result);
-  let parsed; try{parsed=JSON.parse(text);}catch{parsed={result_status:"COMPLETED",summary:text,findings:[],evidence:[],gaps:["Model returned non-JSON output; manual normalization required."],confidence:"LOW",verification:"AI-INFERRED",next_action:"NORMALIZE_AND_REVIEW",route_to:"SIMOT-MASTER"};}
+  let parsed; try{parsed=JSON.parse(text);}catch{parsed={result_status:"BLOCKED",summary:text,findings:[],evidence:[],gaps:["Model returned non-JSON output; manual normalization required."],confidence:"LOW",verification:"AI-INFERRED",next_action:"NORMALIZE_AND_REVIEW",route_to:"SIMOT-MASTER"};}
   const route=body["SCOPE"]==="E2E_SMOKE"?"NONE":(EXECUTABLE_WORKERS.includes(parsed.route_to)?parsed.route_to:(parsed.route_to==="SIMOT-MASTER"?"SIMOT-MASTER":"NONE"));
   return {worker_id:workerId,model,result:parsed,route_to:route,quota};
 }
