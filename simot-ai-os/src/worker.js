@@ -161,13 +161,17 @@ async function runWatchdog(env, scheduledAt = Date.now()){
 async function ensureAutonomousTaskTable(env){
   if(!env.SIMOT_DB) throw new Error("RUNTIME_NOT_CONFIGURED");
   await env.SIMOT_DB.batch([
-    env.SIMOT_DB.prepare("CREATE TABLE IF NOT EXISTS autonomous_tasks (task_id TEXT PRIMARY KEY, name TEXT NOT NULL, priority TEXT NOT NULL, domain TEXT NOT NULL, status TEXT NOT NULL, execution TEXT NOT NULL, attempts INTEGER NOT NULL DEFAULT 0, last_run_at TEXT, next_run_at TEXT, last_result TEXT, blocker TEXT, updated_at TEXT NOT NULL)"),
+    env.SIMOT_DB.prepare("CREATE TABLE IF NOT EXISTS autonomous_tasks (task_id TEXT PRIMARY KEY, name TEXT NOT NULL, priority TEXT NOT NULL, domain TEXT NOT NULL, status TEXT NOT NULL, execution TEXT NOT NULL, attempts INTEGER NOT NULL DEFAULT 0, last_run_at TEXT, next_run_at TEXT, last_result TEXT, blocker TEXT, dependency_reason TEXT, updated_at TEXT NOT NULL)"),
     env.SIMOT_DB.prepare("CREATE INDEX IF NOT EXISTS idx_autonomous_tasks_due ON autonomous_tasks(status,next_run_at)")
   ]);
+  const columns=await env.SIMOT_DB.prepare("PRAGMA table_info(autonomous_tasks)").all();
+  if(!(columns.results||[]).some(c=>c.name==="dependency_reason")){
+    await env.SIMOT_DB.prepare("ALTER TABLE autonomous_tasks ADD COLUMN dependency_reason TEXT").run();
+  }
   const at=now();
   for(const task of (CONTROL_PLANE_MANIFEST.task_registry||[])){
-    await env.SIMOT_DB.prepare("INSERT INTO autonomous_tasks(task_id,name,priority,domain,status,execution,attempts,last_run_at,next_run_at,last_result,blocker,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(task_id) DO UPDATE SET name=excluded.name,priority=excluded.priority,domain=excluded.domain,execution=excluded.execution,updated_at=excluded.updated_at")
-      .bind(task.id,task.name,task.priority,task.domain,task.status,task.execution,0,null,at,null,null,at).run();
+    await env.SIMOT_DB.prepare("INSERT INTO autonomous_tasks(task_id,name,priority,domain,status,execution,attempts,last_run_at,next_run_at,last_result,blocker,dependency_reason,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(task_id) DO UPDATE SET name=excluded.name,priority=excluded.priority,domain=excluded.domain,execution=excluded.execution,updated_at=excluded.updated_at")
+      .bind(task.id,task.name,task.priority,task.domain,task.status,task.execution,0,null,at,null,null,null,at).run();
   }
 }
 function autonomousTaskEnvelope(task){
@@ -193,7 +197,7 @@ async function dispatchNextAutonomousTask(env){
   const task=autonomousTaskEnvelope(row);
   const at=now();
   await env.SIMOT_QUEUE.send(task);
-  await env.SIMOT_DB.prepare("UPDATE autonomous_tasks SET status='IN_PROGRESS',attempts=attempts+1,last_run_at=?,next_run_at=?,last_result=?,blocker=NULL,updated_at=? WHERE task_id=?")
+  await env.SIMOT_DB.prepare("UPDATE autonomous_tasks SET status='IN_PROGRESS',attempts=attempts+1,last_run_at=?,next_run_at=?,last_result=?,blocker=NULL,dependency_reason=NULL,updated_at=? WHERE task_id=?")
     .bind(at,new Date(Date.now()+15*60*1000).toISOString(),"DISPATCHED_TO_CLOUD_WORKER",at,row.task_id).run();
   return {dispatched:true,task_id:row.task_id,attempt:row.attempts+1};
 }
@@ -203,11 +207,21 @@ async function updateAutonomousTaskResult(env,body,result){
   await ensureAutonomousTaskTable(env);
   const gate=evaluateCompletionEvidence({result,runtimeEvidence:runtimeEvidence(env)});
   const status=String(result?.result_status||"").toUpperCase();
-  const finalStatus=status==="COMPLETED"&&gate.verified?"COMPLETED":status==="BLOCKED"||status==="FAILED"?"BLOCKED":"IN_PROGRESS";
+  const gateRejected=status==="COMPLETED"&&!gate.verified;
+  const finalStatus=status==="COMPLETED"&&gate.verified?"COMPLETED":gateRejected||status==="BLOCKED"||status==="FAILED"?"BLOCKED":"IN_PROGRESS";
   const blocker=finalStatus==="COMPLETED"?null:(Array.isArray(result?.gaps)&&result.gaps.length?String(result.gaps[0]):gate.reasons.join(","));
+  const dependencyReason=gateRejected
+    ? (gate.reasons.includes("NO_EVIDENCE")||gate.reasons.includes("RESULT_NOT_VERIFIED")
+        ? "منتظر evidence/verification معتبر از runtime"
+        : gate.reasons.includes("RUNTIME_VERSION_UNVERIFIED")
+          ? "منتظر runtime version evidence معتبر"
+          : gate.reasons.includes("UNRESOLVED_GAPS")
+            ? "منتظر رفع dependency/gap ثبت‌شده: "+(Array.isArray(result?.gaps)&&result.gaps.length?String(result.gaps[0]):"UNRESOLVED_GAPS")
+            : "منتظر capability/adapter اجرایی لازم؛ Completion Gate رد شد: "+gate.reasons.join(","))
+    : null;
   const next=finalStatus==="COMPLETED"?String(result?.next_action||"COMPLETED"):String(result?.next_action||"REVIEW");
-  await env.SIMOT_DB.prepare("UPDATE autonomous_tasks SET status=?,next_run_at=?,last_result=?,blocker=?,updated_at=? WHERE task_id=?")
-    .bind(finalStatus,finalStatus==="COMPLETED"?null:new Date(Date.now()+15*60*1000).toISOString(),next,blocker,now(),taskId).run();
+  await env.SIMOT_DB.prepare("UPDATE autonomous_tasks SET status=?,next_run_at=?,last_result=?,blocker=?,dependency_reason=?,updated_at=? WHERE task_id=?")
+    .bind(finalStatus,finalStatus==="COMPLETED"?null:new Date(Date.now()+15*60*1000).toISOString(),next,blocker,dependencyReason,now(),taskId).run();
 }
 async function ensureRuntimeTables(env){
   if(!env.SIMOT_DB) throw new Error("RUNTIME_NOT_CONFIGURED");
@@ -312,7 +326,7 @@ if(url.pathname==="/completion/status"&&request.method==="GET"){
 if(url.pathname==="/tasks/status"&&request.method==="GET"){
   try{
     await ensureAutonomousTaskTable(env);
-    const rows=await env.SIMOT_DB.prepare("SELECT task_id,name,priority,domain,status,execution,attempts,last_run_at,next_run_at,last_result,blocker,updated_at FROM autonomous_tasks ORDER BY CASE priority WHEN 'CRITICAL' THEN 1 WHEN 'HIGH' THEN 2 WHEN 'MEDIUM' THEN 3 ELSE 4 END, task_id").all();
+    const rows=await env.SIMOT_DB.prepare("SELECT task_id,name,priority,domain,status,execution,attempts,last_run_at,next_run_at,last_result,blocker,dependency_reason,updated_at FROM autonomous_tasks ORDER BY CASE priority WHEN 'CRITICAL' THEN 1 WHEN 'HIGH' THEN 2 WHEN 'MEDIUM' THEN 3 ELSE 4 END, task_id").all();
     const summary=await env.SIMOT_DB.prepare("SELECT status,COUNT(*) AS count FROM autonomous_tasks GROUP BY status").all();
     return json({ok:true,summary:summary.results||[],tasks:rows.results||[]});
   }catch(error){return json({ok:false,error:"AUTONOMOUS_TASK_STATUS_UNAVAILABLE"},503);}
