@@ -18,17 +18,15 @@ export async function createGeminiLiveToken(env) {
       newSessionExpireTime,
       bidiGenerateContentSetup: {
         model: "models/gemini-3.8-live",
-        config: {
-          responseModalities: ["AUDIO"],
-          sessionResumption: {},
-          contextWindowCompression: { slidingWindow: {} },
-          inputAudioTranscription: {},
-          outputAudioTranscription: {},
-          systemInstruction: {
-            parts: [{
-              text: "You are SIMOT Voice Interface. Speak Persian by default. Be concise, action-oriented, and never claim an action is complete unless SIMOT provides completion evidence."
-            }]
-          }
+        generationConfig: { responseModalities: ["AUDIO"] },
+        sessionResumption: {},
+        contextWindowCompression: { slidingWindow: {} },
+        inputAudioTranscription: {},
+        outputAudioTranscription: {},
+        systemInstruction: {
+          parts: [{
+            text: "You are SIMOT Voice Interface. Speak Persian by default. Be concise, action-oriented, and never claim an action is complete unless SIMOT provides completion evidence."
+          }]
         }
       }
     })
