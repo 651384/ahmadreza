@@ -9,7 +9,7 @@ export const AI_PROVIDER_REGISTRY = Object.freeze([
     verified_free: true,
     payment_enabled: false,
     enabled: true,
-    priority: 1,
+    priority: 2,
     latency_rank: 1
   },
   {
@@ -22,7 +22,7 @@ export const AI_PROVIDER_REGISTRY = Object.freeze([
     verified_free: true,
     payment_enabled: false,
     enabled: true,
-    priority: 2,
+    priority: 1,
     latency_rank: 2,
     execution_adapter: "./adapters/gemini.js",
     activation: "REQUIRES_GEMINI_API_KEY_AND_FREE_MODE"
