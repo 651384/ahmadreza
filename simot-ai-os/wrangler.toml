@@ -44,3 +44,8 @@ max_batch_size = 10
 max_batch_timeout = 5
 max_retries = 3
 dead_letter_queue = "simot-events-dlq"
+
+# Worker Previews are required by the current Wrangler preview command.
+# Production settings remain unchanged; Preview-specific bindings can be
+# added later as isolated resources.
+previews = {}

@@ -6,6 +6,7 @@ import { CONTROL_PLANE_MANIFEST, manifestRows } from "./control_plane_manifest.j
 import { evaluateCompletionEvidence, runtimeEvidence, COMPLETION_GATE_VERSION } from "./completion_gate.js";
 import { selectProvider } from "./provider-router.js";
 import { AI_PROVIDER_REGISTRY } from "./ai-provider-registry.js";
+import { exaSearch } from "./adapters/exa.js";
 const VERSION = "0.5.0";
 const EXECUTION_STANDARD_VERSION = "2.1.0";
 // Cloudflare Builds trigger marker — no runtime behavior change.
@@ -299,6 +300,15 @@ async function executeWorkerMessage(env,body){
   const route=body["SCOPE"]==="E2E_SMOKE"?"NONE":(EXECUTABLE_WORKERS.includes(parsed.route_to)?parsed.route_to:(parsed.route_to==="SIMOT-MASTER"?"SIMOT-MASTER":"NONE"));
   return {worker_id:workerId,model:provider.model,result:parsed,route_to:route,quota,provider:provider.id};
 }
+async function runExaSearch(env, request) {
+  if (request.method !== "POST") return json({ ok: false, error: "METHOD_NOT_ALLOWED" }, 405);
+  let body;
+  try { body = await request.json(); } catch { return json({ ok: false, error: "INVALID_JSON" }, 400); }
+  const provider = selectProvider(AI_PROVIDER_REGISTRY, "WEB_SEARCH", { data_class: "PUBLIC" });
+  if (provider.id !== "EXA") return json({ ok: false, provider: provider.id, error: "EXA_NOT_SELECTED" }, 503);
+  const result = await exaSearch(env, body);
+  return json({ ok: result.ok, provider: result.provider, status: result.status, result });
+}
 function safeBody(body){const copy={...body};if(copy.SECRET)delete copy.SECRET;if(copy["API-KEY"])delete copy["API-KEY"];if(copy["PRIVATE-KEY"])delete copy["PRIVATE-KEY"];if(copy.PASSWORD)delete copy.PASSWORD;return copy;}
 async function recordEvent(env,event){await env.SIMOT_DB.prepare("INSERT INTO events(id,msg_id,corr_id,type,status,created_at,updated_at,payload_json,error_code,error_message) VALUES(?,?,?,?,?,?,?,?,?,?)").bind(event.id,event.msg_id,event.corr_id,event.type,event.status,event.created_at,event.updated_at,event.payload_json||null,event.error_code||null,event.error_message||null).run();}
 export default {
@@ -325,6 +335,10 @@ if(url.pathname==="/cloudflare/management/snapshot"&&request.method==="GET"){
   try{return json(await cloudflareManagementSnapshot(env));}catch(error){return json({ok:false,error:"CLOUDFLARE_MANAGEMENT_SNAPSHOT_UNAVAILABLE"},503);}
 }
 if(url.pathname==="/control-plane/manifest"&&request.method==="GET")return json({ok:true,manifest:CONTROL_PLANE_MANIFEST,standard_id:EXECUTION_STANDARD_ID});
+if(url.pathname==="/providers/exa/search"){
+  try { return await runExaSearch(env, request); }
+  catch(error){ return json({ok:false,provider:"EXA",status:"FAILED",error:error?.code||"EXA_PROVIDER_ERROR"},503); }
+}
 if(url.pathname==="/health")return json({service:"simot-ai-os-gateway",version:VERSION,state:env.SIMOT_DEFAULT_STATE||"MANUAL",time:now(),watchdog:{interval_minutes:WATCHDOG_POLICY.interval_minutes,heartbeat_interval_minutes:WATCHDOG_POLICY.heartbeat_interval_minutes,stale_threshold_minutes:WATCHDOG_POLICY.stale_threshold_minutes,recovery_threshold_minutes:WATCHDOG_POLICY.recovery_threshold_minutes}});
 if(url.pathname==="/completion/status"&&request.method==="GET"){
   try{
