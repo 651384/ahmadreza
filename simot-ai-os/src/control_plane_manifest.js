@@ -1,7 +1,7 @@
 import { EXECUTION_STANDARD, EXECUTION_STANDARD_ID } from "./execution_standard.js";
 
 export const CONTROL_PLANE_MANIFEST = Object.freeze({
-  manifest_version: "2.0.0",
+  manifest_version: "2.1.0",
   standard_id: EXECUTION_STANDARD_ID,
   execution_standard: EXECUTION_STANDARD,
   instructions: [
@@ -54,7 +54,10 @@ export const CONTROL_PLANE_MANIFEST = Object.freeze({
     { id: "ARCH-003", name: "Source of Truth", status: "LOCKED" },
     { id: "ARCH-004", name: "Integration/Handoff Architecture v2.0", status: "LOCKED" },
     { id: "ARCH-005", name: "SIMOT-MSG v2", status: "LOCKED" },
-    { id: "ARCH-006", name: "Watchdog + Cloud Controller", status: "ACTIVE" }
+    { id: "ARCH-006", name: "Watchdog + Cloud Controller", status: "ACTIVE" },
+    { id: "ARCH-007", name: "Provider Router + Free Cost Guard", status: "ACTIVE" },
+    { id: "ARCH-008", name: "Capability/Tool Registry", status: "ACTIVE" },
+    { id: "ARCH-009", name: "Completion Gate + Explicit Task State Machine", status: "ACTIVE" }
   ],
   system_scope: {
     org_processes: 71,
