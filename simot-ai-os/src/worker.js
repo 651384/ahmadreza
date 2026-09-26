@@ -170,8 +170,9 @@ async function ensureAutonomousTaskTable(env){
     env.SIMOT_DB.prepare("CREATE TABLE IF NOT EXISTS autonomous_tasks (task_id TEXT PRIMARY KEY, name TEXT NOT NULL, priority TEXT NOT NULL, domain TEXT NOT NULL, status TEXT NOT NULL, execution TEXT NOT NULL, attempts INTEGER NOT NULL DEFAULT 0, last_run_at TEXT, next_run_at TEXT, last_result TEXT, blocker TEXT, dependency_reason TEXT, updated_at TEXT NOT NULL)"),
     env.SIMOT_DB.prepare("CREATE INDEX IF NOT EXISTS idx_autonomous_tasks_due ON autonomous_tasks(status,next_run_at)")
   ]);
-  const cols=await env.SIMOT_DB.prepare("PRAGMA table_info(autonomous_tasks)").all();
-  if(!(cols.results||[]).some(x=>x.name==="dependency_reason")){
+  const pragma=env.SIMOT_DB.prepare("PRAGMA table_info(autonomous_tasks)");
+  const cols=typeof pragma.all==="function" ? await pragma.all() : null;
+  if(cols && !(cols.results||[]).some(x=>x.name==="dependency_reason")){
     await env.SIMOT_DB.prepare("ALTER TABLE autonomous_tasks ADD COLUMN dependency_reason TEXT").run();
   }
   const at=now();
