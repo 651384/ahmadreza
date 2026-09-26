@@ -16,7 +16,7 @@ export async function createGeminiLiveToken(env) {
       uses: 1,
       expireTime,
       newSessionExpireTime,
-      liveConnectConstraints: {
+      bidiGenerateContentSetup: {
         model: "models/gemini-3.8-live",
         config: {
           responseModalities: ["AUDIO"],
