@@ -83,5 +83,5 @@ async function start(){
 function cleanup(){processor?.disconnect();source?.disconnect();processor=null;source=null;document.getElementById('start').disabled=false;document.getElementById('stop').disabled=true}
 document.getElementById('start').onclick=start;
 document.getElementById('stop').onclick=()=>{ws?.close();cleanup()};
-</script></body></html>`, {headers:{"content-type":"text/html; charset=utf-8"}});
+</script></body></html>`, {headers:{"content-type":"text/html; charset=utf-8","cache-control":"no-store, no-cache, must-revalidate, max-age=0","pragma":"no-cache","expires":"0"}});
 }
