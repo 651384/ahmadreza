@@ -16,15 +16,13 @@ export async function createGeminiLiveToken(env) {
       uses: 1,
       expireTime,
       newSessionExpireTime,
-      config: {
-        bidiGenerateContentSetup: {
-          model: "models/gemini-3.8-live",
-          generationConfig: { responseModalities: ["AUDIO"] },
-          systemInstruction: {
-            parts: [{
-              text: "You are SIMOT Voice Interface. Speak Persian by default. Be concise, action-oriented, and never claim an action is complete unless SIMOT provides completion evidence."
-            }]
-          }
+      bidiGenerateContentSetup: {
+        model: "models/gemini-3.8-live",
+        generationConfig: { responseModalities: ["AUDIO"] },
+        systemInstruction: {
+          parts: [{
+            text: "You are SIMOT Voice Interface. Speak Persian by default. Be concise, action-oriented, and never claim an action is complete unless SIMOT provides completion evidence."
+          }]
         }
       }
     })
@@ -64,7 +62,7 @@ async function start(){
  const r=await fetch('/voice/token',{method:'POST'});const j=await r.json();if(!j.ok){status('خطا: '+JSON.stringify(j));document.getElementById('start').disabled=false;return}
  ws=new WebSocket('wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContentConstrained?access_token='+encodeURIComponent(j.token));
  ws.onopen=async()=>{status('وب‌سوکت وصل شد؛ در حال راه‌اندازی...');document.getElementById('stop').disabled=false;ctx=new AudioContext();await ctx.resume();
-  const setup={setup:{model:'models/gemini-3.8-live',generationConfig:{responseModalities:['AUDIO']},systemInstruction:{parts:[{text:'You are SIMOT Voice Interface. Speak Persian by default. Be concise, action-oriented.'}]}}};ws.send(JSON.stringify(setup));
+  const setup={setup:{model:'models/gemini-3.8-live',config:{generationConfig:{responseModalities:['AUDIO']},systemInstruction:{parts:[{text:'You are SIMOT Voice Interface. Speak Persian by default. Be concise, action-oriented.'}]}}}};ws.send(JSON.stringify(setup));
   setTimeout(()=>{if(ws?.readyState===1&&!window.__simotSetupComplete){status('Gemini setup timeout — waiting for setupComplete');}},10000);
  };
  async function startMicrophone(){
