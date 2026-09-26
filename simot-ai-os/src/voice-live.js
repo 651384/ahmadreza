@@ -65,18 +65,21 @@ async function start(){
  document.getElementById('start').disabled=true;status('در حال اتصال...');
  const r=await fetch('/voice/token',{method:'POST'});const j=await r.json();if(!j.ok){status('خطا: '+JSON.stringify(j));document.getElementById('start').disabled=false;return}
  ws=new WebSocket('wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContentConstrained?access_token='+encodeURIComponent(j.token));
- ws.onopen=async()=>{status('متصل — صحبت کنید');document.getElementById('stop').disabled=false;ctx=new AudioContext();await ctx.resume();
-  const setup={setup:{model:'models/gemini-3.8-live',responseModalities:['AUDIO'],sessionResumption:{},contextWindowCompression:{slidingWindow:{}},inputAudioTranscription:{},outputAudioTranscription:{},systemInstruction:{parts:[{text:'You are SIMOT Voice Interface. Speak Persian by default. Be concise, action-oriented.'}]}}};ws.send(JSON.stringify(setup));
+ ws.onopen=async()=>{status('وب‌سوکت وصل شد؛ در حال راه‌اندازی...');document.getElementById('stop').disabled=false;ctx=new AudioContext();await ctx.resume();
+  const setup={setup:{model:'models/gemini-3.8-live',generationConfig:{responseModalities:['AUDIO']},sessionResumption:{},contextWindowCompression:{slidingWindow:{}},inputAudioTranscription:{},outputAudioTranscription:{},systemInstruction:{parts:[{text:'You are SIMOT Voice Interface. Speak Persian by default. Be concise, action-oriented.'}]}}};ws.send(JSON.stringify(setup));
+ };
+ async function startMicrophone(){
   const stream=await navigator.mediaDevices.getUserMedia({audio:{channelCount:1,echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
   source=ctx.createMediaStreamSource(stream);processor=ctx.createScriptProcessor(2048,1,1);source.connect(processor);processor.connect(ctx.destination);
   processor.onaudioprocess=e=>{if(ws?.readyState!==1)return;const pcm=resample(e.inputBuffer.getChannelData(0),ctx.sampleRate,16000);ws.send(JSON.stringify({realtimeInput:{audio:{data:b64(pcm.buffer),mimeType:'audio/pcm;rate=16000'}}}))}
- };
- ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.serverContent?.interrupted){playTime=ctx?.currentTime||0}
+  status('متصل — صحبت کنید');
+ }
+ ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.setupComplete){startMicrophone().catch(err=>{status('دسترسی به میکروفون ناموفق: '+err.message);ws?.close()});return}if(m.error){status('Gemini error: '+JSON.stringify(m.error));return}if(m.serverContent?.interrupted){playTime=ctx?.currentTime||0}
   const parts=m.serverContent?.modelTurn?.parts||[];for(const p of parts)if(p.inlineData?.data)playPcm(unb64(p.inlineData.data));
   if(m.serverContent?.inputTranscription?.text)status('شما: '+m.serverContent.inputTranscription.text);
   if(m.serverContent?.outputTranscription?.text)status('SIMOT: '+m.serverContent.outputTranscription.text);
  };
- ws.onerror=e=>status('WebSocket error');ws.onclose=()=>{status('اتصال بسته شد');cleanup()};
+ ws.onerror=e=>status('WebSocket error');ws.onclose=e=>{status('اتصال بسته شد — code='+e.code+(e.reason?' reason='+e.reason:''));cleanup()};
 }
 function cleanup(){processor?.disconnect();source?.disconnect();processor=null;source=null;document.getElementById('start').disabled=false;document.getElementById('stop').disabled=true}
 document.getElementById('start').onclick=start;
