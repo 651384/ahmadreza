@@ -3,13 +3,13 @@
 Serverless runtime for SIMOT-MASTER and bounded Workers on Cloudflare. The runtime is intentionally independent of Codex, Arena, and any single developer tool or local machine.
 
 ## Current phase
-Cloud-native execution runtime (v0.4.2). The gateway validates the SIMOT-MSG v2 envelope, performs duplicate protection, records operational state in Cloudflare D1, queues accepted messages on Cloudflare Queues, and executes worker messages through the Workers AI binding under a strict daily free-quota guard.
+Cloud-native execution runtime (v0.5.0). The gateway validates the SIMOT-MSG v2 envelope, performs duplicate protection, records operational state in Cloudflare D1, queues accepted messages on Cloudflare Queues, and executes worker messages through the Workers AI binding under a strict free-only provider router, daily request guard, rate/cooldown guard, and completion evidence gate.
 
 ## Provisioned Cloudflare resources
 - Worker: `simot-ai-os-gateway` (deployed via Cloudflare Workers Builds Git integration from `master`).
 - D1 database: `simot-ai-os` (binding `SIMOT_DB`) — schema in `schema.sql`; runtime also auto-creates `ai_daily_usage` and `worker_registry`.
 - Queue: `simot-events` with dead-letter queue `simot-events-dlq` (binding `SIMOT_QUEUE`).
-- Workers AI binding `AI` (default model `@cf/zai-org/glm-4.7-flash`), capped by `SIMOT_AI_MAX_REQUESTS_PER_DAY` (default 200/day) enforced in D1 before every model call.
+- Workers AI binding `AI` uses a verified-free provider registry. The current free provider is `@cf/zai-org/glm-4.7-flash`; paid/unverified providers are hard-blocked. D1 enforces a conservative request budget plus a minimum inter-request interval before every model call.
 - Cron trigger `* * * * *` runs the watchdog and, in CLOUD controller mode, the cloud controller heartbeat.
 
 ## Worker execution
@@ -25,6 +25,14 @@ Messages addressed to `SIMOT-MASTER` or `SIMOT-AI-01..05` are executed by the qu
 Telegram adapter and controlled webhook boundary are present. `src/adapters/telegram.js` normalizes supported Telegram update shapes, maps them into the SIMOT-MSG v2 envelope, and constructs a provider-neutral outbound `sendMessage` request shape. The Worker exposes `/telegram/webhook` only when the secret `TELEGRAM_WEBHOOK_SECRET` is configured; requests must supply the matching `X-Telegram-Bot-Api-Secret-Token` header. The webhook stores no token in source and does not call the Telegram Bot API.
 
 Arena: no runtime integration exists; see `docs/arena-integration-status.md` for the evidence-based decision and the preconditions for adding one.
+
+## Architecture v4 execution safeguards
+- **Provider Router:** AI calls go through a capability-based provider registry with `FREE_FIRST + HARD_COST_GUARD`; no paid provider fallback is allowed.
+- **Scheduler vs inference:** Cron wakes the control plane and dispatches due work; it does not invoke AI merely because a heartbeat occurred.
+- **Task state machine:** `PENDING → IN_PROGRESS → COMPLETED/BLOCKED`. A blocked task is retried only when the worker explicitly marks the blocker retryable; dependency blockers remain parked instead of burning AI quota.
+- **AI decision contract:** model output is compact decision JSON and is normalized by the runtime. Malformed output is `BLOCKED`, never `COMPLETED`.
+- **Completion gate:** completion requires evidence, `VERIFIED` verification, no unresolved gaps, and verified runtime version evidence.
+- **Tool registry:** external capabilities remain behind the existing capability/tool registry and authority gate; registry presence does not grant write authority.
 
 ## Runtime states
 FULL / DEGRADED / MANUAL. PAID is prohibited by default; the provider router (`src/provider-router.js`) fails closed unless free status, data-class eligibility and payment-disabled conditions are verified.
