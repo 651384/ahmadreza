@@ -3,7 +3,7 @@ main = "src/worker.js"
 compatibility_date = "2026-09-21"
 
 [vars]
-SIMOT_RUNTIME_VERSION = "0.4.2"
+SIMOT_RUNTIME_VERSION = "0.5.0"
 SIMOT_EXECUTION_STANDARD_VERSION = "2.1.0"
 SIMOT_DEFAULT_STATE = "ACTIVE"
 # CLOUD: the deployed Worker cron emits its own controller heartbeat, removing
@@ -14,7 +14,8 @@ SIMOT_CONTROLLER_MODE = "CLOUD"
 SIMOT_AI_MODEL = "@cf/zai-org/glm-4.7-flash"
 SIMOT_AI_MAX_REQUESTS_PER_DAY = "200"
 SIMOT_AI_MAX_INPUT_CHARS = "6000"
-SIMOT_AI_MAX_OUTPUT_TOKENS = "500"
+SIMOT_AI_MAX_OUTPUT_TOKENS = "350"
+SIMOT_AI_MIN_INTERVAL_SECONDS = "5"
 CLOUDFLARE_ACCOUNT_ID = "28c48936d40df4c64bffc755f6c0ee7f"
 
 [version_metadata]
