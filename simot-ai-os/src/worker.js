@@ -9,6 +9,7 @@ import { AI_PROVIDER_REGISTRY } from "./ai-provider-registry.js";
 import { exaSearch } from "./adapters/exa.js";
 import { geminiGenerate } from "./adapters/gemini.js";
 import { handleMcpRequest } from "./mcp.js";
+import { createGeminiLiveToken, voicePage } from "./voice-live.js";
 const VERSION = "0.5.0";
 const EXECUTION_STANDARD_VERSION = "2.1.0";
 // Cloudflare Builds trigger marker — no runtime behavior change.
@@ -354,6 +355,11 @@ if(url.pathname==="/cloudflare/management/snapshot"&&request.method==="GET"){
 }
 if(url.pathname==="/control-plane/manifest"&&request.method==="GET")return json({ok:true,manifest:CONTROL_PLANE_MANIFEST,standard_id:EXECUTION_STANDARD_ID});
 if(url.pathname==="/mcp"){ try { return await handleMcpRequest(request, env); } catch(error) { return json({ok:false,error:"MCP_ERROR"},500); } }
+if(url.pathname==="/voice"&&request.method==="GET") return voicePage();
+if(url.pathname==="/voice/token"&&request.method==="POST"){
+  try { return json(await createGeminiLiveToken(env)); }
+  catch(error){ return json({ok:false,error:"VOICE_TOKEN_ENDPOINT_FAILED"},503); }
+}
 if(url.pathname==="/providers/gemini/generate"){
   try { return await runGeminiGenerate(env, request); }
   catch(error){ return json({ok:false,provider:"GOOGLE_GEMINI",status:"FAILED",error:error?.message||"GEMINI_PROVIDER_ERROR"},503); }
