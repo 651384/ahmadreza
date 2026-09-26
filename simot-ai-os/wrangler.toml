@@ -26,7 +26,7 @@ binding = "AI"
 [triggers]
 # Autonomous control-plane heartbeat + watchdog: every minute.
 # Cloudflare Cron executes scheduled() in UTC and does not depend on a local PC.
-crons = ["* * * * *"]
+crons = ["0 * * * *"]
 
 [[d1_databases]]
 binding = "SIMOT_DB"
