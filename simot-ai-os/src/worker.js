@@ -7,6 +7,7 @@ import { evaluateCompletionEvidence, runtimeEvidence, COMPLETION_GATE_VERSION } 
 import { selectProvider } from "./provider-router.js";
 import { AI_PROVIDER_REGISTRY } from "./ai-provider-registry.js";
 import { exaSearch } from "./adapters/exa.js";
+import { handleMcpRequest } from "./mcp.js";
 const VERSION = "0.5.0";
 const EXECUTION_STANDARD_VERSION = "2.1.0";
 // Cloudflare Builds trigger marker — no runtime behavior change.
@@ -335,6 +336,7 @@ if(url.pathname==="/cloudflare/management/snapshot"&&request.method==="GET"){
   try{return json(await cloudflareManagementSnapshot(env));}catch(error){return json({ok:false,error:"CLOUDFLARE_MANAGEMENT_SNAPSHOT_UNAVAILABLE"},503);}
 }
 if(url.pathname==="/control-plane/manifest"&&request.method==="GET")return json({ok:true,manifest:CONTROL_PLANE_MANIFEST,standard_id:EXECUTION_STANDARD_ID});
+if(url.pathname==="/mcp"){ try { return await handleMcpRequest(request, env); } catch(error) { return json({ok:false,error:"MCP_ERROR"},500); } }
 if(url.pathname==="/providers/exa/search"){
   try { return await runExaSearch(env, request); }
   catch(error){ return json({ok:false,provider:"EXA",status:"FAILED",error:error?.code||"EXA_PROVIDER_ERROR"},503); }
