@@ -309,6 +309,21 @@ async function executeWorkerMessage(env,body){
   const route=body["SCOPE"]==="E2E_SMOKE"?"NONE":(EXECUTABLE_WORKERS.includes(parsed.route_to)?parsed.route_to:(parsed.route_to==="SIMOT-MASTER"?"SIMOT-MASTER":"NONE"));
   return {worker_id:workerId,model:provider.model,result:parsed,route_to:route,quota,provider:provider.id};
 }
+async function runGeminiAgent(env, request) {
+  if (request.method !== "POST") return json({ ok: false, error: "METHOD_NOT_ALLOWED" }, 405);
+  let body;
+  try { body = await request.json(); } catch { return json({ ok: false, error: "INVALID_JSON" }, 400); }
+  const input = typeof body?.input === "string" ? body.input : (typeof body?.prompt === "string" ? body.prompt : "");
+  if (!input) return json({ ok: false, error: "GEMINI_INPUT_REQUIRED" }, 400);
+  const result = await geminiGenerate(env, {
+    prompt: input,
+    mcp: true,
+    previousInteractionId: body?.previous_interaction_id || body?.previousInteractionId || null,
+    background: body?.background === true
+  });
+  return json({ ok: result.ok, provider: result.provider, status: result.status, result });
+}
+
 async function runGeminiGenerate(env, request) {
   if (request.method !== "POST") return json({ ok: false, error: "METHOD_NOT_ALLOWED" }, 405);
   let body;
@@ -359,6 +374,10 @@ if(url.pathname==="/voice"&&request.method==="GET") return voicePage();
 if(url.pathname==="/voice/token"&&request.method==="POST"){
   try { return json(await createGeminiLiveToken(env)); }
   catch(error){ return json({ok:false,error:"VOICE_TOKEN_ENDPOINT_FAILED"},503); }
+}
+if(url.pathname==="/providers/gemini/agent"){
+  try { return await runGeminiAgent(env, request); }
+  catch(error){ return json({ok:false,provider:"GOOGLE_GEMINI",status:"FAILED",error:error?.message||"GEMINI_AGENT_ERROR"},503); }
 }
 if(url.pathname==="/providers/gemini/generate"){
   try { return await runGeminiGenerate(env, request); }
