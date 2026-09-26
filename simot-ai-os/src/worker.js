@@ -277,7 +277,16 @@ async scheduled(controller,env,ctx){
   })());
 },
 async fetch(request,env){const url=new URL(request.url);
-try { if(env.SIMOT_DB) await mandatoryPreflight(env,"HTTP:"+url.pathname); else return json({ok:false,error:"RUNTIME_NOT_CONFIGURED"},503); } catch (error) { return json({ok:false,error:"EXECUTION_STANDARD_BLOCKED"},503); }if(url.pathname==="/cloudflare/management/status"&&request.method==="GET"){
+try { if(env.SIMOT_DB) await mandatoryPreflight(env,"HTTP:"+url.pathname); else return json({ok:false,error:"RUNTIME_NOT_CONFIGURED"},503); } catch (error) { return json({ok:false,error:"EXECUTION_STANDARD_BLOCKED"},503); }if(url.pathname==="/cloudflare/management/schedules"&&request.method==="GET"){
+  try{
+    const accountId=env.CLOUDFLARE_ACCOUNT_ID;
+    const scriptName="simot-ai-os-gateway";
+    const r=await cloudflareManagementRequest(env,"/accounts/"+accountId+"/workers/scripts/"+scriptName+"/schedules");
+    const p=await r.json().catch(()=>null);
+    return json({ok:r.ok,http_status:r.status,success:p?.success===true,account_id:accountId,script_name:scriptName,schedules:p?.result?.schedules||[],errors:Array.isArray(p?.errors)?p.errors.slice(0,5):[]});
+  }catch(error){return json({ok:false,error:"CLOUDFLARE_SCHEDULE_READ_UNAVAILABLE"},503);}
+}
+if(url.pathname==="/cloudflare/management/status"&&request.method==="GET"){
   try{
     const probe=await runCloudflareManagementProbe(env);
     const row=await env.SIMOT_DB.prepare("SELECT checked_at,status,account_id,token_status,resources_json,error_code FROM cloudflare_management_probe WHERE id=1").first();
