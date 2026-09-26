@@ -16,17 +16,15 @@ export async function createGeminiLiveToken(env) {
       uses: 1,
       expireTime,
       newSessionExpireTime,
-      bidiGenerateContentSetup: {
-        model: "models/gemini-3.8-live",
-        generationConfig: { responseModalities: ["AUDIO"] },
-        sessionResumption: {},
-        contextWindowCompression: { slidingWindow: {} },
-        inputAudioTranscription: {},
-        outputAudioTranscription: {},
-        systemInstruction: {
-          parts: [{
-            text: "You are SIMOT Voice Interface. Speak Persian by default. Be concise, action-oriented, and never claim an action is complete unless SIMOT provides completion evidence."
-          }]
+      config: {
+        bidiGenerateContentSetup: {
+          model: "models/gemini-3.8-live",
+          generationConfig: { responseModalities: ["AUDIO"] },
+          systemInstruction: {
+            parts: [{
+              text: "You are SIMOT Voice Interface. Speak Persian by default. Be concise, action-oriented, and never claim an action is complete unless SIMOT provides completion evidence."
+            }]
+          }
         }
       }
     })
@@ -66,7 +64,8 @@ async function start(){
  const r=await fetch('/voice/token',{method:'POST'});const j=await r.json();if(!j.ok){status('خطا: '+JSON.stringify(j));document.getElementById('start').disabled=false;return}
  ws=new WebSocket('wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContentConstrained?access_token='+encodeURIComponent(j.token));
  ws.onopen=async()=>{status('وب‌سوکت وصل شد؛ در حال راه‌اندازی...');document.getElementById('stop').disabled=false;ctx=new AudioContext();await ctx.resume();
-  const setup={setup:{model:'models/gemini-3.8-live',generationConfig:{responseModalities:['AUDIO']},sessionResumption:{},contextWindowCompression:{slidingWindow:{}},inputAudioTranscription:{},outputAudioTranscription:{},systemInstruction:{parts:[{text:'You are SIMOT Voice Interface. Speak Persian by default. Be concise, action-oriented.'}]}}};ws.send(JSON.stringify(setup));
+  const setup={setup:{model:'models/gemini-3.8-live',generationConfig:{responseModalities:['AUDIO']},systemInstruction:{parts:[{text:'You are SIMOT Voice Interface. Speak Persian by default. Be concise, action-oriented.'}]}}};ws.send(JSON.stringify(setup));
+  setTimeout(()=>{if(ws?.readyState===1&&!window.__simotSetupComplete){status('Gemini setup timeout — waiting for setupComplete');}},10000);
  };
  async function startMicrophone(){
   const stream=await navigator.mediaDevices.getUserMedia({audio:{channelCount:1,echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
@@ -74,7 +73,7 @@ async function start(){
   processor.onaudioprocess=e=>{if(ws?.readyState!==1)return;const pcm=resample(e.inputBuffer.getChannelData(0),ctx.sampleRate,16000);ws.send(JSON.stringify({realtimeInput:{audio:{data:b64(pcm.buffer),mimeType:'audio/pcm;rate=16000'}}}))}
   status('متصل — صحبت کنید');
  }
- ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.setupComplete){startMicrophone().catch(err=>{status('دسترسی به میکروفون ناموفق: '+err.message);ws?.close()});return}if(m.error){status('Gemini error: '+JSON.stringify(m.error));return}if(m.serverContent?.interrupted){playTime=ctx?.currentTime||0}
+ ws.onmessage=e=>{let m;try{m=JSON.parse(e.data)}catch{status('پاسخ نامعتبر از Gemini دریافت شد');return}if(m.setupComplete){window.__simotSetupComplete=true;status('راه‌اندازی Gemini کامل شد؛ فعال‌سازی میکروفون...');startMicrophone().catch(err=>{status('دسترسی به میکروفون ناموفق: '+err.message);ws?.close()});return}if(m.error){status('Gemini setup/session error: '+JSON.stringify(m.error));ws?.close(1000,'Gemini error');return}if(m.serverContent?.interrupted){playTime=ctx?.currentTime||0}
   const parts=m.serverContent?.modelTurn?.parts||[];for(const p of parts)if(p.inlineData?.data)playPcm(unb64(p.inlineData.data));
   if(m.serverContent?.inputTranscription?.text)status('شما: '+m.serverContent.inputTranscription.text);
   if(m.serverContent?.outputTranscription?.text)status('SIMOT: '+m.serverContent.outputTranscription.text);
