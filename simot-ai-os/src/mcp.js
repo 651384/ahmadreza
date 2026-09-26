@@ -1,3 +1,4 @@
+import { exaSearch } from "./adapters/exa.js";
 const PROTOCOL_VERSION = "2025-11-25";
 
 function response(body, status = 200, headers = {}) {
