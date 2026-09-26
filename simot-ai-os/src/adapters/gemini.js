@@ -1,7 +1,7 @@
 const GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 
 function modelName(env) {
-  return String(env?.GEMINI_MODEL || "gemini-2.5-flash");
+  return String(env?.GEMINI_MODEL || "gemini-3.8-flash");
 }
 
 export async function geminiGenerate(
@@ -27,8 +27,7 @@ export async function geminiGenerate(
       body: JSON.stringify({
         contents: [{ role: "user", parts: [{ text: prompt }] }],
         generationConfig: {
-          maxOutputTokens: Math.min(Number(maxOutputTokens) || 350, 700),
-          temperature: Math.max(0, Math.min(Number(temperature) || 0.1, 0.3))
+          maxOutputTokens: Math.min(Number(maxOutputTokens) || 350, 700)
         }
       })
     });
