@@ -230,6 +230,10 @@ async function ensureRuntimeTables(env){
     env.SIMOT_DB.prepare("CREATE TABLE IF NOT EXISTS worker_registry (worker_id TEXT PRIMARY KEY, status TEXT NOT NULL, last_run_at TEXT, last_msg_id TEXT, last_result TEXT)"),
     ...EXECUTABLE_WORKERS.map(id=>env.SIMOT_DB.prepare("INSERT INTO worker_registry(worker_id,status) VALUES(?,?) ON CONFLICT(worker_id) DO NOTHING").bind(id,"ACTIVE"))
   ]);
+  const usageCols=await env.SIMOT_DB.prepare("PRAGMA table_info(ai_daily_usage)").all();
+  const usageNames=new Set((usageCols.results||[]).map(x=>x.name));
+  if(!usageNames.has("last_request_at")) await env.SIMOT_DB.prepare("ALTER TABLE ai_daily_usage ADD COLUMN last_request_at TEXT").run();
+  if(!usageNames.has("blocked_until")) await env.SIMOT_DB.prepare("ALTER TABLE ai_daily_usage ADD COLUMN blocked_until TEXT").run();
 }
 async function consumeAIQuota(env){
   await ensureRuntimeTables(env);
