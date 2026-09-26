@@ -15,7 +15,7 @@ export const AI_PROVIDER_REGISTRY = Object.freeze([
   {
     id: "GOOGLE_GEMINI",
     kind: "CLOUD_AI",
-    model: "gemini-2.5-flash",
+    model: "gemini-3.8-flash",
     capabilities: ["TEXT_GENERATION"],
     data_classes: ["PUBLIC","INTERNAL"],
     access_class: "CONDITIONAL_FREE",
