@@ -20,14 +20,7 @@ async function geminiAgent(env, { prompt, previousInteractionId = null, backgrou
     tools: [{
       type: "mcp_server",
       name: "simot_mcp",
-      url: "https://simot-ai-os-gateway.vahid-ahmadreza.workers.dev/mcp",
-      allowed_tools: [
-        "simot_health",
-        "simot_tasks_status",
-        "simot_workers_status",
-        "simot_watchdog_status",
-        "simot_exa_search"
-      ]
+      url: "https://simot-ai-os-gateway.vahid-ahmadreza.workers.dev/mcp"
     }]
   };
 
@@ -56,10 +49,17 @@ async function geminiAgent(env, { prompt, previousInteractionId = null, backgrou
     };
   }
 
+  const stepText = Array.isArray(payload?.steps)
+    ? payload.steps
+        .filter(step => step?.type === "model_output")
+        .flatMap(step => Array.isArray(step?.content) ? step.content.map(part => part?.text || "") : [])
+        .join("")
+    : "";
   const outputText =
     payload?.output_text ||
     payload?.outputs?.map(x => x?.text || "").join("") ||
     payload?.output?.filter(x => x?.type === "text").map(x => x?.text || "").join("") ||
+    stepText ||
     "";
 
   return {
@@ -71,7 +71,15 @@ async function geminiAgent(env, { prompt, previousInteractionId = null, backgrou
     interaction_id: payload?.id || null,
     status_value: payload?.status || null,
     output_text: outputText,
-    raw_output_count: Array.isArray(payload?.output) ? payload.output.length : null
+    raw_output_count: Array.isArray(payload?.output) ? payload.output.length : null,
+    steps: Array.isArray(payload?.steps)
+      ? payload.steps.map(step => ({
+          type: step?.type || null,
+          name: step?.name || null,
+          id: step?.id || null,
+          status: step?.status || null
+        }))
+      : null
   };
 }
 
