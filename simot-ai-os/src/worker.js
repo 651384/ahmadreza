@@ -7,6 +7,7 @@ import { evaluateCompletionEvidence, runtimeEvidence, COMPLETION_GATE_VERSION } 
 import { selectProvider } from "./provider-router.js";
 import { AI_PROVIDER_REGISTRY } from "./ai-provider-registry.js";
 import { exaSearch } from "./adapters/exa.js";
+import { geminiGenerate } from "./adapters/gemini.js";
 import { handleMcpRequest } from "./mcp.js";
 const VERSION = "0.5.0";
 const EXECUTION_STANDARD_VERSION = "2.1.0";
@@ -307,6 +308,15 @@ async function executeWorkerMessage(env,body){
   const route=body["SCOPE"]==="E2E_SMOKE"?"NONE":(EXECUTABLE_WORKERS.includes(parsed.route_to)?parsed.route_to:(parsed.route_to==="SIMOT-MASTER"?"SIMOT-MASTER":"NONE"));
   return {worker_id:workerId,model:provider.model,result:parsed,route_to:route,quota,provider:provider.id};
 }
+async function runGeminiGenerate(env, request) {
+  if (request.method !== "POST") return json({ ok: false, error: "METHOD_NOT_ALLOWED" }, 405);
+  let body;
+  try { body = await request.json(); } catch { return json({ ok: false, error: "INVALID_JSON" }, 400); }
+  const provider = selectProvider(AI_PROVIDER_REGISTRY, "TEXT_GENERATION", { data_class: "PUBLIC" });
+  if (provider.id !== "GOOGLE_GEMINI") return json({ ok: false, provider: provider.id, error: "GEMINI_NOT_SELECTED" }, 503);
+  const result = await geminiGenerate(env, body);
+  return json({ ok: result.ok, provider: result.provider, status: result.status, result });
+}
 async function runExaSearch(env, request) {
   if (request.method !== "POST") return json({ ok: false, error: "METHOD_NOT_ALLOWED" }, 405);
   let body;
@@ -344,7 +354,7 @@ if(url.pathname==="/cloudflare/management/snapshot"&&request.method==="GET"){
 }
 if(url.pathname==="/control-plane/manifest"&&request.method==="GET")return json({ok:true,manifest:CONTROL_PLANE_MANIFEST,standard_id:EXECUTION_STANDARD_ID});
 if(url.pathname==="/mcp"){ try { return await handleMcpRequest(request, env); } catch(error) { return json({ok:false,error:"MCP_ERROR"},500); } }
-if(url.pathname==="/providers/exa/search"){
+if(url.pathname==="/providers/gemini/generate"){\n  try { return await runGeminiGenerate(env, request); }\n  catch(error){ return json({ok:false,provider:"GOOGLE_GEMINI",status:"FAILED",error:error?.message||"GEMINI_PROVIDER_ERROR"},503); }\n}\nif(url.pathname==="/providers/exa/search"){
   try { return await runExaSearch(env, request); }
   catch(error){ return json({ok:false,provider:"EXA",status:"FAILED",error:error?.code||"EXA_PROVIDER_ERROR"},503); }
 }
