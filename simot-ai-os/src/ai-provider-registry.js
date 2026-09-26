@@ -13,6 +13,21 @@ export const AI_PROVIDER_REGISTRY = Object.freeze([
     latency_rank: 1
   },
   {
+    id: "GOOGLE_GEMINI",
+    kind: "CLOUD_AI",
+    model: "gemini-2.5-flash",
+    capabilities: ["TEXT_GENERATION"],
+    data_classes: ["PUBLIC","INTERNAL"],
+    access_class: "CONDITIONAL_FREE",
+    verified_free: true,
+    payment_enabled: false,
+    enabled: true,
+    priority: 2,
+    latency_rank: 2,
+    execution_adapter: "./adapters/gemini.js",
+    activation: "REQUIRES_GEMINI_API_KEY_AND_FREE_MODE"
+  },
+  {
     id: "EXA",
     kind: "RESEARCH_PROVIDER",
     capabilities: ["WEB_SEARCH","RESEARCH"],
