@@ -1,5 +1,6 @@
 import { exaSearch } from "./adapters/exa.js";
 const PROTOCOL_VERSION = "2025-11-25";
+const MODERN_PROTOCOL_VERSION = "2026-07-28";
 
 function response(body, status = 200, headers = {}) {
   return new Response(body == null ? null : JSON.stringify(body), {
@@ -100,6 +101,17 @@ export async function handleMcpRequest(request, env) {
   const id = body?.id ?? null;
   const method = body?.method;
   if (!method) return rpcError(id, -32600, "Invalid Request");
+
+  if (method === "server/discover") {
+    return rpcResult(id, {
+      supportedVersions: [MODERN_PROTOCOL_VERSION, PROTOCOL_VERSION],
+      capabilities: { tools: {} },
+      serverInfo: { name: "simot-ai-os", version: env.SIMOT_RUNTIME_VERSION || "0.5.0" },
+      instructions: "SIMOT read-only control-plane MCP gateway. Use tools to inspect SIMOT state; do not claim execution unless a tool returns explicit completion evidence.",
+      ttlMs: 60000,
+      cacheScope: "public"
+    });
+  }
 
   if (method === "initialize") {
     return rpcResult(id, {
