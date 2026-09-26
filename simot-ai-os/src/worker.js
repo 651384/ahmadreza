@@ -354,7 +354,11 @@ if(url.pathname==="/cloudflare/management/snapshot"&&request.method==="GET"){
 }
 if(url.pathname==="/control-plane/manifest"&&request.method==="GET")return json({ok:true,manifest:CONTROL_PLANE_MANIFEST,standard_id:EXECUTION_STANDARD_ID});
 if(url.pathname==="/mcp"){ try { return await handleMcpRequest(request, env); } catch(error) { return json({ok:false,error:"MCP_ERROR"},500); } }
-if(url.pathname==="/providers/gemini/generate"){\n  try { return await runGeminiGenerate(env, request); }\n  catch(error){ return json({ok:false,provider:"GOOGLE_GEMINI",status:"FAILED",error:error?.message||"GEMINI_PROVIDER_ERROR"},503); }\n}\nif(url.pathname==="/providers/exa/search"){
+if(url.pathname==="/providers/gemini/generate"){
+  try { return await runGeminiGenerate(env, request); }
+  catch(error){ return json({ok:false,provider:"GOOGLE_GEMINI",status:"FAILED",error:error?.message||"GEMINI_PROVIDER_ERROR"},503); }
+}
+if(url.pathname==="/providers/exa/search"){
   try { return await runExaSearch(env, request); }
   catch(error){ return json({ok:false,provider:"EXA",status:"FAILED",error:error?.code||"EXA_PROVIDER_ERROR"},503); }
 }
