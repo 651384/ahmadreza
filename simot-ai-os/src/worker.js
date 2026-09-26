@@ -199,6 +199,12 @@ function autonomousTaskEnvelope(task){
     "PAYLOAD":{task_id:task.task_id,name:task.name,priority:task.priority,domain:task.domain}
   };
 }
+async function recoverStaleAutonomousTasks(env){
+  await ensureAutonomousTaskTable(env);
+  const cutoff=new Date(Date.now()-30*60*1000).toISOString();
+  const result=await env.SIMOT_DB.prepare("UPDATE autonomous_tasks SET status='PENDING',next_run_at=?,last_result='RECOVERED_STALE_IN_PROGRESS',blocker='STALE_IN_PROGRESS_RECOVERY',dependency_reason=NULL,updated_at=? WHERE status='IN_PROGRESS' AND last_run_at IS NOT NULL AND last_run_at<=?").bind(now(),now(),cutoff).run();
+  return {recovered:Number(result?.meta?.changes||0),cutoff};
+}
 async function dispatchNextAutonomousTask(env){
   await ensureAutonomousTaskTable(env);
   const row=await env.SIMOT_DB.prepare("SELECT task_id,name,priority,domain,status,attempts,next_run_at FROM autonomous_tasks WHERE status IN ('PENDING','BLOCKED') AND (next_run_at IS NULL OR next_run_at<=?) ORDER BY CASE priority WHEN 'CRITICAL' THEN 1 WHEN 'HIGH' THEN 2 WHEN 'MEDIUM' THEN 3 ELSE 4 END, attempts, task_id LIMIT 1").bind(now()).first();
@@ -321,6 +327,7 @@ async scheduled(controller,env,ctx){
     await maybeEmitCloudHeartbeat(env, scheduledAt);
     await runWatchdog(env, scheduledAt);
     await runCloudflareManagementProbe(env);
+    await recoverStaleAutonomousTasks(env);
     await dispatchNextAutonomousTask(env);
   })());
 },
