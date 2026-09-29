@@ -38,7 +38,7 @@ Activation of any dormant capability requires a separate human-approved change.
 7. Fail closed on uncertainty.
 8. Never report DONE without acceptance and evidence.
 9. Never infer connection or authorization from tool existence.
-10. Preserve human gates for production, secrets, paid services, irreversible actions and security-policy changes.
+10. Preserve human gates for production activation, secrets, paid services, irreversible actions and security-policy changes; normal merge is controlled by CI/CD policy.
 
 ## SOT roles
 
