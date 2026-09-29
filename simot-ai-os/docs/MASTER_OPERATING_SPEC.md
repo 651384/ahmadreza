@@ -138,7 +138,7 @@ Every adapter must declare capability, authority, read-first behavior, idempoten
 Human gate is mandatory for:
 
 - production activation
-- designated merge
+- merge: automated after required CI, policy, review and validation checks pass
 - secret insertion
 - paid services/providers
 - payments/banking
@@ -260,7 +260,7 @@ GitHub
 
 Workers Builds is the preferred native CI/CD path when its Git integration is verified. GitHub remains the code/change-control SOT. Cloudflare dashboard/account state must never be assumed from repository configuration alone.
 
-Production activation remains subject to the project's human-gate policy.
+Production activation remains subject to the project's human-gate policy. Normal merge is not a human gate; merge is a controlled CI/CD stage and may proceed automatically when all required checks and repository policies pass.
 
 ## 14. Security
 
