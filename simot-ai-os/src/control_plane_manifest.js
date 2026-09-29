@@ -26,7 +26,7 @@ export const CONTROL_PLANE_MANIFEST = Object.freeze({
     {
       id: "INST-004",
       name: "Cloudflare owns control plane",
-      rule: "Cloudflare Worker + D1 + Queues + Workers AI are the active runtime control plane. Cron/scheduled execution is a dormant future capability during BUILD phase.",
+      rule: "Cloudflare Worker + D1 + Queues + Workers AI are the active runtime control plane. Cron/scheduled execution is a dormant future capability during BUILD phase. Normal merge is controlled by CI/CD policy and required checks, not a human gate.",
       enforcement: "ARCHITECTURE"
     },
     {
