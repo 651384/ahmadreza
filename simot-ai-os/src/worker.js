@@ -10,7 +10,7 @@ import { geminiGenerate } from "./adapters/gemini.js";
 import { handleMcpRequest } from "./mcp.js";
 import { createGeminiLiveToken, voicePage } from "./voice-live.js";
 const VERSION = "0.5.0";
-const EXECUTION_STANDARD_VERSION = "2.1.0";
+const EXECUTION_STANDARD_VERSION = "2.2.0";
 // Cloudflare Builds trigger marker — no runtime behavior change.
 // Build configuration is managed by Cloudflare Workers Builds.
 const RECIPIENT_RE = /^(SIMOT-MASTER|SIMOT-AI-[0-9]{2})$/;
