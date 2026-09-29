@@ -1,47 +1,83 @@
-# SIMOT AI OS — Execution Standard 2.1.0
+# SIMOT AI OS — Execution Standard 2.2.0
 
 Status: LOCKED
+Phase: BUILD / CONTROLLED MANUAL EXECUTION
 
 ## Mandatory gate
 
-Before **every execution path** the runtime MUST validate this standard:
-- scheduled/Cron execution
+Before every execution path the runtime MUST validate this standard:
 - HTTP/webhook execution
 - Queue/Worker execution
 - management/status execution
+- explicit manual execution
 
-If validation fails, the runtime MUST fail closed and record a blocked state.
+Scheduled/Cron execution is not an active execution path in the current BUILD phase.
+
+If validation fails, the runtime MUST fail closed.
 
 ## Architecture invariant
 
-**SOT-ARCH-LOCAL-PC-001**
+SOT-ARCH-CLOUDFLARE-CORE-002
 
-The SIMOT-AI OS runtime is Cloudflare-native. Local PC is NOT part of the dependency chain.
+Cloudflare is the primary runtime/control plane.
 
-Forbidden runtime dependencies:
-- Local PC
-- PowerShell
-- Desktop Commander
-- Wrangler CLI
-- Codex
-- Arena
+The runtime architecture is provider-neutral, fail-closed and authority-gated.
 
-Those tools may be used for optional development or inspection only. They must never be required for the running system.
+## Runtime control plane
 
-## Control plane
+Active runtime components:
+- Cloudflare Workers
+- Cloudflare D1
+- Cloudflare Queues / DLQ
+- Workers AI
+- runtime observability
 
-Cloudflare Workers + Cron + D1 + Queues + Workers AI own the runtime control plane.
+Dormant architecture capabilities:
+- Cloudflare Cron
+- periodic scheduler
+- automatic Watchdog
+- continuous heartbeat loop
+- periodic reconciliation
+- automatic recovery loop
 
-GitHub is the versioned source of truth and change-control layer.
+Dormant means defined for future use but not executing now.
+
+## Source and change control
+
+GitHub is the versioned code and change-control SOT.
+
+Cloudflare deployment state must be independently verified; repository configuration is not proof of deployment or dashboard configuration.
+
+## Authority
+
+Capability does not imply authorization.
+
+The runtime must distinguish:
+EXISTS → CONNECTED → AUTHENTICATED → AUTHORIZED → EXECUTABLE.
+
+High-risk, irreversible, paid, secret, production and security-policy operations require the applicable human gate.
 
 ## Recovery
 
-Cloud Cron provides the heartbeat/watchdog loop. A stale external controller must not be masked by a cloud heartbeat.
+Recovery logic may exist as bounded functions/contracts, but no continuous autonomous recovery loop may execute during BUILD phase.
 
 ## Completion integrity
 
-No external action may be reported as completed without runtime evidence.
+No action is DONE without:
+desired result
++ acceptance
++ evidence
++ SOT write-back.
 
 ## Change rule
 
-Any future architecture or implementation that introduces Local PC into the runtime dependency chain violates this standard and must be rejected before execution.
+Any future activation of Cron, Watchdog, periodic reconciliation or automatic recovery requires a separate human-approved change with:
+- reason
+- workload being monitored
+- monitoring contract
+- failure definition
+- allowed recovery actions
+- human-gate boundaries
+- test evidence
+- runtime read-back
+- SOT write-back.
