@@ -1,5 +1,4 @@
 import { normalizeTelegramUpdate, buildTelegramEnvelope } from "./adapters/telegram.js";
-import { evaluateWatchdog, normalizeHeartbeat, WATCHDOG_POLICY, buildWatchdogRecord, planCloudHeartbeat, CLOUD_CONTROLLER } from "./watchdog.js";
 import { getWorkerProfile, EXECUTABLE_WORKERS } from "./worker_profiles.js";
 import { validateExecutionStandard, EXECUTION_STANDARD_ID } from "./execution_standard.js";
 import { CONTROL_PLANE_MANIFEST, manifestRows } from "./control_plane_manifest.js";
@@ -11,7 +10,7 @@ import { geminiGenerate } from "./adapters/gemini.js";
 import { handleMcpRequest } from "./mcp.js";
 import { createGeminiLiveToken, voicePage } from "./voice-live.js";
 const VERSION = "0.5.0";
-const EXECUTION_STANDARD_VERSION = "2.1.0";
+const EXECUTION_STANDARD_VERSION = "2.2.0";
 // Cloudflare Builds trigger marker — no runtime behavior change.
 // Build configuration is managed by Cloudflare Workers Builds.
 const RECIPIENT_RE = /^(SIMOT-MASTER|SIMOT-AI-[0-9]{2})$/;
@@ -51,28 +50,6 @@ async function mandatoryPreflight(env, operation){
   // row writes. Durable D1 audit events remain reserved for actual state
   // transitions and task/message results.
   return check;
-}
-async function ensureWatchdogTables(env){
-  if(!env.SIMOT_DB) throw new Error("RUNTIME_NOT_CONFIGURED");
-  await env.SIMOT_DB.batch([
-    env.SIMOT_DB.prepare("CREATE TABLE IF NOT EXISTS controller_heartbeat (id INTEGER PRIMARY KEY, status TEXT NOT NULL, instance_id TEXT, last_heartbeat_at TEXT NOT NULL, current_operation TEXT, state_version TEXT)"),
-    env.SIMOT_DB.prepare("CREATE TABLE IF NOT EXISTS watchdog_state (id INTEGER PRIMARY KEY, checked_at TEXT NOT NULL, state TEXT NOT NULL, action TEXT NOT NULL, controller_status TEXT NOT NULL, age_ms INTEGER, reason TEXT)"),
-    env.SIMOT_DB.prepare("CREATE INDEX IF NOT EXISTS idx_watchdog_state_checked_at ON watchdog_state(checked_at)")
-  ]);
-}
-async function readControllerHeartbeat(env){
-  await ensureWatchdogTables(env);
-  return env.SIMOT_DB.prepare("SELECT id,status,instance_id,last_heartbeat_at,current_operation,state_version FROM controller_heartbeat WHERE id=1").first();
-}
-async function persistWatchdogState(env, record){
-  await ensureWatchdogTables(env);
-  await env.SIMOT_DB.prepare("INSERT INTO watchdog_state(id,checked_at,state,action,controller_status,age_ms,reason) VALUES(1,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET checked_at=excluded.checked_at,state=excluded.state,action=excluded.action,controller_status=excluded.controller_status,age_ms=excluded.age_ms,reason=excluded.reason")
-    .bind(record.checked_at,record.state,record.action,record.controller_status,record.age_ms,record.reason).run();
-}
-async function persistControllerHeartbeat(env, heartbeat, at){
-  await ensureWatchdogTables(env);
-  await env.SIMOT_DB.prepare("INSERT INTO controller_heartbeat(id,status,instance_id,last_heartbeat_at,current_operation,state_version) VALUES(1,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET status=excluded.status,instance_id=excluded.instance_id,last_heartbeat_at=excluded.last_heartbeat_at,current_operation=excluded.current_operation,state_version=excluded.state_version")
-    .bind(heartbeat.status,heartbeat.instance_id,at,heartbeat.current_operation,heartbeat.state_version).run();
 }
 async function ensureCloudflareManagementTable(env){
   if(!env.SIMOT_DB) throw new Error("RUNTIME_NOT_CONFIGURED");
@@ -137,37 +114,6 @@ async function cloudflareManagementSnapshot(env){
   }
   return {ok:true,...out};
 }
-async function maybeEmitCloudHeartbeat(env, scheduledAt = Date.now()){
-  if(String(env.SIMOT_CONTROLLER_MODE||"").toUpperCase()!=="CLOUD")return {emit:false,reason:"CONTROLLER_MODE_NOT_CLOUD"};
-  const existing = await readControllerHeartbeat(env);
-  const plan = planCloudHeartbeat({
-    existing,
-    instanceId: CLOUD_CONTROLLER.instance_prefix+":"+(env.SIMOT_RUNTIME_VERSION||VERSION),
-    stateVersion: env.SIMOT_RUNTIME_VERSION||VERSION
-  });
-  if(plan.emit){
-    await persistControllerHeartbeat(env, plan.heartbeat, new Date(scheduledAt).toISOString());
-  }
-  return plan;
-}
-async function runWatchdog(env, scheduledAt = Date.now()){
-  const heartbeat = await readControllerHeartbeat(env);
-  const evaluation = evaluateWatchdog({
-    controllerStatus: heartbeat?.status ?? "IDLE",
-    lastHeartbeatAt: heartbeat?.last_heartbeat_at ?? null,
-    nowMs: scheduledAt
-  });
-  const record = buildWatchdogRecord(evaluation, new Date(scheduledAt).toISOString());
-  await persistWatchdogState(env, record);
-  return {
-    ...record,
-    policy: WATCHDOG_POLICY,
-    instance_id: heartbeat?.instance_id ?? null,
-    current_operation: heartbeat?.current_operation ?? null,
-    state_version: heartbeat?.state_version ?? null
-  };
-}
-
 async function ensureAutonomousTaskTable(env){
   if(!env.SIMOT_DB) throw new Error("RUNTIME_NOT_CONFIGURED");
   await env.SIMOT_DB.batch([
@@ -200,23 +146,6 @@ function autonomousTaskEnvelope(task){
     "ESCALATION":"SIMOT-MASTER","CONFIDENCE":"HIGH","VERIFICATION":"INTERNAL",
     "PAYLOAD":{task_id:task.task_id,name:task.name,priority:task.priority,domain:task.domain}
   };
-}
-async function recoverStaleAutonomousTasks(env){
-  await ensureAutonomousTaskTable(env);
-  const cutoff=new Date(Date.now()-30*60*1000).toISOString();
-  const result=await env.SIMOT_DB.prepare("UPDATE autonomous_tasks SET status='PENDING',next_run_at=?,last_result='RECOVERED_STALE_IN_PROGRESS',blocker='STALE_IN_PROGRESS_RECOVERY',dependency_reason=NULL,updated_at=? WHERE status='IN_PROGRESS' AND last_run_at IS NOT NULL AND last_run_at<=?").bind(now(),now(),cutoff).run();
-  return {recovered:Number(result?.meta?.changes||0),cutoff};
-}
-async function dispatchNextAutonomousTask(env){
-  await ensureAutonomousTaskTable(env);
-  const row=await env.SIMOT_DB.prepare("SELECT task_id,name,priority,domain,status,attempts,next_run_at FROM autonomous_tasks WHERE status IN ('PENDING','BLOCKED') AND (next_run_at IS NULL OR next_run_at<=?) ORDER BY CASE priority WHEN 'CRITICAL' THEN 1 WHEN 'HIGH' THEN 2 WHEN 'MEDIUM' THEN 3 ELSE 4 END, attempts, task_id LIMIT 1").bind(now()).first();
-  if(!row || !env.SIMOT_QUEUE)return {dispatched:false,reason:"NO_DUE_TASK"};
-  const task=autonomousTaskEnvelope(row);
-  const at=now();
-  await env.SIMOT_QUEUE.send(task);
-  await env.SIMOT_DB.prepare("UPDATE autonomous_tasks SET status='IN_PROGRESS',attempts=attempts+1,last_run_at=?,next_run_at=?,last_result=?,blocker=NULL,dependency_reason=NULL,updated_at=? WHERE task_id=?")
-    .bind(at,new Date(Date.now()+15*60*1000).toISOString(),"DISPATCHED_TO_CLOUD_WORKER",at,row.task_id).run();
-  return {dispatched:true,task_id:row.task_id,attempt:row.attempts+1};
 }
 async function updateAutonomousTaskResult(env,body,result){
   const taskId=Array.isArray(body["TASK-REFS"])?body["TASK-REFS"][0]:null;
@@ -345,18 +274,6 @@ async function runExaSearch(env, request) {
 function safeBody(body){const copy={...body};if(copy.SECRET)delete copy.SECRET;if(copy["API-KEY"])delete copy["API-KEY"];if(copy["PRIVATE-KEY"])delete copy["PRIVATE-KEY"];if(copy.PASSWORD)delete copy.PASSWORD;return copy;}
 async function recordEvent(env,event){await env.SIMOT_DB.prepare("INSERT INTO events(id,msg_id,corr_id,type,status,created_at,updated_at,payload_json,error_code,error_message) VALUES(?,?,?,?,?,?,?,?,?,?)").bind(event.id,event.msg_id,event.corr_id,event.type,event.status,event.created_at,event.updated_at,event.payload_json||null,event.error_code||null,event.error_message||null).run();}
 export default {
-async scheduled(controller,env,ctx){
-  if(!env.SIMOT_DB){ controller.noRetry?.(); return; }
-  try { await mandatoryPreflight(env,"SCHEDULED"); } catch (error) { controller.noRetry?.(); return; }
-  const scheduledAt = controller.scheduledTime || Date.now();
-  ctx.waitUntil((async()=>{
-    await maybeEmitCloudHeartbeat(env, scheduledAt);
-    await runWatchdog(env, scheduledAt);
-    await runCloudflareManagementProbe(env);
-    await recoverStaleAutonomousTasks(env);
-    await dispatchNextAutonomousTask(env);
-  })());
-},
 async fetch(request,env){const url=new URL(request.url);
 try { if(env.SIMOT_DB) await mandatoryPreflight(env,"HTTP:"+url.pathname); else return json({ok:false,error:"RUNTIME_NOT_CONFIGURED"},503); } catch (error) { return json({ok:false,error:"EXECUTION_STANDARD_BLOCKED"},503); }if(url.pathname==="/cloudflare/management/status"&&request.method==="GET"){
   try{
@@ -387,7 +304,7 @@ if(url.pathname==="/providers/exa/search"){
   try { return await runExaSearch(env, request); }
   catch(error){ return json({ok:false,provider:"EXA",status:"FAILED",error:error?.code||"EXA_PROVIDER_ERROR"},503); }
 }
-if(url.pathname==="/health")return json({service:"simot-ai-os-gateway",version:VERSION,state:env.SIMOT_DEFAULT_STATE||"MANUAL",time:now(),watchdog:{interval_minutes:WATCHDOG_POLICY.interval_minutes,heartbeat_interval_minutes:WATCHDOG_POLICY.heartbeat_interval_minutes,stale_threshold_minutes:WATCHDOG_POLICY.stale_threshold_minutes,recovery_threshold_minutes:WATCHDOG_POLICY.recovery_threshold_minutes}});
+if(url.pathname==="/health")return json({service:"simot-ai-os-gateway",version:VERSION,state:env.SIMOT_DEFAULT_STATE||"MANUAL",time:now()});
 if(url.pathname==="/completion/status"&&request.method==="GET"){
   try{
     await ensureAutonomousTaskTable(env);
@@ -414,28 +331,7 @@ if(url.pathname==="/workers/status"&&request.method==="GET"){
     return json({ok:true,runtime:env.SIMOT_DEFAULT_STATE||"MANUAL",model:env.SIMOT_AI_MODEL||null,workers:rows.results||[]});
   }catch(error){return json({ok:false,error:"WORKER_STATUS_UNAVAILABLE"},503);}
 }
-if(url.pathname==="/watchdog/status"&&request.method==="GET"){
-  try{
-    const heartbeat=await readControllerHeartbeat(env);
-    await ensureWatchdogTables(env);
-    const state=await env.SIMOT_DB.prepare("SELECT checked_at,state,action,controller_status,age_ms,reason FROM watchdog_state WHERE id=1").first();
-    return json({ok:true,policy:WATCHDOG_POLICY,controller_mode:String(env.SIMOT_CONTROLLER_MODE||"EXTERNAL").toUpperCase(),heartbeat:heartbeat||null,state:state||null});
-  }catch(error){return json({ok:false,error:"WATCHDOG_STATUS_UNAVAILABLE"},503);}
-}
-if(url.pathname==="/controller/heartbeat"&&request.method==="POST"){
-  if(!env.SIMOT_CONTROLLER_HEARTBEAT_SECRET)return json({ok:false,error:"HEARTBEAT_SECRET_NOT_CONFIGURED",state:"MANUAL"},503);
-  const supplied=request.headers.get("X-SIMOT-Controller-Heartbeat");
-  if(!supplied||supplied!==env.SIMOT_CONTROLLER_HEARTBEAT_SECRET)return json({ok:false,error:"HEARTBEAT_UNAUTHORIZED"},401);
-  let body;try{body=await request.json()}catch{return json({ok:false,error:"INVALID_JSON"},400)}
-  let heartbeat;try{heartbeat=normalizeHeartbeat(body)}catch(error){return json({ok:false,error:error?.message||"INVALID_HEARTBEAT"},400)}
-  try{
-    await ensureWatchdogTables(env);
-    const t=now();
-    await env.SIMOT_DB.prepare("INSERT INTO controller_heartbeat(id,status,instance_id,last_heartbeat_at,current_operation,state_version) VALUES(1,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET status=excluded.status,instance_id=excluded.instance_id,last_heartbeat_at=excluded.last_heartbeat_at,current_operation=excluded.current_operation,state_version=excluded.state_version")
-      .bind(heartbeat.status,heartbeat.instance_id,t,heartbeat.current_operation,heartbeat.state_version).run();
-    return json({ok:true,status:heartbeat.status,last_heartbeat_at:t});
-  }catch(error){return json({ok:false,error:"HEARTBEAT_PERSIST_FAILED"},503);}
-}if(url.pathname==="/telegram/webhook"&&request.method==="POST"){
+if(url.pathname==="/telegram/webhook"&&request.method==="POST"){
 if(!env.TELEGRAM_WEBHOOK_SECRET)return json({ok:false,error:"TELEGRAM_WEBHOOK_NOT_CONFIGURED",state:"MANUAL"},503);
 const supplied=request.headers.get("X-Telegram-Bot-Api-Secret-Token");
 if(!supplied||supplied!==env.TELEGRAM_WEBHOOK_SECRET)return json({ok:false,error:"TELEGRAM_WEBHOOK_UNAUTHORIZED"},401);

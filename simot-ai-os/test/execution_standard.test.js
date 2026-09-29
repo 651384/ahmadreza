@@ -3,8 +3,8 @@ import assert from "node:assert/strict";
 import { EXECUTION_STANDARD, EXECUTION_STANDARD_ID, validateExecutionStandard, assertNoLocalRuntimeDependency } from "../src/execution_standard.js";
 
 test("execution standard locks Cloudflare as control plane", () => {
-  assert.equal(EXECUTION_STANDARD_ID, "SOT-ARCH-LOCAL-PC-001");
-  assert.equal(EXECUTION_STANDARD.version, "2.1.0");
+  assert.equal(EXECUTION_STANDARD_ID, "SOT-ARCH-CLOUDFLARE-CORE-002");
+  assert.equal(EXECUTION_STANDARD.version, "2.2.0");
   assert.equal(EXECUTION_STANDARD.control_plane, "CLOUDFLARE");
   assert.equal(EXECUTION_STANDARD.local_pc_dependency, false);
 });

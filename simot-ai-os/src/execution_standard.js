@@ -1,17 +1,18 @@
 export const EXECUTION_STANDARD = Object.freeze({
-  version: "2.1.0",
+  version: "2.2.0",
   status: "LOCKED",
   control_plane: "CLOUDFLARE",
   local_pc_dependency: false,
   required_preflight: true,
   fail_closed_on_standard_mismatch: true,
   source_of_truth: ["GitHub SOT", "Cloudflare D1 control-plane manifest"],
-  runtime_dependencies: ["Cloudflare Workers", "Cloudflare D1", "Cloudflare Queues", "Cloudflare Cron", "Workers AI"],
+  runtime_dependencies: ["Cloudflare Workers", "Cloudflare D1", "Cloudflare Queues", "Workers AI"],
+  dormant_capabilities: ["Cloudflare Cron", "periodic scheduler", "automatic Watchdog", "continuous heartbeat loop", "periodic reconciliation", "automatic recovery loop"],
   forbidden_runtime_dependencies: ["Local PC", "PowerShell", "Desktop Commander", "Wrangler CLI", "Codex", "Arena"],
   financial_or_irreversible_autonomy: false
 });
 
-export const EXECUTION_STANDARD_ID = "SOT-ARCH-LOCAL-PC-001";
+export const EXECUTION_STANDARD_ID = "SOT-ARCH-CLOUDFLARE-CORE-002";
 
 export function validateExecutionStandard({ env = {}, sourceVersion = EXECUTION_STANDARD.version } = {}) {
   const configured = String(env.SIMOT_EXECUTION_STANDARD_VERSION ?? EXECUTION_STANDARD.version);
