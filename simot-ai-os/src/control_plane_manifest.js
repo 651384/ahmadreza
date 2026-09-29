@@ -1,14 +1,14 @@
 import { EXECUTION_STANDARD, EXECUTION_STANDARD_ID } from "./execution_standard.js";
 
 export const CONTROL_PLANE_MANIFEST = Object.freeze({
-  manifest_version: "2.1.0",
+  manifest_version: "2.2.0",
   standard_id: EXECUTION_STANDARD_ID,
   execution_standard: EXECUTION_STANDARD,
   instructions: [
     {
       id: "INST-001",
       name: "Preflight before every execution",
-      rule: "The execution standard must be validated before scheduled, webhook, queue, or management work begins.",
+      rule: "The execution standard must be validated before webhook, queue, management, or explicit manual work begins. Scheduled/periodic execution is dormant during BUILD phase.",
       enforcement: "RUNTIME_GATE"
     },
     {
@@ -26,7 +26,7 @@ export const CONTROL_PLANE_MANIFEST = Object.freeze({
     {
       id: "INST-004",
       name: "Cloudflare owns control plane",
-      rule: "Cloudflare Worker + Cron + D1 + Queues are the authoritative runtime control plane.",
+      rule: "Cloudflare Worker + D1 + Queues + Workers AI are the active runtime control plane. Cron/scheduled execution is a dormant future capability during BUILD phase.",
       enforcement: "ARCHITECTURE"
     },
     {
@@ -40,7 +40,7 @@ export const CONTROL_PLANE_MANIFEST = Object.freeze({
     { id: "TOOL-001", name: "Cloudflare Workers", role: "runtime/control-plane" },
     { id: "TOOL-002", name: "Cloudflare D1", role: "state/source-of-runtime-record" },
     { id: "TOOL-003", name: "Cloudflare Queues", role: "durable-work-handoff" },
-    { id: "TOOL-004", name: "Cloudflare Cron", role: "autonomous-scheduling/watchdog" },
+    { id: "TOOL-004", name: "Cloudflare Cron", role: "dormant-scheduled-control" },
     { id: "TOOL-005", name: "Workers AI", role: "cloud-worker-execution" },
     { id: "TOOL-006", name: "GitHub", role: "source-of-truth/versioned-change-control" }
   ],
@@ -54,7 +54,7 @@ export const CONTROL_PLANE_MANIFEST = Object.freeze({
     { id: "ARCH-003", name: "Source of Truth", status: "LOCKED" },
     { id: "ARCH-004", name: "Integration/Handoff Architecture v2.0", status: "LOCKED" },
     { id: "ARCH-005", name: "SIMOT-MSG v2", status: "LOCKED" },
-    { id: "ARCH-006", name: "Watchdog + Cloud Controller", status: "ACTIVE" },
+    { id: "ARCH-006", name: "Watchdog + Cloud Controller", status: "DORMANT" },
     { id: "ARCH-007", name: "Provider Router + Free Cost Guard", status: "ACTIVE" },
     { id: "ARCH-008", name: "Capability/Tool Registry", status: "ACTIVE" },
     { id: "ARCH-009", name: "Completion Gate + Explicit Task State Machine", status: "ACTIVE" }
@@ -68,7 +68,7 @@ export const CONTROL_PLANE_MANIFEST = Object.freeze({
   },
   workstreams: [
     { id: "WS-001", name: "Cloudflare control-plane completion", priority: "CRITICAL", status: "ACTIVE" },
-    { id: "WS-002", name: "Autonomous watchdog/recovery", priority: "CRITICAL", status: "ACTIVE" },
+    { id: "WS-002", name: "Autonomous watchdog/recovery", priority: "CRITICAL", status: "DORMANT" },
     { id: "WS-003", name: "Worker activation and routing", priority: "HIGH", status: "ACTIVE" },
     { id: "WS-004", name: "External connector adapters", priority: "CONTROLLED", status: "NOT_LIVE" },
     { id: "WS-005", name: "SIMOT Digital Catalog", priority: "CONTROLLED", status: "IN_PROGRESS" }
@@ -81,7 +81,7 @@ export const CONTROL_PLANE_MANIFEST = Object.freeze({
     value_chains: { count: 12, status: "REGISTRY_REQUIRED", source: "SOT" }
   },
   task_registry: [
-    { id: "TASK-001", name: "تکمیل حاکمیت Cloudflare به‌عنوان هسته مرکزی", priority: "CRITICAL", domain: "CONTROL_PLANE", status: "PENDING", execution: "AUTONOMOUS_TRACKED" },
+    { id: "TASK-001", name: "تکمیل حاکمیت Cloudflare به‌عنوان هسته مرکزی", priority: "CRITICAL", domain: "CONTROL_PLANE", status: "PENDING", execution: "CONTROLLED_TRACKED" },
     { id: "TASK-002", name: "بارگذاری کامل SOT، استانداردها، دستورالعمل‌ها و معماری در Cloudflare", priority: "CRITICAL", domain: "CONTROL_PLANE", status: "PENDING", execution: "AUTONOMOUS_TRACKED" },
     { id: "TASK-003", name: "اتصال کامل Master Memory به Cloudflare D1", priority: "CRITICAL", domain: "MASTER_MEMORY", status: "PENDING", execution: "AUTONOMOUS_TRACKED" },
     { id: "TASK-004", name: "تکمیل رجیستری ۷۱ فرایند سازمانی", priority: "HIGH", domain: "GOVERNANCE", status: "PENDING", execution: "AUTONOMOUS_TRACKED" },
@@ -91,7 +91,7 @@ export const CONTROL_PLANE_MANIFEST = Object.freeze({
     { id: "TASK-008", name: "تکمیل ۱۲ زنجیره ارزش", priority: "HIGH", domain: "VALUE_CHAIN", status: "PENDING", execution: "AUTONOMOUS_TRACKED" },
     { id: "TASK-009", name: "اجرای اجباری Preflight قبل از هر عملیات", priority: "CRITICAL", domain: "RUNTIME", status: "PENDING", execution: "AUTONOMOUS_TRACKED" },
     { id: "TASK-010", name: "تکمیل Fail-Closed و Self-Recovery", priority: "CRITICAL", domain: "RECOVERY", status: "PENDING", execution: "AUTONOMOUS_TRACKED" },
-    { id: "TASK-011", name: "تکمیل Watchdog مستقل و مداوم", priority: "CRITICAL", domain: "WATCHDOG", status: "PENDING", execution: "AUTONOMOUS_TRACKED" },
+    { id: "TASK-011", name: "تعریف و فعال‌سازی آینده Watchdog پس از ورود به OPERATE", priority: "CRITICAL", domain: "WATCHDOG", status: "DEFERRED", execution: "CONTROLLED_TRACKED" },
     { id: "TASK-012", name: "فعال‌سازی کامل Workerهای SIMOT-AI", priority: "HIGH", domain: "WORKERS", status: "PENDING", execution: "AUTONOMOUS_TRACKED" },
     { id: "TASK-013", name: "تکمیل مسیریابی و هماهنگی بین Workerها", priority: "HIGH", domain: "WORKERS", status: "PENDING", execution: "AUTONOMOUS_TRACKED" },
     { id: "TASK-014", name: "تکمیل صف‌ها، DLQ و مدیریت Retry", priority: "HIGH", domain: "QUEUES", status: "PENDING", execution: "AUTONOMOUS_TRACKED" },
