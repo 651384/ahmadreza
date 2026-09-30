@@ -222,7 +222,7 @@ function extractAIText(result){
   if(Array.isArray(result?.choices)){
     const choice=result.choices[0];
     if(choice?.message?.parsed&&typeof choice.message.parsed==="object")return JSON.stringify(choice.message.parsed);
-    const text=contentText(choice?.message?.content)||contentText(choice?.message?.output_text)||contentText(choice?.text)||contentText(choice?.content);
+    const text=contentText(choice?.message?.content)||contentText(choice?.message?.output_text)||contentText(choice?.message?.reasoning_content)||contentText(choice?.message?.reasoning)||contentText(choice?.text)||contentText(choice?.content);
     if(text)return text;
   }
   return JSON.stringify(result);
