@@ -1,4 +1,4 @@
-import { normalizeTelegramUpdate, buildTelegramEnvelope } from "./adapters/telegram.js";
+﻿import { normalizeTelegramUpdate, buildTelegramEnvelope } from "./adapters/telegram.js";
 import { getWorkerProfile, EXECUTABLE_WORKERS } from "./worker_profiles.js";
 import { validateExecutionStandard, EXECUTION_STANDARD_ID } from "./execution_standard.js";
 import { CONTROL_PLANE_MANIFEST, manifestRows } from "./control_plane_manifest.js";
@@ -9,9 +9,9 @@ import { exaSearch } from "./adapters/exa.js";
 import { geminiGenerate } from "./adapters/gemini.js";
 import { handleMcpRequest } from "./mcp.js";
 import { createGeminiLiveToken, voicePage } from "./voice-live.js";
-const VERSION = "0.5.0-3ce34a3";
+const VERSION = "0.5.0-3ce34a3-jsonobject";
 const EXECUTION_STANDARD_VERSION = "2.2.0";
-// Cloudflare Builds trigger marker — no runtime behavior change.
+// Cloudflare Builds trigger marker â€” no runtime behavior change.
 // Diagnostic deployment trigger 2026-09-30.
 // Build configuration is managed by Cloudflare Workers Builds.
 const RECIPIENT_RE = /^(SIMOT-MASTER|SIMOT-AI-[0-9]{2})$/;
@@ -250,7 +250,7 @@ async function executeWorkerMessage(env,body){
   if(!quota.ok)return {worker_id:workerId,model:provider.model,result:{decision:"BLOCKED",result_status:"BLOCKED",summary:"AI budget guard blocked execution.",findings:[],evidence:["D1 ai_daily_usage"],gaps:[quota.reason],confidence:"HIGH",verification:"INTERNAL",next_action:"WAIT_FOR_BUDGET",route_to:"NONE",action_intent:"WAIT",retryable:true},route_to:"NONE",quota,provider:provider.id};
   const maxChars=Number(env.SIMOT_AI_MAX_INPUT_CHARS||6000);
   const prompt=buildWorkerPrompt(workerId,body).slice(0,maxChars);
-  const strictPrompt=prompt+"\nOUTPUT CONTRACT: Return exactly ONE valid JSON object and nothing else. No markdown, no code fences, no duplicate objects, no commentary, no null characters. Required keys: decision, reason, evidence, gaps, confidence, verification, next_action, route_to, action_intent, retryable. If execution is not possible, use decision BLOCKED and explain the exact missing capability."; const responseSchema={type:"object",additionalProperties:false,properties:{decision:{type:"string"},reason:{type:"string"},evidence:{type:"array",items:{type:"string"}},gaps:{type:"array",items:{type:"string"}},confidence:{type:"string"},verification:{type:"string"},next_action:{type:"string"},route_to:{type:"string"},action_intent:{type:"string"},retryable:{type:"boolean"}},required:["decision","reason","evidence","gaps","confidence","verification","next_action","route_to","action_intent","retryable"]}; const result=await env.AI.run(provider.model,{messages:[{role:"system",content:strictPrompt},{role:"user",content:"Process the INPUT MESSAGE above and return exactly the required JSON object now."}],max_tokens:Number(env.SIMOT_AI_MAX_OUTPUT_TOKENS||700),temperature:0.1,seed:7,response_format:{type:"json_schema",json_schema:{name:"simot_worker_result",schema:responseSchema,strict:true}}},{rejectIfBusy:true});
+  const strictPrompt=prompt+"\nOUTPUT CONTRACT: Return exactly ONE valid JSON object and nothing else. No markdown, no code fences, no duplicate objects, no commentary, no null characters. Required keys: decision, reason, evidence, gaps, confidence, verification, next_action, route_to, action_intent, retryable. If execution is not possible, use decision BLOCKED and explain the exact missing capability."; const result=await env.AI.run(provider.model,{messages:[{role:"system",content:strictPrompt},{role:"user",content:"Process the INPUT MESSAGE above and return exactly the required JSON object now."}],max_tokens:Number(env.SIMOT_AI_MAX_OUTPUT_TOKENS||700),temperature:0.1,seed:7,response_format:{type:"json_object"}},{rejectIfBusy:true});
   const text=extractAIText(result);
   let raw;
   try{raw=JSON.parse(text);}catch{try{const fenced=String(text).match(/```(?:json)?\\s*([\\s\\S]*?)\\s*```/i);const s=String(text);const candidate=fenced?fenced[1]:s.slice(s.indexOf("{"),s.lastIndexOf("}")+1);raw=JSON.parse(candidate);}catch{raw={decision:"BLOCKED",reason:"MODEL_NON_JSON",evidence:[],gaps:["Model returned non-JSON output; no completion claim is permitted.","MODEL_RAW_PREVIEW:"+String(text).slice(0,1200)],confidence:"LOW",verification:"UNVERIFIED",next_action:"RETRY_OR_REVIEW",route_to:"NONE",action_intent:"WAIT",retryable:false};}}
