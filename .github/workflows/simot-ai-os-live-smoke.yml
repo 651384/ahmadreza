@@ -20,8 +20,8 @@ jobs:
           URL: https://simot-ai-os-gateway.vahid-ahmadreza.workers.dev
         run: |
           set -euo pipefail
-          expected="$(grep -oP 'SIMOT_RUNTIME_VERSION\s*=\s*"\K[^"]+' simot-ai-os/wrangler.toml)"
-          echo "Expected runtime version from wrangler.toml: $expected"
+          expected="$(grep -oP 'const VERSION\s*=\s*"\K[^"]+' simot-ai-os/src/worker.js)"
+          echo "Expected runtime version from worker.js: $expected"
           # Poll to tolerate Cloudflare Builds deployment propagation after a push.
           for attempt in $(seq 1 20); do
             curl --fail --silent --show-error --retry 5 --retry-delay 3 "$URL/health" -o health.json
@@ -74,7 +74,6 @@ jobs:
           if (body.runtime !== "ACTIVE") throw new Error("Runtime is not ACTIVE");
           console.log(JSON.stringify(body));
           NODE
-
 
       - name: Verify Cloudflare management control plane
         env:
