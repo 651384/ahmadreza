@@ -12,6 +12,7 @@ import { createGeminiLiveToken, voicePage } from "./voice-live.js";
 const VERSION = "0.5.0";
 const EXECUTION_STANDARD_VERSION = "2.2.0";
 // Cloudflare Builds trigger marker — no runtime behavior change.
+// Diagnostic deployment trigger 2026-09-30.
 // Build configuration is managed by Cloudflare Workers Builds.
 const RECIPIENT_RE = /^(SIMOT-MASTER|SIMOT-AI-[0-9]{2})$/;
 const TYPES = new Set(["COMMAND","REQUEST","RESPONSE","HANDOFF","ACK","STATUS","RESULT","ESCALATION","CLARIFICATION","REJECTION","ERROR","CANCEL","UPDATE","DECISION_REQUEST","DECISION"]);
