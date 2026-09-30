@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#111827"><meta name="apple-mobile-web-app-capable" content="yes"><title>عکس‌کم</title><link rel="stylesheet" href="style.css"></head>
+<body><main class="app"><header><div><h1>عکس‌کم</h1><p>فشرده‌سازی و تغییر اندازه عکس، کاملاً آفلاین</p></div><span class="offline">آفلاین</span></header>
+<section class="card"><label class="picker"><input id="files" type="file" accept="image/*" multiple><strong>انتخاب عکس</strong><span>یک یا چند عکس را انتخاب کنید</span></label><div id="selected" class="selected"></div></section>
+<section class="card controls"><label>حجم هدف<select id="target"><option value="102400">۱۰۰ کیلوبایت</option><option value="307200" selected>۳۰۰ کیلوبایت</option><option value="512000">۵۰۰ کیلوبایت</option><option value="1048576">۱ مگابایت</option><option value="custom">دلخواه</option></select></label>
+<label id="customWrap" class="hidden">حجم دلخواه (KB)<input id="customKb" type="number" min="20" max="20000" value="300"></label>
+<label>حداکثر عرض<select id="width"><option value="0" selected>بدون تغییر</option><option value="1920">۱۹۲۰</option><option value="1600">۱۶۰۰</option><option value="1280">۱۲۸۰</option><option value="1024">۱۰۲۴</option></select></label>
+<label>فرمت خروجی<select id="format"><option value="image/jpeg" selected>JPG</option><option value="image/webp">WebP</option></select></label>
+<button id="process" disabled>فشرده‌سازی</button></section>
+<section id="status" class="card status hidden"></section><section id="results" class="results"></section></main><script src="app.js"></script></body></html>
