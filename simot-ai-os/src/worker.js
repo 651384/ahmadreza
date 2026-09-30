@@ -240,7 +240,7 @@ async function executeWorkerMessage(env,body){
   if(!quota.ok)return {worker_id:workerId,model:provider.model,result:{decision:"BLOCKED",result_status:"BLOCKED",summary:"AI budget guard blocked execution.",findings:[],evidence:["D1 ai_daily_usage"],gaps:[quota.reason],confidence:"HIGH",verification:"INTERNAL",next_action:"WAIT_FOR_BUDGET",route_to:"NONE",action_intent:"WAIT",retryable:true},route_to:"NONE",quota,provider:provider.id};
   const maxChars=Number(env.SIMOT_AI_MAX_INPUT_CHARS||6000);
   const prompt=buildWorkerPrompt(workerId,body).slice(0,maxChars);
-  const result=await env.AI.run(provider.model,{prompt,max_tokens:Number(env.SIMOT_AI_MAX_OUTPUT_TOKENS||350),temperature:0.1,seed:7},{rejectIfBusy:true});
+  const result=await env.AI.run(provider.model,{prompt,max_tokens:Number(env.SIMOT_AI_MAX_OUTPUT_TOKENS||350),temperature:0.1,seed:7,response_format:{type:"json_object"}},{rejectIfBusy:true});
   const text=extractAIText(result);
   let raw;
   try{raw=JSON.parse(text);}catch{raw={decision:"BLOCKED",reason:"MODEL_NON_JSON",evidence:[],gaps:["Model returned non-JSON output; no completion claim is permitted."],confidence:"LOW",verification:"UNVERIFIED",next_action:"RETRY_OR_REVIEW",route_to:"NONE",action_intent:"WAIT",retryable:false};}
