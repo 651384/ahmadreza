@@ -9,7 +9,7 @@ import { exaSearch } from "./adapters/exa.js";
 import { geminiGenerate } from "./adapters/gemini.js";
 import { handleMcpRequest } from "./mcp.js";
 import { createGeminiLiveToken, voicePage } from "./voice-live.js";
-const VERSION = "0.5.0-54fef23";
+const VERSION = "0.5.0-3eaafa1";
 const EXECUTION_STANDARD_VERSION = "2.2.0";
 // Cloudflare Builds trigger marker — no runtime behavior change.
 // Diagnostic deployment trigger 2026-09-30.
