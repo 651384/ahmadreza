@@ -204,6 +204,7 @@ function extractAIText(result){
     if(Array.isArray(value)){const text=value.map(contentText).filter(Boolean).join("");if(text)return text;}
     if(value&&typeof value==="object"){
       if(value instanceof Uint8Array)return new TextDecoder().decode(value);
+      if(ArrayBuffer.isView(value))return new TextDecoder().decode(new Uint8Array(value.buffer,value.byteOffset,value.byteLength));
       if(value instanceof ArrayBuffer)return new TextDecoder().decode(new Uint8Array(value));
       if(typeof value.text==="string")return value.text;
       if(typeof value.output_text==="string")return value.output_text;
