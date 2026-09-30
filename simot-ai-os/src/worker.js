@@ -212,6 +212,7 @@ function extractAIText(result){
       if(typeof value.parsed!=="undefined"){const text=contentText(value.parsed);if(text)return text;return JSON.stringify(value.parsed);}
       if(typeof value.parts!=="undefined"){const text=contentText(value.parts);if(text)return text;}
       if(typeof value.content!=="undefined"){const text=contentText(value.content);if(text)return text;}
+      try{const primitive=String(value);if(primitive&&primitive!=="[object Object]")return primitive;}catch{}
     }
     return "";
   };
