@@ -199,7 +199,10 @@ function extractAIText(result){
   if(typeof result?.response==="string")return result.response;
   if(typeof result?.result==="string")return result.result;
   if(typeof result?.response?.content==="string")return result.response.content;
+  if(Array.isArray(result?.response?.content)){const text=result.response.content.map(x=>typeof x==="string"?x:(typeof x?.text==="string"?x.text:"")).join("");if(text)return text;}
+  if(typeof result?.response?.output_text==="string")return result.response.output_text;
   if(Array.isArray(result?.choices)&&typeof result.choices[0]?.message?.content==="string")return result.choices[0].message.content;
+  if(Array.isArray(result?.choices)&&Array.isArray(result.choices[0]?.message?.content)){const text=result.choices[0].message.content.map(x=>typeof x==="string"?x:(typeof x?.text==="string"?x.text:"")).join("");if(text)return text;}
   return JSON.stringify(result);
 }
 function buildWorkerPrompt(workerId,body){
