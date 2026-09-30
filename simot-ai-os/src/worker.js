@@ -198,11 +198,23 @@ async function consumeAIQuota(env){
 function extractAIText(result){
   if(typeof result?.response==="string")return result.response;
   if(typeof result?.result==="string")return result.result;
-  if(typeof result?.response?.content==="string")return result.response.content;
-  if(Array.isArray(result?.response?.content)){const text=result.response.content.map(x=>typeof x==="string"?x:(typeof x?.text==="string"?x.text:"")).join("");if(text)return text;}
-  if(typeof result?.response?.output_text==="string")return result.response.output_text;
-  if(Array.isArray(result?.choices)&&typeof result.choices[0]?.message?.content==="string")return result.choices[0].message.content;
-  if(Array.isArray(result?.choices)&&Array.isArray(result.choices[0]?.message?.content)){const text=result.choices[0].message.content.map(x=>typeof x==="string"?x:(typeof x?.text==="string"?x.text:"")).join("");if(text)return text;}
+  const contentText=(value)=>{
+    if(typeof value==="string")return value;
+    if(Array.isArray(value)){const text=value.map(contentText).filter(Boolean).join("");if(text)return text;}
+    if(value&&typeof value==="object"){
+      if(typeof value.text==="string")return value.text;
+      if(typeof value.output_text==="string")return value.output_text;
+      if(typeof value.content!=="undefined"){const text=contentText(value.content);if(text)return text;}
+    }
+    return "";
+  };
+  const direct=contentText(result?.response?.content)||contentText(result?.response?.output_text);
+  if(direct)return direct;
+  if(Array.isArray(result?.choices)){
+    const choice=result.choices[0];
+    const text=contentText(choice?.message?.content)||contentText(choice?.message?.output_text)||contentText(choice?.text)||contentText(choice?.content);
+    if(text)return text;
+  }
   return JSON.stringify(result);
 }
 function buildWorkerPrompt(workerId,body){
