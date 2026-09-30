@@ -304,6 +304,34 @@ if(url.pathname==="/providers/exa/search"){
   try { return await runExaSearch(env, request); }
   catch(error){ return json({ok:false,provider:"EXA",status:"FAILED",error:error?.code||"EXA_PROVIDER_ERROR"},503); }
 }
+if(url.pathname==="/diagnostic/result"&&request.method==="GET"){
+  try{
+    const msgId=url.searchParams.get("msg_id");
+    if(!msgId)return json({ok:false,error:"MSG_ID_REQUIRED"},400);
+
+    const idem=await env.SIMOT_DB.prepare(
+      "SELECT msg_id,result_status,corr_id,first_seen_at FROM idempotency WHERE msg_id=?"
+    ).bind(msgId).first();
+
+    const event=await env.SIMOT_DB.prepare(
+      "SELECT msg_id,corr_id,type,status,created_at,updated_at,payload_json,error_code,error_message FROM events WHERE msg_id=? ORDER BY created_at DESC LIMIT 1"
+    ).bind(msgId).first();
+
+    const worker=await env.SIMOT_DB.prepare(
+      "SELECT worker_id,status,last_run_at,last_msg_id,last_result FROM worker_registry WHERE last_msg_id=?"
+    ).bind(msgId).first();
+
+    return json({
+      ok:true,
+      msg_id:msgId,
+      idempotency:idem||null,
+      event:event||null,
+      worker:worker||null
+    });
+  }catch(error){
+    return json({ok:false,error:"DIAGNOSTIC_RESULT_UNAVAILABLE"},503);
+  }
+}
 if(url.pathname==="/health")return json({service:"simot-ai-os-gateway",version:VERSION,state:env.SIMOT_DEFAULT_STATE||"MANUAL",time:now()});
 if(url.pathname==="/completion/status"&&request.method==="GET"){
   try{
