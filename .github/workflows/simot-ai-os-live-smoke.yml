@@ -50,8 +50,8 @@ jobs:
           const fs = require("fs");
           const body = JSON.parse(fs.readFileSync("manifest.json", "utf8"));
           if (!body.ok) throw new Error("Control-plane manifest unavailable");
-          if (body.standard_id !== "SOT-ARCH-LOCAL-PC-001") throw new Error("Unexpected standard id");
-          if (body.manifest.execution_standard.version !== "2.1.0") throw new Error("Unexpected execution standard version");
+          if (body.standard_id !== "SOT-ARCH-CLOUDFLARE-CORE-002") throw new Error("Unexpected standard id");
+          if (body.manifest.execution_standard.version !== "2.2.0") throw new Error("Unexpected execution standard version");
           if (body.manifest.execution_standard.control_plane !== "CLOUDFLARE") throw new Error("Unexpected control plane");
           if (body.manifest.execution_standard.local_pc_dependency !== false) throw new Error("Local PC dependency is not false");
           if (!body.manifest.instructions.some(x => x.id === "INST-001" && x.enforcement === "RUNTIME_GATE")) throw new Error("Mandatory preflight rule missing");
