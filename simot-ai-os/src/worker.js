@@ -213,6 +213,7 @@ function extractAIText(result){
   if(direct)return direct;
   if(Array.isArray(result?.choices)){
     const choice=result.choices[0];
+    if(choice?.message?.parsed&&typeof choice.message.parsed==="object")return JSON.stringify(choice.message.parsed);
     const text=contentText(choice?.message?.content)||contentText(choice?.message?.output_text)||contentText(choice?.text)||contentText(choice?.content);
     if(text)return text;
   }
