@@ -5,6 +5,6 @@
 <section class="card controls"><label>حجم هدف<select id="target"><option value="102400">۱۰۰ کیلوبایت</option><option value="307200" selected>۳۰۰ کیلوبایت</option><option value="512000">۵۰۰ کیلوبایت</option><option value="1048576">۱ مگابایت</option><option value="custom">دلخواه</option></select></label>
 <label id="customWrap" class="hidden">حجم دلخواه (KB)<input id="customKb" type="number" min="20" max="20000" value="300"></label>
 <label>حداکثر عرض<select id="width"><option value="0" selected>بدون تغییر</option><option value="1920">۱۹۲۰</option><option value="1600">۱۶۰۰</option><option value="1280">۱۲۸۰</option><option value="1024">۱۰۲۴</option></select></label>
-<label>فرمت خروجی<select id="format"><option value="image/jpeg" selected>JPG</option><option value="image/webp">WebP</option></select></label>
+<label>فرمت خروجی<select id="format"><option value="image/jpeg" selected>JPG</option><option value="image/webp">WebP</option><option value="image/png">PNG</option></select></label>
 <button id="process" disabled>فشرده‌سازی</button></section>
 <section id="status" class="card status hidden"></section><section id="results" class="results"></section></main><script src="app.js"></script><script>if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});</script></body></html>
