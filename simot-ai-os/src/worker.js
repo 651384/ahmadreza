@@ -337,6 +337,15 @@ if(url.pathname==="/cloudflare/management/snapshot"&&request.method==="GET"){
   try{return json(await cloudflareManagementSnapshot(env));}catch(error){return json({ok:false,error:"CLOUDFLARE_MANAGEMENT_SNAPSHOT_UNAVAILABLE"},503);}
 }
 if(url.pathname==="/control-plane/manifest"&&request.method==="GET")return json({ok:true,manifest:CONTROL_PLANE_MANIFEST,standard_id:EXECUTION_STANDARD_ID});
+if(url.pathname==="/mailbox/reply"&&request.method==="POST"){
+  try{
+    const body=await request.json();
+    return json(await writeChatgptMailbox(env,body));
+  }catch(error){
+    const status=error?.message==="MAILBOX_UNAUTHORIZED"?401:error?.message==="MAILBOX_TOKEN_NOT_CONFIGURED"?503:400;
+    return json({ok:false,error:error?.message||"MAILBOX_REPLY_FAILED"},status);
+  }
+}
 if(url.pathname==="/mailbox/send"&&request.method==="POST"){
   try{
     const body=await request.json();
