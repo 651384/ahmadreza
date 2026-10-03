@@ -1,4 +1,5 @@
 import { exaSearch } from "./adapters/exa.js";
+import { submitJarvisMessage, readJarvisMailbox } from "./jarvis-bridge.js";
 const PROTOCOL_VERSION = "2025-11-25";
 const MODERN_PROTOCOL_VERSION = "2026-07-28";
 
@@ -45,7 +46,7 @@ const TOOLS = [
       type: "object",
       properties: {
         since: { type: "string", maxLength: 64 },
-        limit: { type: "integer", minimum: 1, maximum: 50 }
+        limit: { type: "integer", minimum: 1, maximum: 50 },\n        direction: { type: "string", enum: ["JARVIS_TO_SIMOT","SIMOT_TO_JARVIS"] }
       },
       additionalProperties: false
     }
@@ -95,17 +96,11 @@ async function toolCall(name, args, env) {
     ).first();
     return { heartbeat: heartbeat || null, watchdog: state || null };
   }
+  if (name === "simot_jarvis_send") {
+    return await submitJarvisMessage(env,args?.message,{msgId:args?.msg_id,corrId:args?.corr_id});
+  }
   if (name === "simot_mailbox_read") {
-    await env.SIMOT_DB.prepare("CREATE TABLE IF NOT EXISTS jarvis_mailbox (id INTEGER PRIMARY KEY AUTOINCREMENT, msg_id TEXT NOT NULL UNIQUE, corr_id TEXT, direction TEXT NOT NULL, body TEXT NOT NULL, created_at TEXT NOT NULL)").run();
-    const limit = Math.min(50, Math.max(1, Number(args?.limit || 20)));
-    const since = typeof args?.since === "string" && args.since ? args.since : null;
-    const query = since
-      ? "SELECT id,msg_id,corr_id,direction,body,created_at FROM jarvis_mailbox WHERE created_at>? ORDER BY id ASC LIMIT ?"
-      : "SELECT id,msg_id,corr_id,direction,body,created_at FROM jarvis_mailbox ORDER BY id DESC LIMIT ?";
-    const rows = since
-      ? await env.SIMOT_DB.prepare(query).bind(since, limit).all()
-      : await env.SIMOT_DB.prepare(query).bind(limit).all();
-    return { messages: rows.results || [] };
+    return await readJarvisMailbox(env,{since:args?.since,limit:args?.limit,direction:args?.direction});
   }
   if (name === "simot_exa_search") {
     const result = await exaSearch(env, args || {});
@@ -131,7 +126,7 @@ export async function handleMcpRequest(request, env) {
       supportedVersions: [MODERN_PROTOCOL_VERSION, PROTOCOL_VERSION],
       capabilities: { tools: {} },
       serverInfo: { name: "simot-ai-os", version: env.SIMOT_RUNTIME_VERSION || "0.5.0" },
-      instructions: "SIMOT read-only control-plane MCP gateway. Use tools to inspect SIMOT state; do not claim execution unless a tool returns explicit completion evidence.",
+      instructions: "SIMOT control-plane MCP gateway. Jarvis may submit requests through simot_jarvis_send and read responses through simot_mailbox_read; do not claim execution unless a tool returns explicit completion evidence.",
       ttlMs: 60000,
       cacheScope: "public"
     });
