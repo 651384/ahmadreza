@@ -50,3 +50,14 @@ CREATE TABLE IF NOT EXISTS watchdog_state (
   reason TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_watchdog_state_checked_at ON watchdog_state(checked_at);
+
+
+CREATE TABLE IF NOT EXISTS jarvis_mailbox (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  msg_id TEXT NOT NULL UNIQUE,
+  corr_id TEXT,
+  direction TEXT NOT NULL,
+  body TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_jarvis_mailbox_created_at ON jarvis_mailbox(created_at);

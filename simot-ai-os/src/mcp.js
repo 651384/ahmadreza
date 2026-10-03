@@ -1,4 +1,5 @@
 import { exaSearch } from "./adapters/exa.js";
+import { submitJarvisMessage, readJarvisMailbox } from "./jarvis-bridge.js";
 const PROTOCOL_VERSION = "2025-11-25";
 const MODERN_PROTOCOL_VERSION = "2026-07-28";
 
@@ -37,6 +38,24 @@ const TOOLS = [
     name: "simot_watchdog_status",
     description: "Read SIMOT cloud watchdog and heartbeat status.",
     inputSchema: { type: "object", properties: {}, additionalProperties: false }
+  },
+  {
+    name: "simot_jarvis_send",
+    description: "Submit a user request from Jarvis into the SIMOT execution queue.",
+    inputSchema: { type: "object", properties: { message: { type: "string", minLength: 1, maxLength: 12000 }, msg_id: { type: "string", maxLength: 128 }, corr_id: { type: "string", maxLength: 128 } }, required: ["message"], additionalProperties: false }
+  },
+  {
+    name: "simot_mailbox_read",
+    description: "Read recent SIMOT Jarvis bridge messages. Returns only mailbox records and never secrets.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        since: { type: "string", maxLength: 64 },
+        limit: { type: "integer", minimum: 1, maximum: 50 },
+        direction: { type: "string", enum: ["JARVIS_TO_SIMOT","SIMOT_TO_JARVIS"] }
+      },
+      additionalProperties: false
+    }
   },
   {
     name: "simot_exa_search",
@@ -83,6 +102,12 @@ async function toolCall(name, args, env) {
     ).first();
     return { heartbeat: heartbeat || null, watchdog: state || null };
   }
+  if (name === "simot_jarvis_send") {
+    return await submitJarvisMessage(env,args?.message,{msgId:args?.msg_id,corrId:args?.corr_id});
+  }
+  if (name === "simot_mailbox_read") {
+    return await readJarvisMailbox(env,{since:args?.since,limit:args?.limit,direction:args?.direction});
+  }
   if (name === "simot_exa_search") {
     const result = await exaSearch(env, args || {});
     return { provider: result.provider, status: result.status, result };
@@ -107,7 +132,7 @@ export async function handleMcpRequest(request, env) {
       supportedVersions: [MODERN_PROTOCOL_VERSION, PROTOCOL_VERSION],
       capabilities: { tools: {} },
       serverInfo: { name: "simot-ai-os", version: env.SIMOT_RUNTIME_VERSION || "0.5.0" },
-      instructions: "SIMOT read-only control-plane MCP gateway. Use tools to inspect SIMOT state; do not claim execution unless a tool returns explicit completion evidence.",
+      instructions: "SIMOT control-plane MCP gateway. Jarvis may submit requests through simot_jarvis_send and read responses through simot_mailbox_read; do not claim execution unless a tool returns explicit completion evidence.",
       ttlMs: 60000,
       cacheScope: "public"
     });
