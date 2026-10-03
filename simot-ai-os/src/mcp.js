@@ -51,7 +51,8 @@ const TOOLS = [
       type: "object",
       properties: {
         since: { type: "string", maxLength: 64 },
-        limit: { type: "integer", minimum: 1, maximum: 50 },\n        direction: { type: "string", enum: ["JARVIS_TO_SIMOT","SIMOT_TO_JARVIS"] }
+        limit: { type: "integer", minimum: 1, maximum: 50 },
+        direction: { type: "string", enum: ["JARVIS_TO_SIMOT","SIMOT_TO_JARVIS"] }
       },
       additionalProperties: false
     }
