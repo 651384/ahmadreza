@@ -40,6 +40,11 @@ const TOOLS = [
     inputSchema: { type: "object", properties: {}, additionalProperties: false }
   },
   {
+    name: "simot_jarvis_send",
+    description: "Submit a user request from Jarvis into the SIMOT execution queue.",
+    inputSchema: { type: "object", properties: { message: { type: "string", minLength: 1, maxLength: 12000 }, msg_id: { type: "string", maxLength: 128 }, corr_id: { type: "string", maxLength: 128 } }, required: ["message"], additionalProperties: false }
+  },
+  {
     name: "simot_mailbox_read",
     description: "Read recent SIMOT Jarvis bridge messages. Returns only mailbox records and never secrets.",
     inputSchema: {
