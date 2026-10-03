@@ -298,6 +298,18 @@ async function runExaSearch(env, request) {
   const result = await exaSearch(env, body);
   return json({ ok: result.ok, provider: result.provider, status: result.status, result });
 }
+async function writeChatgptMailbox(env,body){
+  if(!env.SIMOT_MAILBOX_TOKEN) throw new Error("MAILBOX_TOKEN_NOT_CONFIGURED");
+  const supplied=body?.token;
+  if(typeof supplied!=="string"||supplied!==env.SIMOT_MAILBOX_TOKEN) throw new Error("MAILBOX_UNAUTHORIZED");
+  const message=body?.message;
+  if(typeof message!=="string"||message.trim().length<1||message.length>12000) throw new Error("INVALID_MAILBOX_MESSAGE");
+  const msgId=typeof body?.msg_id==="string"&&body.msg_id?body.msg_id:"CHATGPT-"+crypto.randomUUID();
+  const corrId=typeof body?.corr_id==="string"&&body.corr_id?body.corr_id:msgId;
+  await env.SIMOT_DB.prepare("CREATE TABLE IF NOT EXISTS jarvis_mailbox (id INTEGER PRIMARY KEY AUTOINCREMENT, msg_id TEXT NOT NULL UNIQUE, corr_id TEXT, direction TEXT NOT NULL, body TEXT NOT NULL, created_at TEXT NOT NULL)").run();
+  await env.SIMOT_DB.prepare("INSERT INTO jarvis_mailbox(msg_id,corr_id,direction,body,created_at) VALUES(?,?,?,?,?)").bind(msgId,corrId,"CHATGPT_TO_JARVIS",message.trim(),now()).run();
+  return {ok:true,msg_id:msgId,corr_id:corrId,direction:"CHATGPT_TO_JARVIS"};
+}
 async function writeJarvisMailbox(env,body){
   if(!env.SIMOT_MAILBOX_TOKEN) throw new Error("MAILBOX_TOKEN_NOT_CONFIGURED");
   const supplied=body?.token;
