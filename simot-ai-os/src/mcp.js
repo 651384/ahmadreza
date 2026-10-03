@@ -39,6 +39,18 @@ const TOOLS = [
     inputSchema: { type: "object", properties: {}, additionalProperties: false }
   },
   {
+    name: "simot_mailbox_read",
+    description: "Read recent SIMOT Jarvis bridge messages. Returns only mailbox records and never secrets.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        since: { type: "string", maxLength: 64 },
+        limit: { type: "integer", minimum: 1, maximum: 50 }
+      },
+      additionalProperties: false
+    }
+  },
+  {
     name: "simot_exa_search",
     description: "Run a public-web research search through the configured Exa provider.",
     inputSchema: {
@@ -82,6 +94,18 @@ async function toolCall(name, args, env) {
       "SELECT checked_at,state,action,controller_status,age_ms,reason FROM watchdog_state WHERE id=1"
     ).first();
     return { heartbeat: heartbeat || null, watchdog: state || null };
+  }
+  if (name === "simot_mailbox_read") {
+    await env.SIMOT_DB.prepare("CREATE TABLE IF NOT EXISTS jarvis_mailbox (id INTEGER PRIMARY KEY AUTOINCREMENT, msg_id TEXT NOT NULL UNIQUE, corr_id TEXT, direction TEXT NOT NULL, body TEXT NOT NULL, created_at TEXT NOT NULL)").run();
+    const limit = Math.min(50, Math.max(1, Number(args?.limit || 20)));
+    const since = typeof args?.since === "string" && args.since ? args.since : null;
+    const query = since
+      ? "SELECT id,msg_id,corr_id,direction,body,created_at FROM jarvis_mailbox WHERE created_at>? ORDER BY id ASC LIMIT ?"
+      : "SELECT id,msg_id,corr_id,direction,body,created_at FROM jarvis_mailbox ORDER BY id DESC LIMIT ?";
+    const rows = since
+      ? await env.SIMOT_DB.prepare(query).bind(since, limit).all()
+      : await env.SIMOT_DB.prepare(query).bind(limit).all();
+    return { messages: rows.results || [] };
   }
   if (name === "simot_exa_search") {
     const result = await exaSearch(env, args || {});
