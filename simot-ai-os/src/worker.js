@@ -298,6 +298,18 @@ async function runExaSearch(env, request) {
   const result = await exaSearch(env, body);
   return json({ ok: result.ok, provider: result.provider, status: result.status, result });
 }
+async function writeJarvisMailbox(env,body){
+  if(!env.SIMOT_MAILBOX_TOKEN) throw new Error("MAILBOX_TOKEN_NOT_CONFIGURED");
+  const supplied=body?.token;
+  if(typeof supplied!=="string"||supplied!==env.SIMOT_MAILBOX_TOKEN) throw new Error("MAILBOX_UNAUTHORIZED");
+  const message=body?.message;
+  if(typeof message!=="string"||message.trim().length<1||message.length>12000) throw new Error("INVALID_MAILBOX_MESSAGE");
+  const msgId=typeof body?.msg_id==="string"&&body.msg_id?body.msg_id:"JARVIS-"+crypto.randomUUID();
+  const corrId=typeof body?.corr_id==="string"&&body.corr_id?body.corr_id:msgId;
+  await env.SIMOT_DB.prepare("CREATE TABLE IF NOT EXISTS jarvis_mailbox (id INTEGER PRIMARY KEY AUTOINCREMENT, msg_id TEXT NOT NULL UNIQUE, corr_id TEXT, direction TEXT NOT NULL, body TEXT NOT NULL, created_at TEXT NOT NULL)").run();
+  await env.SIMOT_DB.prepare("INSERT INTO jarvis_mailbox(msg_id,corr_id,direction,body,created_at) VALUES(?,?,?,?,?)").bind(msgId,corrId,"JARVIS_TO_CHATGPT",message.trim(),now()).run();
+  return {ok:true,msg_id:msgId,corr_id:corrId};
+}
 function safeBody(body){const copy={...body};if(copy.SECRET)delete copy.SECRET;if(copy["API-KEY"])delete copy["API-KEY"];if(copy["PRIVATE-KEY"])delete copy["PRIVATE-KEY"];if(copy.PASSWORD)delete copy.PASSWORD;return copy;}
 async function recordEvent(env,event){await env.SIMOT_DB.prepare("INSERT INTO events(id,msg_id,corr_id,type,status,created_at,updated_at,payload_json,error_code,error_message) VALUES(?,?,?,?,?,?,?,?,?,?)").bind(event.id,event.msg_id,event.corr_id,event.type,event.status,event.created_at,event.updated_at,event.payload_json||null,event.error_code||null,event.error_message||null).run();}
 export default {
@@ -313,6 +325,15 @@ if(url.pathname==="/cloudflare/management/snapshot"&&request.method==="GET"){
   try{return json(await cloudflareManagementSnapshot(env));}catch(error){return json({ok:false,error:"CLOUDFLARE_MANAGEMENT_SNAPSHOT_UNAVAILABLE"},503);}
 }
 if(url.pathname==="/control-plane/manifest"&&request.method==="GET")return json({ok:true,manifest:CONTROL_PLANE_MANIFEST,standard_id:EXECUTION_STANDARD_ID});
+if(url.pathname==="/mailbox/send"&&request.method==="POST"){
+  try{
+    const body=await request.json();
+    return json(await writeJarvisMailbox(env,body));
+  }catch(error){
+    const status=error?.message==="MAILBOX_UNAUTHORIZED"?401:error?.message==="MAILBOX_TOKEN_NOT_CONFIGURED"?503:400;
+    return json({ok:false,error:error?.message||"MAILBOX_SEND_FAILED"},status);
+  }
+}
 if(url.pathname==="/mcp"){ try { return await handleMcpRequest(request, env); } catch(error) { return json({ok:false,error:"MCP_ERROR"},500); } }
 if(url.pathname==="/voice"&&request.method==="GET") return voicePage();
 if(url.pathname==="/voice/token"&&request.method==="POST"){
