@@ -263,7 +263,7 @@ async function executeWorkerMessage(env,body){
   if(normalizedDecision==="COMPLETED"&&(!parsed.evidence.length||parsed.verification!=="VERIFIED")){
     parsed.result_status="BLOCKED";parsed.gaps=[...(parsed.gaps||[]),"Completion requires evidence and VERIFIED verification."];parsed.next_action="REVIEW_COMPLETION_EVIDENCE";parsed.retryable=false;
   }
-  const route=body["SCOPE"]==="E2E_SMOKE"?"NONE":(EXECUTABLE_WORKERS.includes(parsed.route_to)?parsed.route_to:(parsed.route_to==="SIMOT-MASTER"?"SIMOT-MASTER":"NONE"));
+  const route=body["SCOPE"]==="E2E_SMOKE"?"NONE":(parsed.route_to===workerId?"NONE":(EXECUTABLE_WORKERS.includes(parsed.route_to)?parsed.route_to:(parsed.route_to==="SIMOT-MASTER"?"SIMOT-MASTER":"NONE")));
   return {worker_id:workerId,model:provider.model,result:parsed,route_to:route,quota,provider:provider.id};
 }
 async function runGeminiAgent(env, request) {
