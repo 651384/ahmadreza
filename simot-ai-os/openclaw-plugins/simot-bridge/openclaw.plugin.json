@@ -1,0 +1,22 @@
+{
+  "id": "simot-bridge",
+  "name": "SIMOT Bridge",
+  "description": "Deterministically routes user turns from OpenClaw Jarvis to SIMOT without a local LLM call.",
+  "activation": {
+    "onStartup": true
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "endpoint": {
+        "type": "string",
+        "description": "SIMOT synchronous Jarvis endpoint."
+      },
+      "tokenEnv": {
+        "type": "string",
+        "description": "Environment variable containing the SIMOT mailbox token."
+      }
+    }
+  }
+}
