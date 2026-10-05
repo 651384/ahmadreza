@@ -8,9 +8,9 @@ import { AI_PROVIDER_REGISTRY } from "./ai-provider-registry.js";
 import { exaSearch } from "./adapters/exa.js";
 import { geminiGenerate } from "./adapters/gemini.js";
 import { handleMcpRequest } from "./mcp.js";
-import { ensureJarvisMailbox, submitJarvisMessage, writeJarvisResult } from "./jarvis-bridge.js";
+import { ensureJarvisMailbox, buildJarvisEnvelope, submitJarvisMessage, writeJarvisResult } from "./jarvis-bridge.js";
 import { createGeminiLiveToken, voicePage } from "./voice-live.js";
-const VERSION = "0.5.0-3ce34a3-nothink";
+const VERSION = "0.5.0-4-jarvis-sync";
 const EXECUTION_STANDARD_VERSION = "2.2.0";
 // Cloudflare Builds trigger marker â€” no runtime behavior change.
 // Diagnostic deployment trigger 2026-09-30.
@@ -313,6 +313,47 @@ async function writeChatgptMailbox(env,body,request){
   await env.SIMOT_DB.prepare("INSERT INTO jarvis_mailbox(msg_id,corr_id,direction,body,created_at) VALUES(?,?,?,?,?)").bind(msgId,corrId,"SIMOT_TO_JARVIS",message.trim(),now()).run();
   return {ok:true,msg_id:msgId,corr_id:corrId,direction:"SIMOT_TO_JARVIS"};
 }
+async function runJarvisSync(env,body,request){
+  if(!env.SIMOT_MAILBOX_TOKEN) throw new Error("MAILBOX_TOKEN_NOT_CONFIGURED");
+  const auth=request?.headers?.get("Authorization")||"";
+  const headerToken=auth.startsWith("Bearer ")?auth.slice(7):"";
+  const supplied=typeof body?.token==="string"&&body.token?body.token:headerToken;
+  if(supplied!==env.SIMOT_MAILBOX_TOKEN) throw new Error("MAILBOX_UNAUTHORIZED");
+  const message=typeof body?.message==="string"?body.message.trim():"";
+  if(!message||message.length>12000) throw new Error("INVALID_MAILBOX_MESSAGE");
+  await ensureJarvisMailbox(env);
+  await ensureRuntimeTables(env);
+  const msgId=typeof body?.msg_id==="string"&&body.msg_id?body.msg_id:"JARVIS-"+crypto.randomUUID();
+  const corrId=typeof body?.corr_id==="string"&&body.corr_id?body.corr_id:msgId;
+  const envelope=buildJarvisEnvelope(message,{msgId,corrId});
+  const t=now();
+  const existing=await env.SIMOT_DB.prepare("SELECT msg_id,result_status,corr_id FROM idempotency WHERE msg_id=?").bind(msgId).first();
+  if(existing) return json({ok:true,duplicate:true,msg_id:msgId,corr_id:existing.corr_id,result_status:existing.result_status});
+  await env.SIMOT_DB.prepare("INSERT INTO idempotency(msg_id,first_seen_at,result_status,corr_id) VALUES(?,?,?,?)").bind(msgId,t,"ACCEPTED_FOR_EXECUTION",corrId).run();
+  await env.SIMOT_DB.prepare("INSERT INTO jarvis_mailbox(msg_id,corr_id,direction,body,created_at) VALUES(?,?,?,?,?)").bind(msgId,corrId,"JARVIS_TO_SIMOT",message,t).run();
+  await recordEvent(env,{id:crypto.randomUUID(),msg_id:msgId,corr_id:corrId,type:"REQUEST",status:"ACCEPTED_FOR_EXECUTION",created_at:t,updated_at:t,payload_json:JSON.stringify(safeBody(envelope))});
+  try{
+    const execution=await executeWorkerMessage(env,envelope);
+    const result=execution.result;
+    const resultJson=JSON.stringify(result);
+    if(execution.route_to==="NONE"){
+      await writeJarvisResult(env,envelope,result);
+    }else{
+      const nextId=msgId+"-"+execution.route_to;
+      const next={...envelope,"FRAME-END":"<<<SIMOT-MSG v2 | END | MSG-ID="+nextId+">>>","MSG-ID":nextId,"CORR-ID":corrId,"REPLY-TO":msgId,"FROM":execution.worker_id,"TO":execution.route_to,"STATUS":"NEW","RESULT-STATUS":"PENDING","NEXT-ACTION":"EXECUTE_ROUTED_WORKER","WRITE-BACK":"REQUIRED","PAYLOAD":result};
+      if(env.SIMOT_QUEUE) await env.SIMOT_QUEUE.send(next);
+    }
+    await recordEvent(env,{id:crypto.randomUUID(),msg_id:msgId,corr_id:corrId,type:"RESULT",status:"COMPLETED",created_at:t,updated_at:now(),payload_json:JSON.stringify(safeBody({worker_id:execution.worker_id,model:execution.model,result,route_to:execution.route_to}))});
+    await env.SIMOT_DB.prepare("UPDATE worker_registry SET last_run_at=?,last_msg_id=?,last_result=? WHERE worker_id=?").bind(now(),msgId,resultJson,execution.worker_id).run();
+    await env.SIMOT_DB.prepare("UPDATE idempotency SET result_status=? WHERE msg_id=?").bind(result.result_status==="COMPLETED"?"COMPLETED":"BLOCKED",msgId).run();
+    return json({ok:true,msg_id:msgId,corr_id:corrId,status:result.result_status||"UNKNOWN",worker_id:execution.worker_id,model:execution.model,route_to:execution.route_to,result});
+  }catch(error){
+    await env.SIMOT_DB.prepare("UPDATE idempotency SET result_status=? WHERE msg_id=?").bind("BLOCKED",msgId).run().catch(()=>{});
+    await recordEvent(env,{id:crypto.randomUUID(),msg_id:msgId,corr_id:corrId,type:"RESULT",status:"BLOCKED",created_at:t,updated_at:now(),payload_json:JSON.stringify(safeBody(envelope)),error_code:error?.message||"JARVIS_SYNC_FAILED",error_message:String(error?.message||error)}).catch(()=>{});
+    throw error;
+  }
+}
+
 async function writeJarvisMailbox(env,body,request){
   if(!env.SIMOT_MAILBOX_TOKEN) throw new Error("MAILBOX_TOKEN_NOT_CONFIGURED");
   const auth=request?.headers?.get("Authorization")||"";
@@ -343,6 +384,15 @@ if(url.pathname==="/mailbox/reply"&&request.method==="POST"){
   }catch(error){
     const status=error?.message==="MAILBOX_UNAUTHORIZED"?401:error?.message==="MAILBOX_TOKEN_NOT_CONFIGURED"?503:400;
     return json({ok:false,error:error?.message||"MAILBOX_REPLY_FAILED"},status);
+  }
+}
+if(url.pathname==="/jarvis/execute"&&request.method==="POST"){
+  try{
+    const body=await request.json();
+    return await runJarvisSync(env,body,request);
+  }catch(error){
+    const status=error?.message==="MAILBOX_UNAUTHORIZED"?401:error?.message==="MAILBOX_TOKEN_NOT_CONFIGURED"?503:error?.message==="AI_BINDING_NOT_CONFIGURED"?503:400;
+    return json({ok:false,error:error?.message||"JARVIS_SYNC_FAILED"},status);
   }
 }
 if(url.pathname==="/mailbox/send"&&request.method==="POST"){
