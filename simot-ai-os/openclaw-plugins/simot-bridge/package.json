@@ -1,0 +1,15 @@
+{
+  "name": "@simot/openclaw-simot-bridge",
+  "version": "1.0.0",
+  "type": "module",
+  "peerDependencies": {
+    "openclaw": ">=2026.9.6"
+  },
+  "openclaw": {
+    "extensions": ["./index.ts"],
+    "compat": {
+      "pluginApi": ">=2026.9.6",
+      "minGatewayVersion": "2026.9.6"
+    }
+  }
+}
