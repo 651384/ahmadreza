@@ -260,7 +260,7 @@ async function executeWorkerMessage(env,body){
   const decision=String(raw?.decision||raw?.result_status||"BLOCKED").toUpperCase();
   const normalizedDecision=["COMPLETED","BLOCKED","PENDING"].includes(decision)?decision:"BLOCKED";
   const parsed={result_status:normalizedDecision,summary:String(raw?.summary||raw?.reason||""),user_answer:String(raw?.user_answer||raw?.answer||""),findings:Array.isArray(raw?.findings)?raw.findings:[],evidence:Array.isArray(raw?.evidence)?raw.evidence:[],gaps:Array.isArray(raw?.gaps)?raw.gaps:[],confidence:String(raw?.confidence||"LOW"),verification:String(raw?.verification||"UNVERIFIED"),next_action:String(raw?.next_action||"REVIEW"),route_to:String(raw?.route_to||"NONE"),action_intent:String(raw?.action_intent||"NONE"),retryable:Boolean(raw?.retryable)}; if(!parsed.user_answer){parsed.user_answer="پاسخ انسانی از مدل دریافت نشد؛ درخواست پردازش شد اما نتیجه قابل ارائه نیست."; parsed.gaps=[...(parsed.gaps||[]),"USER_ANSWER_MISSING"]; parsed.next_action="RETRY_USER_ANSWER";}
-  if(normalizedDecision==="COMPLETED"&&(!parsed.evidence.length||parsed.verification!=="VERIFIED")){
+  if(body["SCOPE"]!=="JARVIS_REQUEST"&&normalizedDecision==="COMPLETED"&&(!parsed.evidence.length||parsed.verification!=="VERIFIED")){
     parsed.result_status="BLOCKED";parsed.gaps=[...(parsed.gaps||[]),"Completion requires evidence and VERIFIED verification."];parsed.next_action="REVIEW_COMPLETION_EVIDENCE";parsed.retryable=false;
   }
   const route=body["SCOPE"]==="E2E_SMOKE"?"NONE":(parsed.route_to===workerId?"NONE":(EXECUTABLE_WORKERS.includes(parsed.route_to)?parsed.route_to:(parsed.route_to==="SIMOT-MASTER"?"SIMOT-MASTER":"NONE")));
@@ -299,10 +299,12 @@ async function runExaSearch(env, request) {
   const result = await exaSearch(env, body);
   return json({ ok: result.ok, provider: result.provider, status: result.status, result });
 }
-async function writeChatgptMailbox(env,body){
+async function writeChatgptMailbox(env,body,request){
   if(!env.SIMOT_MAILBOX_TOKEN) throw new Error("MAILBOX_TOKEN_NOT_CONFIGURED");
-  const supplied=body?.token;
-  if(typeof supplied!=="string"||supplied!==env.SIMOT_MAILBOX_TOKEN) throw new Error("MAILBOX_UNAUTHORIZED");
+  const auth=request?.headers?.get("Authorization")||"";
+  const headerToken=auth.startsWith("Bearer ")?auth.slice(7):"";
+  const supplied=typeof body?.token==="string"&&body.token?body.token:headerToken;
+  if(supplied!==env.SIMOT_MAILBOX_TOKEN) throw new Error("MAILBOX_UNAUTHORIZED");
   const message=body?.message;
   if(typeof message!=="string"||message.trim().length<1||message.length>12000) throw new Error("INVALID_MAILBOX_MESSAGE");
   await ensureJarvisMailbox(env);
@@ -311,10 +313,12 @@ async function writeChatgptMailbox(env,body){
   await env.SIMOT_DB.prepare("INSERT INTO jarvis_mailbox(msg_id,corr_id,direction,body,created_at) VALUES(?,?,?,?,?)").bind(msgId,corrId,"SIMOT_TO_JARVIS",message.trim(),now()).run();
   return {ok:true,msg_id:msgId,corr_id:corrId,direction:"SIMOT_TO_JARVIS"};
 }
-async function writeJarvisMailbox(env,body){
+async function writeJarvisMailbox(env,body,request){
   if(!env.SIMOT_MAILBOX_TOKEN) throw new Error("MAILBOX_TOKEN_NOT_CONFIGURED");
-  const supplied=body?.token;
-  if(typeof supplied!=="string"||supplied!==env.SIMOT_MAILBOX_TOKEN) throw new Error("MAILBOX_UNAUTHORIZED");
+  const auth=request?.headers?.get("Authorization")||"";
+  const headerToken=auth.startsWith("Bearer ")?auth.slice(7):"";
+  const supplied=typeof body?.token==="string"&&body.token?body.token:headerToken;
+  if(supplied!==env.SIMOT_MAILBOX_TOKEN) throw new Error("MAILBOX_UNAUTHORIZED");
   return await submitJarvisMessage(env,body?.message,{msgId:body?.msg_id,corrId:body?.corr_id});
 }
 function safeBody(body){const copy={...body};if(copy.SECRET)delete copy.SECRET;if(copy["API-KEY"])delete copy["API-KEY"];if(copy["PRIVATE-KEY"])delete copy["PRIVATE-KEY"];if(copy.PASSWORD)delete copy.PASSWORD;return copy;}
@@ -335,7 +339,7 @@ if(url.pathname==="/control-plane/manifest"&&request.method==="GET")return json(
 if(url.pathname==="/mailbox/reply"&&request.method==="POST"){
   try{
     const body=await request.json();
-    return json(await writeChatgptMailbox(env,body));
+    return json(await writeChatgptMailbox(env,body,request));
   }catch(error){
     const status=error?.message==="MAILBOX_UNAUTHORIZED"?401:error?.message==="MAILBOX_TOKEN_NOT_CONFIGURED"?503:400;
     return json({ok:false,error:error?.message||"MAILBOX_REPLY_FAILED"},status);
@@ -344,7 +348,7 @@ if(url.pathname==="/mailbox/reply"&&request.method==="POST"){
 if(url.pathname==="/mailbox/send"&&request.method==="POST"){
   try{
     const body=await request.json();
-    return json(await writeJarvisMailbox(env,body));
+    return json(await writeJarvisMailbox(env,body,request));
   }catch(error){
     const status=error?.message==="MAILBOX_UNAUTHORIZED"?401:error?.message==="MAILBOX_TOKEN_NOT_CONFIGURED"?503:400;
     return json({ok:false,error:error?.message||"MAILBOX_SEND_FAILED"},status);
