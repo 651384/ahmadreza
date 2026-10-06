@@ -265,10 +265,10 @@ async function runtimeStateSnapshot(env,workerId,body){
       status:"NOT_AVAILABLE",
       reason:"D1 runtime does not contain the external Master Memory/SOT content."
     },
-    last_marker:"NOT_AVAILABLE",
-    last_position:"NOT_AVAILABLE",
-    d1_logical_name:"NOT_AVAILABLE",
-    d1_database_id:"NOT_AVAILABLE"
+    last_marker:currentWorker?.last_msg_id||"NOT_AVAILABLE",
+    last_position:currentWorker?.last_run_at||"NOT_AVAILABLE",
+    d1_logical_name:"simot-ai-os",
+    d1_database_id:"6bb8ae5c-df7d-4c4b-bf0d-bdd73857a480"
   };
 }
 
