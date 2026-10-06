@@ -3,54 +3,52 @@
 Serverless runtime for SIMOT-MASTER and bounded Workers on Cloudflare. The runtime is intentionally independent of Codex, Arena, and any single developer tool or local machine.
 
 ## Current phase
+
 Cloud-native execution runtime (v0.5.0). The gateway validates the SIMOT-MSG v2 envelope, performs duplicate protection, records operational state in Cloudflare D1, queues accepted messages on Cloudflare Queues, and executes worker messages through the Workers AI binding under a strict free-only provider router, daily request guard, rate/cooldown guard, and completion evidence gate.
 
 ## Provisioned Cloudflare resources
-- Worker: `simot-ai-os-gateway` (deployed via Cloudflare Workers Builds Git integration from `master`).
+
+- Worker: `simot-ai-os-gateway`. The currently verified production deployment is from branch `feat/simot-tool-execution-bridge` at commit `22549bcd7fecfd3d760832802d1d8d9d92a93857`; this branch is not merged to `master`.
 - D1 database: `simot-ai-os` (binding `SIMOT_DB`) — schema in `schema.sql`; runtime also auto-creates `ai_daily_usage` and `worker_registry`.
 - Queue: `simot-events` with dead-letter queue `simot-events-dlq` (binding `SIMOT_QUEUE`).
 - Workers AI binding `AI` uses a verified-free provider registry. The current free provider is `@cf/zai-org/glm-4.7-flash`; paid/unverified providers are hard-blocked. D1 enforces a conservative request budget plus a minimum inter-request interval before every model call.
-- Cron trigger `* * * * *` runs the watchdog and, in CLOUD controller mode, the cloud controller heartbeat.
+- Cron/watchdog/scheduled control is defined but DORMANT during the current BUILD / CONTROLLED MANUAL EXECUTION phase.
 
 ## Worker execution
-Messages addressed to `SIMOT-MASTER` or `SIMOT-AI-01..05` are executed by the queue consumer using the profiles in `src/worker_profiles.js`. Inter-worker routing re-queues follow-up envelopes; `SCOPE=E2E_SMOKE` suppresses routing fan-out. Results, registry state, and idempotency status are persisted in D1 and observable at `/workers/status`.
 
-## Cloud-native controller / watchdog
-`SIMOT_CONTROLLER_MODE=CLOUD` (set in `wrangler.toml`) makes the deployed Worker its own controller: each cron run emits a `CLOUD-CRON:*` heartbeat before the watchdog evaluation, so no laptop or external process is required for the control plane. Fail-safe rules (see `src/watchdog.js` `planCloudHeartbeat`):
-- An external ACTIVE controller heartbeat is never overwritten — a stale external controller still surfaces as `STALE`/`RECOVERY_REQUIRED`.
-- The cloud heartbeat is emitted only when no controller exists, when refreshing its own cloud instance, or when the external controller declared `IDLE`.
-`POST /controller/heartbeat` remains available for an optional external controller and stays fail-closed behind `SIMOT_CONTROLLER_HEARTBEAT_SECRET`.
+Messages addressed to `SIMOT-MASTER` or `SIMOT-AI-01..05` are executed by the queue consumer using the profiles in `src/worker_profiles.js`. Inter-worker routing re-queues follow-up envelopes. Results, registry state, and idempotency status are persisted in D1 and observable at `/workers/status`.
 
-## Channel adapters
-Telegram adapter and controlled webhook boundary are present. `src/adapters/telegram.js` normalizes supported Telegram update shapes, maps them into the SIMOT-MSG v2 envelope, and constructs a provider-neutral outbound `sendMessage` request shape. The Worker exposes `/telegram/webhook` only when the secret `TELEGRAM_WEBHOOK_SECRET` is configured; requests must supply the matching `X-Telegram-Bot-Api-Secret-Token` header. The webhook stores no token in source and does not call the Telegram Bot API.
+## Control-plane execution safeguards
 
-Arena: no runtime integration exists; see `docs/arena-integration-status.md` for the evidence-based decision and the preconditions for adding one.
+- **Mandatory preflight:** Execution Standard 2.2.0 is validated before HTTP, queue/worker, management/status, and explicit manual execution.
+- **Fail closed:** missing/mismatched/violated standards and unsupported capabilities stop execution.
+- **No false completion:** external actions are not reported completed without adapter evidence and completion-gate verification.
+- **No automatic loops in BUILD:** Cron, Watchdog, periodic reconciliation, continuous heartbeat, and automatic recovery are dormant.
+- **Authority gate:** capability existence does not grant execution authority.
+- **Human gates:** production activation, secrets, paid services, irreversible actions, and security-policy changes remain gated.
 
-## Architecture v4 execution safeguards
-- **Provider Router:** AI calls go through a capability-based provider registry with `FREE_FIRST + HARD_COST_GUARD`; no paid provider fallback is allowed.
-- **Scheduler vs inference:** Cron wakes the control plane and dispatches due work; it does not invoke AI merely because a heartbeat occurred.
-- **Task state machine:** `PENDING → IN_PROGRESS → COMPLETED/BLOCKED`. A blocked task is retried only when the worker explicitly marks the blocker retryable; dependency blockers remain parked instead of burning AI quota.
-- **AI decision contract:** model output is compact decision JSON and is normalized by the runtime. Malformed output is `BLOCKED`, never `COMPLETED`.
-- **Completion gate:** completion requires evidence, `VERIFIED` verification, no unresolved gaps, and verified runtime version evidence.
-- **Tool registry:** external capabilities remain behind the existing capability/tool registry and authority gate; registry presence does not grant write authority.
+## Memory / Source-of-Truth architecture
 
-## Runtime states
-FULL / DEGRADED / MANUAL. PAID is prohibited by default; the provider router (`src/provider-router.js`) fails closed unless free status, data-class eligibility and payment-disabled conditions are verified.
+- Canonical structured policy/decision memory: Notion.
+- Canonical durable file/evidence memory: Microsoft OneDrive/SharePoint at `SIMOT-AI-OS/MEMORY/`.
+- D1 is **runtime state**, not the primary company-memory store.
+- The runtime contains reference-first memory contracts (`memory-contract.js` / `memory-binary-contract.js`), but no live Worker-side OneDrive/SharePoint retrieval adapter is currently connected.
+- The intended future path is: Jarvis → SIMOT Gateway → Memory Retrieval Layer → canonical OneDrive/SharePoint memory → evidence/canonical context → SIMOT-MASTER.
+- Current memory gap is explicit: `MASTER_MEMORY_NOT_AVAILABLE`; do not substitute D1 runtime records for canonical memory.
+
+## External tools
+
+External tool adapters (Notion, HubSpot, OneDrive, Asana, etc.) remain controlled contracts unless a live runtime adapter and authenticated execution path are independently verified. ChatGPT-side connector availability is not evidence that the Cloudflare Worker can call the connector.
 
 ## Security
-Secrets are runtime environment variables/secrets only. Never commit API keys, bot tokens, or Cloudflare credentials. Endpoints guarded by secrets fail closed (503) when the secret is not configured.
 
-The message envelope is an application-level protocol, not cryptographic authentication. Stronger authentication/integrity must be provided by the transport or authoritative access-control layer when required.
+Secrets are runtime environment variables/secrets only. Never commit API keys, bot tokens, or Cloudflare credentials. Endpoints guarded by secrets fail closed when the secret is not configured.
 
 ## Validation
+
 - Deterministic tests: `npm test` (Node 22, `node --test`).
-- CI: `.github/workflows/simot-ai-os-validation.yml` (tests + `wrangler deploy --dry-run`), live smoke, worker E2E, and a 5-minute GitHub Actions watchdog probe — all GitHub-hosted; no local machine is required.
-
-## Current limitations
-- Deployment is performed by Cloudflare Workers Builds configured in the Cloudflare dashboard; the repository contains no push-based deploy credentials by design.
-- External tool adapters (Notion, HubSpot, OneDrive, Asana, etc.) exist as validated contracts only; no live tool credentials or calls are wired into the runtime.
-- **Developer-tool independence:** Codex/Arena are not runtime dependencies and are not required for operation, validation, source-of-truth management, or deployment. The system of record remains GitHub plus the approved SIMOT SOT.
-
+- CI: `.github/workflows/simot-ai-os-validation.yml` (tests + `wrangler deploy --dry-run` and other repository checks).
 
 ## Locked execution standard
-The runtime enforces **Execution Standard 2.1.0** before scheduled, HTTP, queue, and management execution. SOT invariant **SOT-ARCH-LOCAL-PC-001** permanently removes Local PC from the runtime dependency chain. The Cloudflare control plane owns runtime scheduling, state, queueing, watchdog, and worker execution. See `docs/EXECUTION_STANDARD.md`, `docs/SOT.md`, and `docs/CONTROL_PLANE_MANIFEST.md`.
+
+The runtime enforces **Execution Standard 2.2.0**. SOT invariant `SOT-ARCH-CLOUDFLARE-CORE-002` makes Cloudflare the active runtime/control plane and removes Local PC from the runtime dependency chain. See `docs/EXECUTION_STANDARD.md`, `docs/SOT.md`, and `docs/CONTROL_PLANE_MANIFEST.md`.
