@@ -474,7 +474,22 @@ function safeBody(body){const copy={...body};if(copy.SECRET)delete copy.SECRET;i
 async function recordEvent(env,event){await env.SIMOT_DB.prepare("INSERT INTO events(id,msg_id,corr_id,type,status,created_at,updated_at,payload_json,error_code,error_message) VALUES(?,?,?,?,?,?,?,?,?,?)").bind(event.id,event.msg_id,event.corr_id,event.type,event.status,event.created_at,event.updated_at,event.payload_json||null,event.error_code||null,event.error_message||null).run();}
 export default {
 async fetch(request,env){const url=new URL(request.url);
-try { if(env.SIMOT_DB) await mandatoryPreflight(env,"HTTP:"+url.pathname); else return json({ok:false,error:"RUNTIME_NOT_CONFIGURED"},503); } catch (error) { return json({ok:false,error:"EXECUTION_STANDARD_BLOCKED"},503); }if(url.pathname==="/cloudflare/management/status"&&request.method==="GET"){
+try { if(env.SIMOT_DB) await mandatoryPreflight(env,"HTTP:"+url.pathname); else return json({ok:false,error:"RUNTIME_NOT_CONFIGURED"},503); } catch (error) { return json({ok:false,error:"EXECUTION_STANDARD_BLOCKED"},503); }if(url.pathname==="/master-memory/test"&&request.method==="GET"){
+  try{
+    if(!env.SIMOT_MASTER_MEMORY) return json({ok:false,error:"MASTER_MEMORY_VPC_NOT_BOUND"},503);
+    const r=await env.SIMOT_MASTER_MEMORY.fetch("http://127.0.0.1:9100/health");
+    const body=await r.json().catch(()=>null);
+    return json({
+      ok:r.ok && body?.ok===true,
+      vpc_http_status:r.status,
+      memory:body,
+      route:"WORKER->VPC->TUNNEL->127.0.0.1:9100"
+    },r.ok?200:502);
+  }catch(error){
+    return json({ok:false,error:"MASTER_MEMORY_VPC_FETCH_FAILED"},502);
+  }
+}
+if(url.pathname==="/cloudflare/management/status"&&request.method==="GET"){
   try{
     const probe=await runCloudflareManagementProbe(env);
     const row=await env.SIMOT_DB.prepare("SELECT checked_at,status,account_id,token_status,resources_json,error_code FROM cloudflare_management_probe WHERE id=1").first();
