@@ -23,6 +23,52 @@ function requireAuthority(authority) {
   return allowed.has(value) ? value : null;
 }
 
+
+const IDENT_RE = /^[A-Za-z_][A-Za-z0-9_]*$/;
+
+function boundedLimit(value, fallback = 25) {
+  const n = Number(value);
+  if (!Number.isInteger(n)) return fallback;
+  return Math.min(100, Math.max(1, n));
+}
+
+function safeIdentifier(value, field) {
+  const v = String(value ?? "").trim();
+  if (!IDENT_RE.test(v)) throw new Error(field + "_INVALID");
+  return v;
+}
+
+async function simotD1Read(env, operation, args = {}) {
+  if (!env?.SIMOT_DB) return blocked("D1_NOT_CONFIGURED", "CONFIGURE_SIMOT_DB");
+
+  if (operation === "D1_LIST_TABLES") {
+    const rows = await env.SIMOT_DB
+      .prepare("SELECT name,type FROM sqlite_master WHERE type IN ('table','view') AND name NOT LIKE 'sqlite_%' ORDER BY name")
+      .all();
+    return { ok:true, status:"COMPLETED", verification:"DIRECT_D1_READ", operation, result:{tables:rows.results||[]} };
+  }
+
+  const table = safeIdentifier(args.table, "TABLE");
+  if (operation === "D1_DESCRIBE_TABLE") {
+    const rows = await env.SIMOT_DB.prepare(`PRAGMA table_info(${table})`).all();
+    return { ok:true, status:"COMPLETED", verification:"DIRECT_D1_READ", operation, result:{table,columns:rows.results||[]} };
+  }
+
+  if (operation === "D1_READ_ROWS") {
+    const limit = boundedLimit(args.limit, 25);
+    const columns = Array.isArray(args.columns) && args.columns.length
+      ? args.columns.map(v => safeIdentifier(v, "COLUMN")).join(",")
+      : "*";
+    const orderBy = args.order_by ? safeIdentifier(args.order_by, "ORDER_BY") : null;
+    const direction = String(args.direction || "DESC").toUpperCase() === "ASC" ? "ASC" : "DESC";
+    const sql = `SELECT ${columns} FROM ${table}${orderBy ? ` ORDER BY ${orderBy} ${direction}` : ""} LIMIT ?`;
+    const rows = await env.SIMOT_DB.prepare(sql).bind(limit).all();
+    return { ok:true, status:"COMPLETED", verification:"DIRECT_D1_READ", operation, result:{table,limit,rows:rows.results||[]} };
+  }
+
+  return blocked("UNSUPPORTED_D1_OPERATION", "CLARIFY_TOOL_OPERATION", { operation });
+}
+
 async function cloudflareManagement(env, operation, args = {}) {
   if (!env.CLOUDFLARE_MANAGEMENT_API_TOKEN || !env.CLOUDFLARE_ACCOUNT_ID) {
     return blocked("CLOUDFLARE_MANAGEMENT_NOT_CONFIGURED", "CONFIGURE_CLOUDFLARE_MANAGEMENT");
@@ -114,6 +160,14 @@ export async function executeToolRequest(env, input = {}) {
       return cloudflareManagement(env, operation, input.args || {});
     }
     return blocked("CLOUDFLARE_TOOL_AUTHORITY_BLOCKED", "TOOL_AUTHORITY_GATE");
+  }
+
+  if (toolRef === "D1") {
+    if (!["D1_LIST_TABLES", "D1_DESCRIBE_TABLE", "D1_READ_ROWS"].includes(operation)) {
+      return blocked("UNSUPPORTED_D1_OPERATION", "CLARIFY_TOOL_OPERATION", { operation });
+    }
+    try { return await simotD1Read(env, operation, input.args || {}); }
+    catch (error) { return blocked(error?.message || "D1_READ_FAILED", "REVIEW_D1_REQUEST", { operation }); }
   }
 
   if (toolRef === "SIMOT") {
