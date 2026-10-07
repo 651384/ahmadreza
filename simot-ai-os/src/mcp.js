@@ -2,6 +2,7 @@ import { exaSearch } from "./adapters/exa.js";
 import { submitJarvisMessage, readJarvisMailbox } from "./jarvis-bridge.js";
 import { executeToolRequest } from "./tool-execution-bridge.js";
 import { writeCloudflareMasterMemorySecret } from "./adapters/cloudflare-secrets-write.js";
+import { writeMasterMemoryE2E } from "./adapters/master-memory-write.js";
 const PROTOCOL_VERSION = "2025-11-25";
 const MODERN_PROTOCOL_VERSION = "2026-07-28";
 
@@ -47,6 +48,19 @@ async function toolCall(name, args, env) {
     return { provider: result.provider, status: result.status, result };
   }
   if (name === "simot_tool_execute") {
+    if (String(args?.tool_ref || "").toUpperCase() === "MASTER_MEMORY" && String(args?.operation || "").toUpperCase() === "WRITE_E2E_OBJECT") {
+      if (String(args?.mode || "").toUpperCase() !== "WRITE") {
+        return { ok:false, status:"BLOCKED", error_code:"WRITE_MODE_REQUIRED", next_action:"SET_MODE_WRITE" };
+      }
+      return await writeMasterMemoryE2E(env, {
+        authority: args?.authority,
+        approval: args?.args?.approval === true,
+        bucket: args?.args?.bucket,
+        object_id: args?.args?.object_id,
+        content: args?.args?.content
+      });
+    }
+
     if (
       String(args?.tool_ref || "").toUpperCase() === "CLOUDFLARE" &&
       String(args?.operation || "").toUpperCase() === "UPDATE_MASTER_MEMORY_TOKEN"
