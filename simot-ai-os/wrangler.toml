@@ -40,4 +40,8 @@ max_retries = 3
 dead_letter_queue = "simot-events-dlq"
 
 
+[[vpc_services]]
+binding = "SIMOT_MASTER_MEMORY"
+service_id = "01a11105-c59d-7721-889a-8b368ef8c57d"
+
 [previews]
