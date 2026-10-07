@@ -1,42 +1,68 @@
 {
-  "schema_version": "1.1",
-  "updated_at": "2026-09-29",
+  "schema_version": "1.2",
+  "updated_at": "2026-10-07",
   "project": "SIMOT AI OS",
   "repository": "651384/ahmadreza",
   "base_branch": "master",
-  "implementation_branch": "simot-ai-os/remove-automatic-watchdog",
+  "implementation_branch": "feat/simot-tool-execution-bridge",
   "runtime": {
     "worker": "simot-ai-os-gateway",
-    "target_architecture_version": "2.0.0",
-    "runtime_standard": "2.2.0",
+    "runtime_version": "0.5.0-4-jarvis-sync",
+    "execution_standard": "2.2.0",
     "cloudflare_worker_url": "https://simot-ai-os-gateway.vahid-ahmadreza.workers.dev",
+    "d1_binding": "SIMOT_DB",
     "d1": "simot-ai-os",
-    "queue": "simot-events",
-    "dead_letter_queue": "simot-events-dlq",
+    "d1_database_id": "6bb48e5c-df7d-4c4b-bf0d-bdd73857a480",
     "ai_model": "@cf/zai-org/glm-4.7-flash",
+    "vpc_binding": "SIMOT_MASTER_MEMORY",
+    "vpc_service": "simot-master-memory",
+    "vpc_service_id": "01a11105-c59d-7721-889a-8b368ef8c57d",
     "cron": "DORMANT",
     "watchdog": "DORMANT",
     "periodic_automatic_checks": "DORMANT",
     "automatic_recovery_loop": "DORMANT"
   },
-  "runtime_policy": {
-    "phase": "BUILD",
-    "execution_mode": "CONTROLLED_MANUAL",
-    "automatic_interval_execution": false,
-    "continuous_watchdog": false,
-    "background_mutation": false
+  "master_memory": {
+    "status": "AVAILABLE",
+    "sot_id": "SOT-ARCH-CLOUDFLARE-CORE-002",
+    "version": "2.2.0",
+    "sot_status": "LOCKED",
+    "control_plane": "CLOUDFLARE",
+    "source": "MASTER_MEMORY_VPS",
+    "route": "WORKER->VPC->TUNNEL->MASTER_MEMORY",
+    "canonical_object": "working/SOT-CANONICAL",
+    "canonical_version": 2,
+    "canonical_sha256": "8158ae913049c9dbff8371932a52a80ca7c5d968eb1f09f311f93ee634f1fe4f",
+    "index_object": "index/MASTER-SOT-INDEX",
+    "index_version": 2,
+    "index_sha256": "924db8996c3c86c86d7b280710a8ba5c1024cac9e4f460d4ed64f4fae11ff0b0",
+    "verified": {
+      "readback": true,
+      "version_match": true,
+      "sha256_match": true,
+      "sot_identity": true
+    }
   },
-  "source_recorded": {
-    "cloud_runtime": true,
-    "d1_state": true,
-    "queue": true,
-    "workers_ai": true,
-    "webhook": true,
-    "message_validation": true,
-    "idempotency": true,
-    "github_ci": true,
-    "e2e": true
+  "live_e2e": {
+    "status": "VERIFIED",
+    "latest_corr_id": "JARVIS-20dcda04-8117-410d-8a17-91318eebf053",
+    "latest_result": "COMPLETED",
+    "jarvis_to_simot": true,
+    "simot_to_jarvis": true,
+    "live_state_verification": "DIRECT_D1_RUNTIME_READ",
+    "gaps": [],
+    "confidence": "HIGH"
   },
+  "mcp_tools": [
+    "simot_health",
+    "simot_tasks_status",
+    "simot_workers_status",
+    "simot_watchdog_status",
+    "simot_jarvis_send",
+    "simot_mailbox_read",
+    "simot_exa_search",
+    "simot_tool_execute"
+  ],
   "workers": [
     "SIMOT-MASTER",
     "SIMOT-AI-01",
@@ -45,23 +71,52 @@
     "SIMOT-AI-04",
     "SIMOT-AI-05"
   ],
-  "known_gap": "No direct Cloudflare Management connector is available in the AI tool environment.",
-  "security_constraints": [
-    "Do not modify Cloudflare Access/WAF/security policies without explicit authorization.",
-    "Do not commit secrets.",
-    "Fail closed on uncertain authorization or execution state.",
-    "Do not duplicate an uncertain action.",
-    "Do not activate periodic automation during BUILD phase."
+  "runtime_policy": {
+    "phase": "BUILD",
+    "execution_mode": "CONTROLLED_MANUAL",
+    "automatic_interval_execution": false,
+    "continuous_watchdog": false,
+    "background_mutation": false,
+    "default_provider_policy": "FREE_ONLY",
+    "jarvis_openai_paid_api": false
+  },
+  "source_of_truth": {
+    "master_memory": "canonical SOT",
+    "cloudflare_d1": "runtime/control-plane state",
+    "github": "versioned code/change control",
+    "notion": "architecture/policy/decision knowledge",
+    "sharepoint_onedrive": "durable evidence/files",
+    "asana": "execution/task state",
+    "hubspot": "commercial SOT when connected/authorized"
+  },
+  "continuation": {
+    "read_master_operating_spec": true,
+    "read_continuation_state": true,
+    "read_core_runtime_state": "simot-ai-os/docs/CORE_RUNTIME_STATE_2026-10-07.md",
+    "inspect_live_runtime_when_relevant": true,
+    "reconcile_before_action": true,
+    "select_exactly_one_next_valid_step": true,
+    "check_authority": true,
+    "verify_before_completion": true,
+    "write_back": true,
+    "never_treat_d1_as_master_memory": true,
+    "never_use_stale_historical_state_as_current": true
+  },
+  "known_constraints": [
+    "Every arbitrary user instruction is not automatically executable.",
+    "Missing adapter/capability/authority produces BLOCKED or PENDING.",
+    "High-risk and irreversible actions require human approval.",
+    "No secrets in source or documentation.",
+    "No paid provider invocation without approval.",
+    "No periodic automation during BUILD."
   ],
   "next_priorities": [
-    "Verify Cloudflare Workers Builds Git integration and production branch configuration.",
-    "Reconcile repository configuration with live Cloudflare deployment state.",
+    "Use the verified OpenClaw -> Jarvis -> SIMOT route as the normal user interface.",
     "Complete durable business task definitions and bounded orchestration.",
-    "Establish persistent business source-of-truth structures.",
-    "Specialize worker profiles and routing.",
-    "Harden retry/DLQ/idempotency behavior.",
+    "Harden verified adapters and operation-specific authority.",
+    "Reconcile Workers Builds and production branch configuration.",
     "Add observability and operational dashboards.",
-    "Add only external integrations required by concrete workflows."
+    "Add only integrations required by concrete workflows."
   ],
-  "continuation_rule": "On every session, read this state and the Master Operating Specification, inspect current authoritative state, reconcile conflicts, execute exactly one safe next step, verify it, and write back the result. Do not enable periodic automation unless explicitly approved."
+  "continuation_rule": "Every new session reads the operating specification, continuation state and core runtime state, inspects authoritative live state when relevant, reconciles conflicts, selects one safe next step, checks authority, executes, verifies, writes back and continues. Do not restart from assumptions."
 }
