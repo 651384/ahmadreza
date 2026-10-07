@@ -63,3 +63,8 @@ No secrets added or changed. All fail-closed gates (Telegram webhook, heartbeat 
 1. Observe live `/health` version 0.4.0 after Cloudflare Builds deploys master.
 2. Observe live `/watchdog/status` transitioning from `controller_status: IDLE` to `ACTIVE` with `instance_id` prefix `CLOUD-CRON:` within one 3-minute cron cycle.
 3. Confirm GitHub live-smoke and worker-E2E workflows pass against the new deployment.
+
+## RUN 2026-10-07 — Controlled Worker deployment trigger
+- The corrected MCP write-adapter code is already merged on `master`.
+- Triggering the canonical `master` Cloudflare build so the live Worker can be verified against that exact source state.
+- No secrets are recorded in this log.
