@@ -228,6 +228,60 @@ function extractAIText(result){
   }
   return JSON.stringify(result);
 }
+async function readMasterMemoryState(env){
+  if(!env.SIMOT_MASTER_MEMORY)return{status:"NOT_AVAILABLE",reason:"MASTER_MEMORY_VPC_NOT_BOUND"};
+  if(!env.SIMOT_MASTER_MEMORY_TOKEN)return{status:"NOT_AVAILABLE",reason:"MASTER_MEMORY_TOKEN_NOT_CONFIGURED"};
+
+  try{
+    const auth={headers:{"Authorization":"Bearer "+env.SIMOT_MASTER_MEMORY_TOKEN}};
+    const ir=await env.SIMOT_MASTER_MEMORY.fetch("http://127.0.0.1:9100/memory/index/MASTER-SOT-INDEX",auth);
+    if(!ir.ok)return{status:"UNAVAILABLE",reason:"MASTER_MEMORY_INDEX_READ_FAILED",http_status:ir.status};
+
+    const ie=await ir.json().catch(()=>null);
+    if(!ie?.ok||!ie?.content)return{status:"UNAVAILABLE",reason:"MASTER_MEMORY_INDEX_INVALID"};
+
+    const index=JSON.parse(ie.content);
+    const canonical=index?.canonical_object;
+    if(!canonical?.bucket||!canonical?.object_id||!canonical?.version||!canonical?.sha256)
+      return{status:"UNAVAILABLE",reason:"MASTER_MEMORY_INDEX_CANONICAL_REF_INVALID"};
+
+    const sr=await env.SIMOT_MASTER_MEMORY.fetch(
+      "http://127.0.0.1:9100/memory/"+encodeURIComponent(canonical.bucket)+"/"+encodeURIComponent(canonical.object_id),auth
+    );
+    if(!sr.ok)return{status:"UNAVAILABLE",reason:"MASTER_MEMORY_SOT_READ_FAILED",http_status:sr.status};
+
+    const se=await sr.json().catch(()=>null);
+    if(!se?.ok||!se?.content)return{status:"UNAVAILABLE",reason:"MASTER_MEMORY_SOT_INVALID"};
+
+    const actualVersion=Number(se?.metadata?.version);
+    const actualSha256=String(se?.metadata?.sha256||"");
+
+    if(actualVersion!==Number(canonical.version))
+      return{status:"UNAVAILABLE",reason:"MASTER_MEMORY_VERSION_MISMATCH",expected_version:Number(canonical.version),actual_version:actualVersion};
+
+    if(actualSha256!==String(canonical.sha256))
+      return{status:"UNAVAILABLE",reason:"MASTER_MEMORY_SHA256_MISMATCH",expected_sha256:String(canonical.sha256),actual_sha256:actualSha256};
+
+    const sot=JSON.parse(se.content);
+    if(sot?.sot_id!=="SOT-ARCH-CLOUDFLARE-CORE-002"||sot?.version!=="2.2.0"||sot?.status!=="LOCKED"||sot?.control_plane!=="CLOUDFLARE")
+      return{status:"UNAVAILABLE",reason:"MASTER_MEMORY_SOT_IDENTITY_INVALID"};
+
+    return{
+      status:"AVAILABLE",
+      source:"MASTER_MEMORY_VPS",
+      route:"WORKER->VPC->TUNNEL->MASTER_MEMORY",
+      canonical_object:canonical,
+      verified:{readback:true,version_match:true,sha256_match:true,sot_identity:true},
+      sot_id:sot.sot_id,
+      sot_version:sot.version,
+      sot_status:sot.status,
+      phase:sot.phase,
+      control_plane:sot.control_plane
+    };
+  }catch{
+    return{status:"UNAVAILABLE",reason:"MASTER_MEMORY_TRANSPORT_OR_PARSE_FAILED"};
+  }
+}
 async function runtimeStateSnapshot(env,workerId,body){
   await ensureRuntimeTables(env);
   const currentWorker=await env.SIMOT_DB.prepare(
@@ -247,8 +301,11 @@ async function runtimeStateSnapshot(env,workerId,body){
     "SELECT usage_date,requests,last_request_at,blocked_until FROM ai_daily_usage WHERE usage_date=?"
   ).bind(usageDate).first().catch(()=>null);
 
+  const masterMemory=await readMasterMemoryState(env);
+
   return {
     source:"SIMOT_D1_RUNTIME_STATE",
+
     authoritative_fields:{
       worker_id:workerId,
       runtime_version:VERSION,
@@ -261,10 +318,7 @@ async function runtimeStateSnapshot(env,workerId,body){
     recent_events:recentEvents.results||[],
     autonomous_tasks:tasks.results||[],
     ai_daily_usage:usage||null,
-    master_memory:{
-      status:"NOT_AVAILABLE",
-      reason:"D1 runtime does not contain the external Master Memory/SOT content."
-    },
+    master_memory:masterMemory,
     last_marker:currentWorker?.last_msg_id||"NOT_AVAILABLE",
     last_position:currentWorker?.last_run_at||"NOT_AVAILABLE",
     d1_logical_name:"simot-ai-os",
