@@ -117,13 +117,11 @@ export async function writeCloudflareMasterMemorySecret(
 
   const result = await cloudflareRequest(env, path, {
     method: "PUT",
-    body: JSON.stringify([
-      {
-        name: TARGET_SECRET,
-        type: "secret_text",
-        text: secret_value
-      }
-    ])
+    body: JSON.stringify({
+      name: TARGET_SECRET,
+      type: "secret_text",
+      text: secret_value
+    })
   });
 
   if (!result.ok) return result;
