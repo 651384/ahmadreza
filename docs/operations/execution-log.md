@@ -68,3 +68,5 @@ No secrets added or changed. All fail-closed gates (Telegram webhook, heartbeat 
 - The corrected MCP write-adapter code is already merged on `master`.
 - Triggering the canonical `master` Cloudflare build so the live Worker can be verified against that exact source state.
 - No secrets are recorded in this log.
+
+- Deployment trigger path: PR merge on canonical `master` to activate repository-bound deployment automation; live verification remains mandatory.
