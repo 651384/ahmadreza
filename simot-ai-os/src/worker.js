@@ -493,8 +493,10 @@ if(url.pathname==="/master-memory/e2e-read"&&request.method==="GET"){
   try{
     if(!env.SIMOT_MASTER_MEMORY) return json({ok:false,error:"MASTER_MEMORY_VPC_NOT_BOUND"},503);
     if(!env.SIMOT_MASTER_MEMORY_TOKEN) return json({ok:false,error:"MASTER_MEMORY_TOKEN_NOT_CONFIGURED"},503);
+    const objectId=url.searchParams.get("object_id")||"E2E-BRIDGE-001";
+    if(!/^E2E-[A-Z0-9][A-Z0-9._-]{0,119}$/.test(objectId)) return json({ok:false,error:"MASTER_MEMORY_E2E_OBJECT_ID_NOT_ALLOWED"},400);
     const r=await env.SIMOT_MASTER_MEMORY.fetch(
-      "http://127.0.0.1:9100/memory/working/E2E-BRIDGE-001",
+      "http://127.0.0.1:9100/memory/working/"+encodeURIComponent(objectId),
       {headers:{"Authorization":"Bearer "+env.SIMOT_MASTER_MEMORY_TOKEN}}
     );
     const body=await r.json().catch(()=>null);
@@ -502,6 +504,7 @@ if(url.pathname==="/master-memory/e2e-read"&&request.method==="GET"){
       ok:r.ok,
       vpc_http_status:r.status,
       memory:body,
+      object_id:objectId,
       route:"WORKER->VPC->TUNNEL->MASTER_MEMORY_READ"
     },r.ok?200:502);
   }catch(error){
