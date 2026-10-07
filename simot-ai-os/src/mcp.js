@@ -1,6 +1,7 @@
 import { exaSearch } from "./adapters/exa.js";
 import { submitJarvisMessage, readJarvisMailbox } from "./jarvis-bridge.js";
 import { executeToolRequest } from "./tool-execution-bridge.js";
+import { writeCloudflareMasterMemorySecret } from "./adapters/cloudflare-secrets-write.js";
 const PROTOCOL_VERSION = "2025-11-25";
 const MODERN_PROTOCOL_VERSION = "2026-07-28";
 
@@ -45,7 +46,31 @@ async function toolCall(name, args, env) {
     const result = await exaSearch(env, args || {});
     return { provider: result.provider, status: result.status, result };
   }
-  if (name === "simot_tool_execute") return await executeToolRequest(env, args || {});
+  if (name === "simot_tool_execute") {
+    if (
+      String(args?.tool_ref || "").toUpperCase() === "CLOUDFLARE" &&
+      String(args?.operation || "").toUpperCase() === "UPDATE_MASTER_MEMORY_TOKEN"
+    ) {
+      if (String(args?.mode || "").toUpperCase() !== "WRITE") {
+        return {
+          ok: false,
+          status: "BLOCKED",
+          error_code: "WRITE_MODE_REQUIRED",
+          next_action: "SET_MODE_WRITE"
+        };
+      }
+
+      return await writeCloudflareMasterMemorySecret(env, {
+        authority: args?.authority,
+        approval: args?.args?.approval === true,
+        script_name: args?.args?.script_name,
+        secret_name: args?.args?.secret_name,
+        secret_value: args?.args?.secret_value
+      });
+    }
+
+    return await executeToolRequest(env, args || {});
+  }
   throw new Error("UNKNOWN_TOOL");
 }
 

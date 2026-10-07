@@ -518,6 +518,40 @@ if(url.pathname==="/cloudflare/management/status"&&request.method==="GET"){
 if(url.pathname==="/cloudflare/management/snapshot"&&request.method==="GET"){
   try{return json(await cloudflareManagementSnapshot(env));}catch(error){return json({ok:false,error:"CLOUDFLARE_MANAGEMENT_SNAPSHOT_UNAVAILABLE"},503);}
 }
+if(url.pathname==="/master-memory/test"&&request.method==="GET"){
+  try{
+    if(!env.SIMOT_MASTER_MEMORY) return json({ok:false,error:"MASTER_MEMORY_VPC_NOT_BOUND"},503);
+    const r=await env.SIMOT_MASTER_MEMORY.fetch("http://127.0.0.1:9100/health");
+    const body=await r.json().catch(()=>null);
+    return json({
+      ok:r.ok && body?.ok===true,
+      vpc_http_status:r.status,
+      memory:body,
+      route:"WORKER->VPC->TUNNEL->127.0.0.1:9100"
+    },r.ok?200:502);
+  }catch(error){
+    return json({ok:false,error:"MASTER_MEMORY_VPC_FETCH_FAILED"},502);
+  }
+}
+if(url.pathname==="/master-memory/e2e-read"&&request.method==="GET"){
+  try{
+    if(!env.SIMOT_MASTER_MEMORY) return json({ok:false,error:"MASTER_MEMORY_VPC_NOT_BOUND"},503);
+    if(!env.SIMOT_MASTER_MEMORY_TOKEN) return json({ok:false,error:"MASTER_MEMORY_TOKEN_NOT_CONFIGURED"},503);
+    const r=await env.SIMOT_MASTER_MEMORY.fetch("http://127.0.0.1:9100/memory/working/E2E-BRIDGE-001",{
+      headers:{Authorization:"Bearer "+env.SIMOT_MASTER_MEMORY_TOKEN}
+    });
+    const body=await r.json().catch(()=>null);
+    const ok=r.ok && body?.ok===true && body?.content==="SIMOT BRIDGE MEMORY PASS";
+    return json({
+      ok,
+      vpc_http_status:r.status,
+      memory:body,
+      route:"WORKER->VPC->TUNNEL->MASTER_MEMORY_READ"
+    },ok?200:502);
+  }catch(error){
+    return json({ok:false,error:"MASTER_MEMORY_E2E_READ_FAILED"},502);
+  }
+}
 if(url.pathname==="/control-plane/manifest"&&request.method==="GET")return json({ok:true,manifest:CONTROL_PLANE_MANIFEST,standard_id:EXECUTION_STANDARD_ID});
 if(url.pathname==="/mailbox/reply"&&request.method==="POST"){
   try{
