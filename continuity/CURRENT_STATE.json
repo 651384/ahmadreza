@@ -1,0 +1,61 @@
+{
+  "schema": "SIMOT-CONTINUITY-v1",
+  "state_version": 1,
+  "state_status": "ACTIVE",
+  "updated_at": "2026-10-08T00:00:00Z",
+  "system": {
+    "name": "SIMOT AI OS",
+    "role": "personal_ai_os",
+    "canonical_brain": "SIMOT"
+  },
+  "user_constraints": [
+    "SIMOT remains the brain.",
+    "No unnecessary paid APIs/services/subscriptions.",
+    "No unnecessary new credentials or secrets without approval.",
+    "Phone-first daily interface.",
+    "Free-first.",
+    "Human gate before production activation, deletion, store/KYC/payment activation, new secrets, costs, or merge-to-master.",
+    "Never claim an action is done without verification.",
+    "Never invent unavailable access or evidence.",
+    "Do not change architecture silently."
+  ],
+  "locked_decisions": [
+    "SIMOT is the authoritative brain/orchestration system.",
+    "The client/interface must remain replaceable.",
+    "Do not build a custom mobile app while a suitable existing client can satisfy the need.",
+    "OpenClaw is a client/interface candidate, not the brain.",
+    "Jarvis must not become a second autonomous brain."
+  ],
+  "current_project": {
+    "id": "SIMOT-CONTINUITY-001",
+    "title": "Canonical cross-session continuity control plane"
+  },
+  "current_objective": {
+    "id": "CONTINUITY-001",
+    "title": "Implement one authoritative state system so new sessions cannot silently lose the project path."
+  },
+  "current_phase": "FOUNDATION_IMPLEMENTATION",
+  "last_verified_position": "Architecture agreed: one canonical CURRENT_STATE plus locked DECISIONS and verifiable EVIDENCE; task log written immediately after verification.",
+  "last_completed_task": "CONTINUITY-001-T001",
+  "blocker": "Canonical state has not yet been installed on the VPS because the available PC-to-VPS SSH path is not authenticated in this session.",
+  "next_action": "Install the same canonical continuity files on the VPS Master Memory location using a verified authorized write path; then verify read/write and make VPS the runtime continuity authority.",
+  "do_not_do": [
+    "Do not debug OpenClaw voice/Talk.",
+    "Do not redesign Jarvis/OpenClaw architecture.",
+    "Do not create a custom mobile app.",
+    "Do not modify production SIMOT runtime.",
+    "Do not introduce paid APIs or new secrets.",
+    "Do not reopen locked architecture decisions unless the user explicitly requests review."
+  ],
+  "continuity_locations": {
+    "repository": "651384/ahmadreza/continuity/",
+    "canonical_runtime_target": "/srv/simot-memory/",
+    "canonical_files": [
+      "CURRENT_STATE.json",
+      "DECISIONS.json",
+      "EVIDENCE_INDEX.json",
+      "TASK_LOG.jsonl",
+      "CONTINUITY_CONTRACT.md"
+    ]
+  }
+}
