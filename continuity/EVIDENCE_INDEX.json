@@ -12,6 +12,7 @@
     {"id":"E-008","type":"github_commit","ref":"3430b6cdafe8829d131907a4588fd4bd00539931","path":"continuity/CONTINUITY_CONTRACT.md","claim":"Canonical continuity contract rewritten to SIMOT-CANONICAL-001 v3.0.0 and verified by successful read-back."},
     {"id":"E-009","type":"github_commit","ref":"298ded54dba855ba3818dc8bc2a406b851ab3d32","path":"continuity/CURRENT_STATE.json","claim":"Canonical current state reconciled to standard v3.0.0 and verified by successful read-back."},
     {"id":"E-010","type":"github_commit","ref":"d7e18702199a1391b818e0d105b149c256c52319","path":"docs/architecture/cloud-first-runtime.md","claim":"Obsolete cloud-first runtime instructions were retired and verified by read-back; historical active cron/watchdog wording is no longer authoritative."},
-    {"id":"E-011","type":"github_commit","ref":"3e01ec27923aed1cf0a26ff34219a0bc6fb2351a","path":"simot-ai-os/docs/developer-tool-independence.md","claim":"Developer-tool independence policy reconciled to canonical continuity authority and verified by read-back."}
+    {"id":"E-011","type":"github_commit","ref":"3e01ec27923aed1cf0a26ff34219a0bc6fb2351a","path":"simot-ai-os/docs/developer-tool-independence.md","claim":"Developer-tool independence policy reconciled to canonical continuity authority and verified by read-back."},
+    {"id":"E-012","type":"github_commit","ref":"6d6f9006242cea7404836313e1b6b3cf590b94cb","path":"simot-ai-os/wrangler.toml","claim":"Repository runtime configuration now declares canonical execution standard 3.0.0 and was verified by read-back; no deployment was performed."}
   ]
 }
