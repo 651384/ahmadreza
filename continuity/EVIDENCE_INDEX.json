@@ -1,0 +1,40 @@
+{
+  "schema": "SIMOT-CONTINUITY-EVIDENCE-v1",
+  "updated_at": "2026-10-08T00:00:00Z",
+  "evidence": [
+    {
+      "id": "E-001",
+      "type": "github_commit",
+      "ref": "dd0a294c25ce36d585879af9719f14f620efc008",
+      "path": "continuity/CONTINUITY_CONTRACT.md",
+      "claim": "Continuity contract created."
+    },
+    {
+      "id": "E-002",
+      "type": "github_commit",
+      "ref": "b4ca3cc570b25b013312cf369757b4d8102e308d",
+      "path": "continuity/CURRENT_STATE.json",
+      "claim": "Canonical current state created."
+    },
+    {
+      "id": "E-003",
+      "type": "verification",
+      "ref": "db835109aefc8eac07e82a37050b42969e543c82",
+      "path": "continuity/CONTINUITY_CONTRACT.md",
+      "claim": "Contract read back successfully after creation."
+    },
+    {
+      "id": "E-004",
+      "type": "verification",
+      "ref": "855b3fc65d09d31f0d983cd942add8c92b9c3761",
+      "path": "continuity/CURRENT_STATE.json",
+      "claim": "Current state read back successfully after creation."
+    },
+    {
+      "id": "E-005",
+      "type": "runtime_access",
+      "ref": "Desktop Commander DESKTOP-771TT6B",
+      "claim": "PC is accessible; SSH BatchMode to srv7015981364 did not authenticate, so VPS write was not falsely claimed."
+    }
+  ]
+}
