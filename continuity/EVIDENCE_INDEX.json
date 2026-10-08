@@ -42,6 +42,12 @@
       "ref": "319fd1c3238e773fe55bf7d06175c4ba77668996",
       "path": "continuity/CURRENT_STATE.json",
       "claim": "Current state advanced to state_version 2 and read back successfully."
+    },
+    {
+      "id": "E-007",
+      "type": "access_test",
+      "ref": "Desktop Commander PID 84660",
+      "claim": "Non-interactive SSH from the connected Windows PC to srv7015981364 did not authenticate; no VPS write was claimed."
     }
   ]
 }
