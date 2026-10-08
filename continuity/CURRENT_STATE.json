@@ -1,48 +1,21 @@
 {
-  "schema": "SIMOT-CONTINUITY-v1",
-  "state_version": 4,
-  "state_status": "ACTIVE",
-  "updated_at": "2026-10-08",
-  "canonical_standard": {"id":"SIMOT-CANONICAL-001","version":"3.0.0"},
-  "system": {"name":"SIMOT AI OS","role":"personal_ai_os","canonical_brain":"SIMOT"},
-  "user_constraints": [
-    "SIMOT remains the brain.",
-    "No unnecessary paid APIs/services/subscriptions.",
-    "No unnecessary new credentials or secrets without approval.",
-    "Phone-first daily interface.",
-    "Free-first.",
-    "Human gate before production activation, deletion, store/KYC/payment activation, new secrets, costs, or merge-to-master.",
-    "Never claim an action is done without verification.",
-    "Never invent unavailable access or evidence.",
-    "Do not change architecture silently.",
-    "No parallel competing paths.",
-    "Immediate write-back after every meaningful task."
-  ],
-  "locked_decisions": ["D-001","D-002","D-003","D-004","D-005","D-006"],
-  "current_project": {"id":"SIMOT-CONTINUITY-001","title":"Canonical cross-session continuity control plane"},
-  "current_objective": {"id":"CONTINUITY-001","title":"Implement one authoritative state system so new sessions cannot silently lose the project path."},
-  "current_phase": "REPOSITORY_CLEANUP",
-  "last_verified_position": "The canonical continuity contract has been rewritten to SIMOT-CANONICAL-001 v3.0.0 and verified in GitHub. Remaining non-VPS work is atomic reconciliation of repository state and removal/retirement of obsolete competing instructions.",
-  "last_completed_task": "CONTINUITY-001-T003",
-  "last_task_evidence": ["E-008"],
-  "blocker": "No blocker for repository reconciliation; VPS installation remains intentionally deferred until all non-VPS cleanup is complete.",
-  "next_action": "Reconcile the canonical evidence index and task log with the verified v3.0.0 contract rewrite, then continue repository cleanup one file at a time.",
-  "do_not_do": [
-    "Do not debug OpenClaw voice/Talk.",
-    "Do not redesign Jarvis/OpenClaw architecture.",
-    "Do not create a custom mobile app.",
-    "Do not install anything on VPS yet.",
-    "Do not modify production deployment/runtime activation without explicit approval.",
-    "Do not introduce paid APIs or new secrets.",
-    "Do not create a second canonical standard or second live memory.",
-    "Do not reopen locked architecture decisions unless the user explicitly requests review."
-  ],
-  "continuity_locations": {
-    "repository": "651384/ahmadreza/continuity/",
-    "canonical_runtime_target": "/srv/simot-memory/",
-    "canonical_files": ["CURRENT_STATE.json","DECISIONS.json","EVIDENCE_INDEX.json","TASK_LOG.jsonl","CONTINUITY_CONTRACT.md"]
-  },
-  "repository_commits": {
-    "contract": "3430b6cdafe8829d131907a4588fd4bd00539931"
-  }
+  "schema":"SIMOT-CONTINUITY-v1",
+  "state_version":5,
+  "state_status":"ACTIVE",
+  "updated_at":"2026-10-08",
+  "canonical_standard":{"id":"SIMOT-CANONICAL-001","version":"3.0.0"},
+  "system":{"name":"SIMOT AI OS","role":"personal_ai_os","canonical_brain":"SIMOT"},
+  "user_constraints":["SIMOT remains the brain.","No unnecessary paid APIs/services/subscriptions.","No unnecessary new credentials or secrets without approval.","Phone-first daily interface.","Free-first.","Human gate before production activation, deletion, store/KYC/payment activation, new secrets, costs, or merge-to-master.","Never claim an action is done without verification.","Never invent unavailable access or evidence.","Do not change architecture silently.","No parallel competing paths.","Immediate write-back after every meaningful task."],
+  "locked_decisions":["D-001","D-002","D-003","D-004","D-005","D-006"],
+  "current_project":{"id":"SIMOT-CONTINUITY-001","title":"Canonical cross-session continuity control plane"},
+  "current_objective":{"id":"CONTINUITY-001","title":"Implement one authoritative state system so new sessions cannot silently lose the project path."},
+  "current_phase":"REPOSITORY_CLEANUP",
+  "last_verified_position":"Canonical standard v3.0.0 is active in the repository; CURRENT_STATE, EVIDENCE_INDEX and TASK_LOG are reconciled; the known conflicting cloud-first runtime document is explicitly retired.",
+  "last_completed_task":"CONTINUITY-001-T005",
+  "last_task_evidence":["E-010"],
+  "blocker":"No repository blocker currently verified. VPS installation remains intentionally deferred until the non-VPS audit is complete.",
+  "next_action":"Audit repository for any remaining competing standards, continuity files, or active automation-policy instructions before further mutation.",
+  "do_not_do":["Do not debug OpenClaw voice/Talk.","Do not redesign Jarvis/OpenClaw architecture.","Do not create a custom mobile app.","Do not install anything on VPS yet.","Do not modify production deployment/runtime activation without explicit approval.","Do not introduce paid APIs or new secrets.","Do not create a second canonical standard or second live memory.","Do not reopen locked architecture decisions unless the user explicitly requests review."],
+  "continuity_locations":{"repository":"651384/ahmadreza/continuity/","canonical_runtime_target":"/srv/simot-memory/","canonical_files":["CURRENT_STATE.json","DECISIONS.json","EVIDENCE_INDEX.json","TASK_LOG.jsonl","CONTINUITY_CONTRACT.md"]},
+  "repository_commits":{"contract":"3430b6cdafe8829d131907a4588fd4bd00539931","current_state":"298ded54dba855ba3818dc8bc2a406b851ab3d32","evidence":"9332f6ab270ed0ccfd4b583ad4fa3d4be2167ad9","task_log":"1e285f7d9cd324482ed5dd91b423419247599e69","retired_cloud_first":"d7e18702199a1391b818e0d105b149c256c52319"}
 }
