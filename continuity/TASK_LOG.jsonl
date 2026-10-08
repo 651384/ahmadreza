@@ -1,23 +1,5 @@
-{
-  "task_id": "CONTINUITY-001-T001",
-  "timestamp": "2026-10-08T00:00:00Z",
-  "status": "VERIFIED",
-  "title": "Create canonical continuity contract and current state foundation",
-  "scope": "Repository-side continuity foundation",
-  "actions": [
-    "Created continuity/CONTINUITY_CONTRACT.md",
-    "Created continuity/CURRENT_STATE.json",
-    "Read both files back from GitHub and verified expected markers"
-  ],
-  "evidence": [
-    "E-001",
-    "E-002",
-    "E-003",
-    "E-004"
-  ],
-  "blocker": "VPS canonical runtime location not yet written because the available PC-to-VPS SSH path is not authenticated in this session.",
-  "next_task": "CONTINUITY-001-T002",
-  "next_action": "Install and verify the canonical continuity set on the VPS Master Memory location using an authorized write path."
-}
+{"task_id":"CONTINUITY-001-T001","timestamp":"2026-10-08T00:00:00Z","status":"VERIFIED","title":"Create canonical continuity contract and current state foundation","scope":"Repository-side continuity foundation","actions":["Created continuity/CONTINUITY_CONTRACT.md","Created continuity/CURRENT_STATE.json","Read both files back from GitHub and verified expected markers"],"evidence":["E-001","E-002","E-003","E-004"],"blocker":"VPS canonical runtime location not yet written because the available PC-to-VPS SSH path is not authenticated in this session.","next_task":"CONTINUITY-001-T002","next_action":"Install and verify the canonical continuity set on the VPS Master Memory location using an authorized write path."}
 {"task_id":"CONTINUITY-001-T001","timestamp":"2026-10-08","status":"VERIFIED","event":"FINAL_WRITEBACK_VERIFIED","evidence":["E-006"],"note":"CURRENT_STATE was advanced only after foundation verification; canonical next action remains VPS installation."}
 {"task_id":"CONTINUITY-001-T002","timestamp":"2026-10-08","status":"BLOCKED","title":"Verify authorized VPS write path","actions":["Checked connected Desktop Commander device","Attempted non-interactive SSH to srv7015981364","SSH exited without authentication/output"],"evidence":["E-005","E-007"],"next_action":"Use an already-authorized VPS access path; do not create a new secret solely for continuity."}
+{"task_id":"CONTINUITY-001-T003","timestamp":"2026-10-08","status":"VERIFIED","title":"Rewrite the single canonical SIMOT standard","scope":"Repository canonical contract","actions":["Rewrote continuity/CONTINUITY_CONTRACT.md to SIMOT-CANONICAL-001 v3.0.0","Read back the rewritten contract and verified the canonical rules"],"evidence":["E-008"],"next_task":"CONTINUITY-001-T004","next_action":"Reconcile the remaining continuity evidence/state records and then audit repository instructions for obsolete competing standards."}
+{"task_id":"CONTINUITY-001-T004","timestamp":"2026-10-08","status":"VERIFIED","title":"Reconcile canonical current state and evidence index","scope":"Repository continuity records","actions":["Updated CURRENT_STATE.json to state_version 4 and canonical standard v3.0.0","Read CURRENT_STATE.json back successfully","Recorded E-008 and E-009 in EVIDENCE_INDEX.json"],"evidence":["E-009"],"next_task":"CONTINUITY-001-T005","next_action":"Audit repository for obsolete or competing continuity/execution/heartbeat instructions and identify exact files before any cleanup mutation."}
