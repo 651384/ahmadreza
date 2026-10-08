@@ -1,0 +1,48 @@
+{
+  "schema": "SIMOT-CONTINUITY-DECISIONS-v1",
+  "updated_at": "2026-10-08T00:00:00Z",
+  "decisions": [
+    {
+      "id": "D-001",
+      "status": "LOCKED",
+      "title": "SIMOT is the canonical brain",
+      "decision": "SIMOT owns orchestration, memory, planning, automation, tool routing, and business/software workflows.",
+      "reason": "The interface must be replaceable and must not become a second brain."
+    },
+    {
+      "id": "D-002",
+      "status": "LOCKED",
+      "title": "Client is replaceable",
+      "decision": "Phone/desktop/web clients may change without changing SIMOT state and architecture.",
+      "reason": "Prevents interface problems from derailing the core project."
+    },
+    {
+      "id": "D-003",
+      "status": "LOCKED",
+      "title": "No custom mobile app for now",
+      "decision": "Use an existing suitable client before building a dedicated mobile app.",
+      "reason": "Avoid unnecessary engineering and maintenance."
+    },
+    {
+      "id": "D-004",
+      "status": "LOCKED",
+      "title": "No independent Jarvis brain",
+      "decision": "Jarvis, if used, is persona/client/interface terminology, not a separate autonomous backend brain.",
+      "reason": "Avoids an unnecessary extra reasoning layer."
+    },
+    {
+      "id": "D-005",
+      "status": "LOCKED",
+      "title": "Immediate write-back after verification",
+      "decision": "Every meaningful task must be recorded immediately after verification, before the next task starts.",
+      "reason": "Prevents context loss when a chat/session ends unexpectedly."
+    },
+    {
+      "id": "D-006",
+      "status": "LOCKED",
+      "title": "No silent scope changes",
+      "decision": "A session may not change the current project/objective/architecture without explicit user approval.",
+      "reason": "Direct response to repeated project drift."
+    }
+  ]
+}
