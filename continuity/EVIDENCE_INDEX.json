@@ -1,7 +1,7 @@
 {
-  "schema": "SIMOT-CONTINUITY-EVIDENCE-v1",
-  "updated_at": "2026-10-08",
-  "evidence": [
+  "schema":"SIMOT-CONTINUITY-EVIDENCE-v1",
+  "updated_at":"2026-10-08",
+  "evidence":[
     {"id":"E-001","type":"github_commit","ref":"dd0a294c25ce36d585879af9719f14f620efc008","path":"continuity/CONTINUITY_CONTRACT.md","claim":"Continuity contract created."},
     {"id":"E-002","type":"github_commit","ref":"b4ca3cc570b25b013312cf369757b4d8102e308d","path":"continuity/CURRENT_STATE.json","claim":"Canonical current state created."},
     {"id":"E-003","type":"verification","ref":"db835109aefc8eac07e82a37050b42969e543c82","path":"continuity/CONTINUITY_CONTRACT.md","claim":"Contract read back successfully after creation."},
@@ -10,6 +10,7 @@
     {"id":"E-006","type":"verification","ref":"319fd1c3238e773fe55bf7d06175c4ba77668996","path":"continuity/CURRENT_STATE.json","claim":"Current state advanced to state_version 2 and read back successfully."},
     {"id":"E-007","type":"access_test","ref":"Desktop Commander PID 84660","claim":"Non-interactive SSH from the connected Windows PC to srv7015981364 did not authenticate; no VPS write was claimed."},
     {"id":"E-008","type":"github_commit","ref":"3430b6cdafe8829d131907a4588fd4bd00539931","path":"continuity/CONTINUITY_CONTRACT.md","claim":"Canonical continuity contract rewritten to SIMOT-CANONICAL-001 v3.0.0 and verified by successful read-back."},
-    {"id":"E-009","type":"github_commit","ref":"298ded54dba855ba3818dc8bc2a406b851ab3d32","path":"continuity/CURRENT_STATE.json","claim":"Canonical current state reconciled to standard v3.0.0 and verified by successful read-back."}
+    {"id":"E-009","type":"github_commit","ref":"298ded54dba855ba3818dc8bc2a406b851ab3d32","path":"continuity/CURRENT_STATE.json","claim":"Canonical current state reconciled to standard v3.0.0 and verified by successful read-back."},
+    {"id":"E-010","type":"github_commit","ref":"d7e18702199a1391b818e0d105b149c256c52319","path":"docs/architecture/cloud-first-runtime.md","claim":"Obsolete cloud-first runtime instructions were retired and verified by read-back; historical active cron/watchdog wording is no longer authoritative."}
   ]
 }
