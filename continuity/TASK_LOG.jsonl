@@ -20,3 +20,4 @@
   "next_action": "Install and verify the canonical continuity set on the VPS Master Memory location using an authorized write path."
 }
 {"task_id":"CONTINUITY-001-T001","timestamp":"2026-10-08","status":"VERIFIED","event":"FINAL_WRITEBACK_VERIFIED","evidence":["E-006"],"note":"CURRENT_STATE was advanced only after foundation verification; canonical next action remains VPS installation."}
+{"task_id":"CONTINUITY-001-T002","timestamp":"2026-10-08","status":"BLOCKED","title":"Verify authorized VPS write path","actions":["Checked connected Desktop Commander device","Attempted non-interactive SSH to srv7015981364","SSH exited without authentication/output"],"evidence":["E-005","E-007"],"next_action":"Use an already-authorized VPS access path; do not create a new secret solely for continuity."}
