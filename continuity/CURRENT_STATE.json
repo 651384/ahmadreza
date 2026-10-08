@@ -1,13 +1,10 @@
 {
   "schema": "SIMOT-CONTINUITY-v1",
-  "state_version": 3,
+  "state_version": 4,
   "state_status": "ACTIVE",
   "updated_at": "2026-10-08",
-  "system": {
-    "name": "SIMOT AI OS",
-    "role": "personal_ai_os",
-    "canonical_brain": "SIMOT"
-  },
+  "canonical_standard": {"id":"SIMOT-CANONICAL-001","version":"3.0.0"},
+  "system": {"name":"SIMOT AI OS","role":"personal_ai_os","canonical_brain":"SIMOT"},
   "user_constraints": [
     "SIMOT remains the brain.",
     "No unnecessary paid APIs/services/subscriptions.",
@@ -17,61 +14,35 @@
     "Human gate before production activation, deletion, store/KYC/payment activation, new secrets, costs, or merge-to-master.",
     "Never claim an action is done without verification.",
     "Never invent unavailable access or evidence.",
-    "Do not change architecture silently."
+    "Do not change architecture silently.",
+    "No parallel competing paths.",
+    "Immediate write-back after every meaningful task."
   ],
-  "locked_decisions": [
-    "D-001",
-    "D-002",
-    "D-003",
-    "D-004",
-    "D-005",
-    "D-006"
-  ],
-  "current_project": {
-    "id": "SIMOT-CONTINUITY-001",
-    "title": "Canonical cross-session continuity control plane"
-  },
-  "current_objective": {
-    "id": "CONTINUITY-001",
-    "title": "Implement one authoritative state system so new sessions cannot silently lose the project path."
-  },
-  "current_phase": "VPS_ACCESS_BLOCKED",
-  "last_verified_position": "Repository continuity foundation is verified; VPS write-path verification is blocked by missing non-interactive authentication.",
-  "last_completed_task": "CONTINUITY-001-T002",
-  "last_task_evidence": [
-    "E-001",
-    "E-002",
-    "E-003",
-    "E-004"
-  ],
-  "blocker": "No currently available authorized non-interactive write path from the connected PC to srv7015981364.",
-  "next_action": "Use an existing authorized VPS session/access path to install the canonical continuity files under /srv/simot-memory/; do not create a new credential.",
+  "locked_decisions": ["D-001","D-002","D-003","D-004","D-005","D-006"],
+  "current_project": {"id":"SIMOT-CONTINUITY-001","title":"Canonical cross-session continuity control plane"},
+  "current_objective": {"id":"CONTINUITY-001","title":"Implement one authoritative state system so new sessions cannot silently lose the project path."},
+  "current_phase": "REPOSITORY_CLEANUP",
+  "last_verified_position": "The canonical continuity contract has been rewritten to SIMOT-CANONICAL-001 v3.0.0 and verified in GitHub. Remaining non-VPS work is atomic reconciliation of repository state and removal/retirement of obsolete competing instructions.",
+  "last_completed_task": "CONTINUITY-001-T003",
+  "last_task_evidence": ["E-008"],
+  "blocker": "No blocker for repository reconciliation; VPS installation remains intentionally deferred until all non-VPS cleanup is complete.",
+  "next_action": "Reconcile the canonical evidence index and task log with the verified v3.0.0 contract rewrite, then continue repository cleanup one file at a time.",
   "do_not_do": [
     "Do not debug OpenClaw voice/Talk.",
     "Do not redesign Jarvis/OpenClaw architecture.",
     "Do not create a custom mobile app.",
-    "Do not modify production SIMOT runtime.",
+    "Do not install anything on VPS yet.",
+    "Do not modify production deployment/runtime activation without explicit approval.",
     "Do not introduce paid APIs or new secrets.",
+    "Do not create a second canonical standard or second live memory.",
     "Do not reopen locked architecture decisions unless the user explicitly requests review."
   ],
   "continuity_locations": {
     "repository": "651384/ahmadreza/continuity/",
     "canonical_runtime_target": "/srv/simot-memory/",
-    "canonical_files": [
-      "CURRENT_STATE.json",
-      "DECISIONS.json",
-      "EVIDENCE_INDEX.json",
-      "TASK_LOG.jsonl",
-      "CONTINUITY_CONTRACT.md"
-    ]
+    "canonical_files": ["CURRENT_STATE.json","DECISIONS.json","EVIDENCE_INDEX.json","TASK_LOG.jsonl","CONTINUITY_CONTRACT.md"]
   },
   "repository_commits": {
-    "contract": "dd0a294c25ce36d585879af9719f14f620efc008",
-    "current_state_initial": "b4ca3cc570b25b013312cf369757b4d8102e308d",
-    "decisions": "1e57119d49662824c82cfca409adc73ae0938a09",
-    "evidence": "951344bb275b8ad7bd31a19702044ee02dc55e75",
-    "task_log": "296ec32cb2745aca7183b74c4057eed112d8e269",
-    "evidence_latest": "1486d72027b9c71820f3d620e52acb276757e3a0",
-    "task_log_latest": "a5018efdcf4b6995517b692da26b8508f3043884"
+    "contract": "3430b6cdafe8829d131907a4588fd4bd00539931"
   }
 }
