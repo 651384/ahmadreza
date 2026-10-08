@@ -1,6 +1,6 @@
 {
   "schema": "SIMOT-CONTINUITY-EVIDENCE-v1",
-  "updated_at": "2026-10-08T00:00:00Z",
+  "updated_at": "2026-10-08",
   "evidence": [
     {
       "id": "E-001",
@@ -35,6 +35,13 @@
       "type": "runtime_access",
       "ref": "Desktop Commander DESKTOP-771TT6B",
       "claim": "PC is accessible; SSH BatchMode to srv7015981364 did not authenticate, so VPS write was not falsely claimed."
+    },
+    {
+      "id": "E-006",
+      "type": "verification",
+      "ref": "319fd1c3238e773fe55bf7d06175c4ba77668996",
+      "path": "continuity/CURRENT_STATE.json",
+      "claim": "Current state advanced to state_version 2 and read back successfully."
     }
   ]
 }
