@@ -26,6 +26,15 @@ const VERIFICATION = new Set(["VERIFIED","INTERNAL","SECONDARY","UNVERIFIED","AI
 const RESULT_STATUSES = new Set(["PENDING","COMPLETED","BLOCKED","FAILED","REJECTED","CANCELLED","UNKNOWN"]);
 const WRITE_BACK = new Set(["COMPLETED","REQUIRED","NOT-APPLICABLE","FAILED"]);
 
+
+function authorizeMasterMemoryBridge(request,env){
+  const token=env.SIMOT_MAILBOX_TOKEN;
+  return typeof token==="string" && token.length>0 && request.headers.get("Authorization")==="Bearer "+token;
+}
+function validMasterMemoryBucket(bucket){
+  return ["inputs","evidence","outputs","working","index","metadata","versions","quarantine"].includes(bucket);
+}
+
 function json(data, status = 200) { return new Response(JSON.stringify(data), { status, headers: { "content-type": "application/json; charset=utf-8" } }); }
 function now() { return new Date().toISOString(); }
 function validateEnvelope(body) { if (!body || typeof body !== "object" || Array.isArray(body)) return "INVALID_BODY"; const required=["MSG-ID","CORR-ID","REPLY-TO","THREAD-ID","FROM","TO","TYPE","PRIORITY","AUTHORITY","STATUS","SCOPE","SOT-REFS","TASK-REFS","RECORD-REFS","EXPECTED-ACTION","DEADLINE","CONFIDENTIALITY","PAYLOAD-FORMAT","PART","RESULT-STATUS","NEXT-ACTION","WRITE-BACK","ESCALATION","CONFIDENCE","VERIFICATION"]; for(const k of required) if(body[k]===undefined||body[k]===null||body[k]==="") return "MISSING_"+k; if(!RECIPIENT_RE.test(String(body["TO"]))) return "WRONG_RECIPIENT"; if(body["TO"]==="SIMOT-MASTER"&&body["FROM"]!=="SIMOT-AI-01"&&!/^SIMOT-AI-[0-9]{2}$/.test(String(body["FROM"]))) return "INVALID_SENDER_FOR_MASTER"; if(/^SIMOT-AI-[0-9]{2}$/.test(String(body["TO"]))&&body["FROM"]!=="SIMOT-MASTER") return "INVALID_SENDER_FOR_WORKER"; if(!TYPES.has(body["TYPE"])) return "INVALID_TYPE"; if(!PRIORITIES.has(body["PRIORITY"])) return "INVALID_PRIORITY"; if(!AUTHORITIES.has(body["AUTHORITY"])) return "INVALID_AUTHORITY"; if(!STATUSES.has(body["STATUS"])) return "INVALID_STATUS"; if(!CONFIDENTIALITY.has(body["CONFIDENTIALITY"])) return "INVALID_CONFIDENTIALITY"; if(!PAYLOAD_FORMATS.has(body["PAYLOAD-FORMAT"])) return "INVALID_PAYLOAD_FORMAT"; if(!RESULT_STATUSES.has(body["RESULT-STATUS"])) return "INVALID_RESULT_STATUS"; if(!WRITE_BACK.has(body["WRITE-BACK"])) return "INVALID_WRITE_BACK"; if(!VERIFICATION.has(body["VERIFICATION"])) return "INVALID_VERIFICATION"; if(typeof body["PART"]!=="string"||!/^\d+\/\d+$/.test(body["PART"])) return "INVALID_PART"; const [part,total]=body["PART"].split("/").map(Number); if(!Number.isInteger(part)||!Number.isInteger(total)||total<1||part<1||part>total)return "INVALID_PART"; if(body["REPLY-TO"]!=="NONE"&&typeof body["REPLY-TO"]!=="string")return "INVALID_REPLY_TO"; if(body["SCOPE"]&&String(body["SCOPE"]).length>4000)return "SCOPE_TOO_LARGE"; return null; }
@@ -511,6 +520,70 @@ if(url.pathname==="/master-memory/e2e-read"&&request.method==="GET"){
     return json({ok:false,error:"MASTER_MEMORY_E2E_READ_FAILED"},502);
   }
 }
+
+if(url.pathname==="/master-memory/continuity-state"&&(request.method==="GET"||request.method==="POST")){
+  if(!authorizeMasterMemoryBridge(request,env)) return json({ok:false,error:"MASTER_MEMORY_BRIDGE_UNAUTHORIZED"},401);
+  if(!env.SIMOT_MASTER_MEMORY) return json({ok:false,error:"MASTER_MEMORY_VPC_NOT_BOUND"},503);
+  if(!env.SIMOT_MASTER_MEMORY_TOKEN) return json({ok:false,error:"MASTER_MEMORY_TOKEN_NOT_CONFIGURED"},503);
+  try{
+    let init={headers:{"Authorization":"Bearer "+env.SIMOT_MASTER_MEMORY_TOKEN}};
+    if(request.method==="POST"){
+      const length=Number(request.headers.get("content-length")||0);
+      if(length>2_000_000) return json({ok:false,error:"CONTINUITY_PAYLOAD_TOO_LARGE"},413);
+      let body;
+      try{body=await request.json();}catch{return json({ok:false,error:"INVALID_JSON"},400);}
+      if(!body||typeof body!=="object"||Array.isArray(body)||
+        !Number.isInteger(body.expected_version)||!body.state||typeof body.state!=="object"||
+        !body.task_record||typeof body.task_record!=="object"||!Array.isArray(body.evidence_records)){
+        return json({ok:false,error:"INVALID_CONTINUITY_WRITE_PAYLOAD"},400);
+      }
+      init={...init,method:"POST",headers:{...init.headers,"content-type":"application/json"},body:JSON.stringify(body)};
+    }
+    const r=await env.SIMOT_MASTER_MEMORY.fetch("http://127.0.0.1:9100/continuity/state",init);
+    const result=await r.json().catch(()=>null);
+    return json({ok:r.ok&&result?.ok===true,upstream_status:r.status,result,route:"WORKER->VPC->TUNNEL->MASTER_MEMORY_CONTINUITY"},r.status);
+  }catch(error){return json({ok:false,error:"MASTER_MEMORY_CONTINUITY_BRIDGE_FAILED"},502);}
+}
+if(url.pathname==="/master-memory/object-write"&&request.method==="POST"){
+  if(!authorizeMasterMemoryBridge(request,env)) return json({ok:false,error:"MASTER_MEMORY_BRIDGE_UNAUTHORIZED"},401);
+  if(!env.SIMOT_MASTER_MEMORY) return json({ok:false,error:"MASTER_MEMORY_VPC_NOT_BOUND"},503);
+  if(!env.SIMOT_MASTER_MEMORY_TOKEN) return json({ok:false,error:"MASTER_MEMORY_TOKEN_NOT_CONFIGURED"},503);
+  const length=Number(request.headers.get("content-length")||0);
+  if(length>1_100_000) return json({ok:false,error:"MEMORY_PAYLOAD_TOO_LARGE"},413);
+  let body;
+  try{body=await request.json();}catch{return json({ok:false,error:"INVALID_JSON"},400);}
+  if(!body||typeof body!=="object"||Array.isArray(body)||
+    !validMasterMemoryBucket(body.bucket)||
+    typeof body.object_id!=="string"||!/^[A-Za-z0-9._-]{1,120}$/.test(body.object_id)||
+    typeof body.content!=="string"){
+    return json({ok:false,error:"INVALID_MEMORY_OBJECT_PAYLOAD"},400);
+  }
+  try{
+    const r=await env.SIMOT_MASTER_MEMORY.fetch("http://127.0.0.1:9100/memory",{
+      method:"POST",
+      headers:{"Authorization":"Bearer "+env.SIMOT_MASTER_MEMORY_TOKEN,"content-type":"application/json"},
+      body:JSON.stringify({bucket:body.bucket,object_id:body.object_id,content:body.content})
+    });
+    const result=await r.json().catch(()=>null);
+    return json({ok:r.ok&&result?.ok===true,upstream_status:r.status,result,route:"WORKER->VPC->TUNNEL->MASTER_MEMORY_WRITE"},r.status);
+  }catch(error){return json({ok:false,error:"MASTER_MEMORY_OBJECT_WRITE_FAILED"},502);}
+}
+if(url.pathname==="/master-memory/object-read"&&request.method==="GET"){
+  if(!authorizeMasterMemoryBridge(request,env)) return json({ok:false,error:"MASTER_MEMORY_BRIDGE_UNAUTHORIZED"},401);
+  if(!env.SIMOT_MASTER_MEMORY) return json({ok:false,error:"MASTER_MEMORY_VPC_NOT_BOUND"},503);
+  if(!env.SIMOT_MASTER_MEMORY_TOKEN) return json({ok:false,error:"MASTER_MEMORY_TOKEN_NOT_CONFIGURED"},503);
+  const bucket=url.searchParams.get("bucket")||"working";
+  const objectId=url.searchParams.get("object_id")||"";
+  if(!validMasterMemoryBucket(bucket)||!/^[A-Za-z0-9._-]{1,120}$/.test(objectId)) return json({ok:false,error:"INVALID_MEMORY_OBJECT_REFERENCE"},400);
+  try{
+    const r=await env.SIMOT_MASTER_MEMORY.fetch("http://127.0.0.1:9100/memory/"+encodeURIComponent(bucket)+"/"+encodeURIComponent(objectId),{
+      headers:{"Authorization":"Bearer "+env.SIMOT_MASTER_MEMORY_TOKEN}
+    });
+    const result=await r.json().catch(()=>null);
+    return json({ok:r.ok&&result?.ok===true,upstream_status:r.status,result,route:"WORKER->VPC->TUNNEL->MASTER_MEMORY_READ"},r.status);
+  }catch(error){return json({ok:false,error:"MASTER_MEMORY_OBJECT_READ_FAILED"},502);}
+}
+
 if(url.pathname==="/cloudflare/management/status"&&request.method==="GET"){
   try{
     const probe=await runCloudflareManagementProbe(env);
