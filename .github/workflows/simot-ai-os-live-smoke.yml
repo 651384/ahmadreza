@@ -22,7 +22,6 @@ jobs:
           set -euo pipefail
           expected="$(grep -oP 'const VERSION\s*=\s*"\K[^"]+' simot-ai-os/src/worker.js)"
           echo "Expected runtime version from worker.js: $expected"
-          # Poll to tolerate Cloudflare Builds deployment propagation after a push.
           for attempt in $(seq 1 20); do
             curl --fail --silent --show-error --retry 5 --retry-delay 3 "$URL/health" -o health.json
             live="$(node -p "JSON.parse(require('fs').readFileSync('health.json','utf8')).version")"
@@ -94,6 +93,78 @@ jobs:
             if (m.resources?.[key]?.success !== true) throw new Error("Cloudflare resource check failed: " + key);
           }
           console.log(JSON.stringify({status:m.status, token_status:m.token_status, checked_at:m.checked_at}));
+          NODE
+
+      - name: Verify Cloudflare to VPS Master Memory read path
+        env:
+          URL: https://simot-ai-os-gateway.vahid-ahmadreza.workers.dev
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error "$URL/master-memory/test" -o memory-health.json
+          node - <<'NODE'
+          const fs = require("fs");
+          const body = JSON.parse(fs.readFileSync("memory-health.json", "utf8"));
+          if (!body.ok || body.vpc_http_status !== 200 || body.memory?.service !== "simot-memory") {
+            throw new Error("Cloudflare-to-VPS Master Memory health check failed: " + JSON.stringify(body));
+          }
+          console.log(JSON.stringify({ok:body.ok, route:body.route, vpc_http_status:body.vpc_http_status}));
+          NODE
+          curl --fail --silent --show-error "$URL/master-memory/e2e-read?object_id=E2E-BRIDGE-001" -o memory-read.json
+          node - <<'NODE'
+          const fs = require("fs");
+          const body = JSON.parse(fs.readFileSync("memory-read.json", "utf8"));
+          if (!body.ok || body.vpc_http_status !== 200 || body.memory?.content !== "SIMOT BRIDGE MEMORY PASS") {
+            throw new Error("Cloudflare-to-VPS Master Memory readback failed: " + JSON.stringify(body));
+          }
+          console.log(JSON.stringify({ok:body.ok, route:body.route, object_id:body.object_id}));
+          NODE
+
+      - name: Verify Cloudflare-to-VPS Master Memory write and readback
+        env:
+          URL: https://simot-ai-os-gateway.vahid-ahmadreza.workers.dev
+          SIMOT_MAILBOX_TOKEN: ${{ secrets.SIMOT_MAILBOX_TOKEN }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: |
+          set -euo pipefail
+          test -n "$SIMOT_MAILBOX_TOKEN" || { echo "Required GitHub Actions secret SIMOT_MAILBOX_TOKEN is missing"; exit 1; }
+          node - <<'NODE'
+          const fs = require("fs");
+          const token = process.env.SIMOT_MAILBOX_TOKEN;
+          const objectId = `E2E-CF-VPS-${process.env.RUN_ID}-${process.env.RUN_ATTEMPT}`;
+          const content = `SIMOT_CLOUDFLARE_VPS_E2E_PASS:${objectId}`;
+          const payload = {
+            jsonrpc: "2.0", id: 1, method: "tools/call",
+            params: { name: "simot_tool_execute", arguments: {
+              tool_ref: "MASTER_MEMORY", operation: "WRITE_E2E_OBJECT", mode: "WRITE",
+              authority: "SYSTEM_WRITE_ALLOWED",
+              args: { approval: true, bucket: "working", object_id: objectId, content }
+            }}
+          };
+          fetch(process.env.URL + "/mcp", {
+            method: "POST",
+            headers: { "content-type": "application/json", "authorization": "Bearer " + token },
+            body: JSON.stringify(payload)
+          }).then(async response => {
+            const body = await response.json();
+            if (!response.ok || body.error || body.result?.isError) throw new Error("MCP write request failed: " + JSON.stringify(body));
+            const result = JSON.parse(body.result.content[0].text);
+            if (!result.ok || result.status !== "COMPLETED") throw new Error("VPS write failed: " + JSON.stringify(result));
+            fs.writeFileSync("memory-write.json", JSON.stringify({objectId, content, result}));
+            console.log(JSON.stringify({ok:result.ok, status:result.status, object_id:objectId, verification:result.verification}));
+          }).catch(error => { console.error(error); process.exit(1); });
+          NODE
+          object_id="$(node -p "JSON.parse(require('fs').readFileSync('memory-write.json','utf8')).objectId")"
+          expected="$(node -p "JSON.parse(require('fs').readFileSync('memory-write.json','utf8')).content")"
+          curl --fail --silent --show-error "$URL/master-memory/e2e-read?object_id=$object_id" -o memory-readback.json
+          node - "$expected" <<'NODE'
+          const fs = require("fs");
+          const expected = process.argv[2];
+          const body = JSON.parse(fs.readFileSync("memory-readback.json", "utf8"));
+          if (!body.ok || body.vpc_http_status !== 200 || body.memory?.content !== expected) {
+            throw new Error("VPS write/readback mismatch: " + JSON.stringify(body));
+          }
+          console.log(JSON.stringify({ok:true, object_id:body.object_id, route:body.route, readback_matches:true}));
           NODE
 
       - name: Verify Telegram webhook remains fail-closed
