@@ -1,0 +1,24 @@
+{
+  "schema": "simot.visual-control-plane.graph",
+  "schemaVersion": 1,
+  "graphId": "simot-core-overview",
+  "revision": 1,
+  "updatedAt": "2026-10-11",
+  "nodes": [
+    { "id": "simot", "type": "simotNode", "position": { "x": 420, "y": 230 }, "data": { "label": "هستهٔ SIMOT AI OS", "kind": "core", "status": "VERIFIED", "detail": "هستهٔ هماهنگ‌سازی؛ وضعیت زندهٔ همهٔ اجزا هنوز متصل نیست." } },
+    { "id": "gateway", "type": "simotNode", "position": { "x": 420, "y": 60 }, "data": { "label": "Cloudflare Gateway", "kind": "runtime", "status": "VERIFIED", "detail": "کد و تنظیمات مخزن بررسی شده؛ سلامت زنده در این نمونه آزمایش نشده." } },
+    { "id": "memory", "type": "simotNode", "position": { "x": 70, "y": 230 }, "data": { "label": "VPS Master Memory", "kind": "memory", "status": "NOT_VERIFIED", "detail": "منبع عملیاتی اصلی؛ خواندن/بازیابی زنده باید با آزمون جداگانه تأیید شود." } },
+    { "id": "d1", "type": "simotNode", "position": { "x": 420, "y": 410 }, "data": { "label": "Cloudflare D1", "kind": "runtime", "status": "CONFIG_ONLY", "detail": "حافظهٔ runtime؛ جایگزین Master Memory نیست." } },
+    { "id": "github", "type": "simotNode", "position": { "x": 770, "y": 230 }, "data": { "label": "GitHub", "kind": "source", "status": "VERIFIED", "detail": "مخزن و شاخهٔ نمونه؛ منبع کد و نسخه‌بندی." } },
+    { "id": "notion", "type": "simotNode", "position": { "x": 70, "y": 410 }, "data": { "label": "Notion", "kind": "knowledge", "status": "NOT_CONNECTED", "detail": "معماری، سیاست‌ها و تصمیم‌ها؛ اتصال زنده از این رابط برقرار نیست." } },
+    { "id": "asana", "type": "simotNode", "position": { "x": 770, "y": 410 }, "data": { "label": "Asana", "kind": "execution", "status": "NOT_CONNECTED", "detail": "اجرای کارها؛ اتصال زنده از این رابط برقرار نیست." } }
+  ],
+  "edges": [
+    { "id": "e-gateway-core", "source": "gateway", "target": "simot", "label": "runtime" },
+    { "id": "e-memory-core", "source": "memory", "target": "simot", "label": "canonical memory" },
+    { "id": "e-core-d1", "source": "simot", "target": "d1", "label": "runtime state" },
+    { "id": "e-github-core", "source": "github", "target": "simot", "label": "versioned code" },
+    { "id": "e-memory-notion", "source": "memory", "target": "notion", "label": "evidence / policy" },
+    { "id": "e-github-asana", "source": "github", "target": "asana", "label": "controlled execution" }
+  ]
+}
