@@ -54,7 +54,7 @@ test("writes only to working E2E object and verifies readback without returning 
   assert.equal(result.content_returned, false);
   assert.equal(env.objects.get("working/E2E-TEST-001"), request.content);
   assert.equal(env.calls.filter(x => x.method === "POST").length, 1);
-  assert.equal(env.calls.filter(x => x.method === "GET").length, 2);
+  assert.equal(env.calls.filter(x => x.method === "GET").length, 1);
 });
 
 test("fails closed when readback content differs", async () => {

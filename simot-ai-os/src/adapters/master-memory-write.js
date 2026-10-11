@@ -38,28 +38,6 @@ export async function runMasterMemoryE2E(env, input = {}) {
 
   const readUrl = MASTER_MEMORY_ORIGIN + "/memory/" + encodeURIComponent(bucket) + "/" + encodeURIComponent(object_id);
   const headers = { Authorization: "Bearer " + env.SIMOT_MASTER_MEMORY_TOKEN };
-  let initialRead;
-  try {
-    initialRead = await env.SIMOT_MASTER_MEMORY.fetch(readUrl, { headers });
-  } catch {
-    return blockedResult("MASTER_MEMORY_READBACK_TRANSPORT_FAILED", "RETRY_AFTER_RUNTIME_NETWORK_CHECK");
-  }
-  const initialPayload = await initialRead.json().catch(() => null);
-  if (initialRead.ok && initialPayload?.ok === true && initialPayload.content === content) {
-    return {
-      ok: true, status: "COMPLETED", verification: "WRITE_READBACK_MATCH",
-      operation: "WRITE_E2E_OBJECT", bucket, object_id, write_performed: false,
-      write: { ok: true, skipped_existing_match: true },
-      readback: { ok: true, http_status: initialRead.status, content_matches: true, metadata: initialPayload.metadata || null },
-      content_returned: false, next_action: "E2E_VERIFIED"
-    };
-  }
-  if (initialRead.status !== 404 && (!initialRead.ok || initialPayload?.ok !== true)) {
-    return blockedResult("MASTER_MEMORY_READBACK_FAILED", "REVIEW_MASTER_MEMORY_READ_RESPONSE", {
-      readback: { ok: false, http_status: initialRead.status, content_matches: false }
-    });
-  }
-
   const write = await writeMasterMemoryE2E(env, { authority, approval, bucket, object_id, content });
   if (!write.ok) return blockedResult(write.error_code || "MASTER_MEMORY_WRITE_FAILED", write.next_action || "REVIEW_MASTER_MEMORY_WRITE");
 
