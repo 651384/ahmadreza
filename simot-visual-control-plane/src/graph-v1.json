@@ -2,8 +2,8 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 9,
-  "updatedAt": "2026-10-12T07:43:37.749Z",
+  "revision": 10,
+  "updatedAt": "2026-10-12T07:44:15.311Z",
   "nodes": [
     {
       "id": "simot-core",
@@ -43,6 +43,7 @@
         "status": "VERIFIED",
         "role": "منبع اصلی تداوم و وضعیت عملیاتی",
         "capabilities": [
+          "CONTINUITY_CONTRACT.md",
           "CURRENT_STATE",
           "TASK_LOG",
           "EVIDENCE_INDEX",
@@ -1421,6 +1422,36 @@
           "شکست تکرارشونده"
         ]
       }
+    },
+    {
+      "id": "source-of-truth-policy",
+      "type": "simotNode",
+      "position": {
+        "x": 320,
+        "y": 1770
+      },
+      "data": {
+        "label": "Source-of-Truth Policy",
+        "kind": "security",
+        "status": "PLANNED",
+        "role": "تعیین مرجع معتبر هر نوع داده",
+        "capabilities": [
+          "Master Memory: وضعیت عملیاتی",
+          "SharePoint/OneDrive: اسناد و شواهد",
+          "Notion: معماری و سیاست",
+          "GitHub: کد و نسخه",
+          "Asana: وظایف",
+          "HubSpot: CRM",
+          "Cloudflare: شواهد runtime",
+          "UI: نمایش"
+        ],
+        "accessMethod": "سیاست معماری SIMOT",
+        "permissions": "ChatGPT و UI منبع canonical وضعیت عملیاتی نیستند",
+        "evidence": "قاعدهٔ معماری ثبت‌شده؛ enforcement زنده بررسی نشده",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "اتصال policy به context و data governance",
+        "detail": "هر منبع نقش مشخص دارد؛ VPS Master Memory مرجع وضعیت عملیاتی است و سایر سامانه‌ها نقش اختصاصی خود را حفظ می‌کنند."
+      }
     }
   ],
   "edges": [
@@ -2236,6 +2267,56 @@
       "data": {
         "status": "PLANNED",
         "evidence": "ارتباط معماری هدف؛ در این مرحله تست runtime انجام نشده."
+      }
+    },
+    {
+      "id": "e-policy-source-hierarchy",
+      "source": "policy-engine",
+      "target": "source-of-truth-policy",
+      "label": "ENFORCES",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط معماری هدف؛ اجرا بررسی نشده."
+      }
+    },
+    {
+      "id": "e-source-master-memory",
+      "source": "source-of-truth-policy",
+      "target": "master-memory",
+      "label": "OPERATIONAL_SOURCE",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "سیاست منبع؛ اتصال runtime بررسی نشده."
+      }
+    },
+    {
+      "id": "e-source-docs",
+      "source": "source-of-truth-policy",
+      "target": "sharepoint",
+      "label": "DOCUMENTS_AND_EVIDENCE",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "سیاست منبع؛ اتصال runtime بررسی نشده."
+      }
+    },
+    {
+      "id": "e-source-code",
+      "source": "source-of-truth-policy",
+      "target": "github",
+      "label": "CODE_AND_VERSION",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "سیاست منبع؛ اتصال runtime بررسی نشده."
+      }
+    },
+    {
+      "id": "e-source-ui",
+      "source": "source-of-truth-policy",
+      "target": "vcp",
+      "label": "DISPLAY_ONLY",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "سیاست منبع؛ اتصال runtime بررسی نشده."
       }
     }
   ]
