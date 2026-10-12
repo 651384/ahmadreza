@@ -2,7 +2,7 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 39,
+  "revision": 40,
   "updatedAt": "2026-10-12T00:00:00.000Z",
   "nodes": [
     {
@@ -1441,7 +1441,9 @@
         "kind": "security",
         "status": "PLANNED",
         "role": "security",
-        "capabilities": "توقف ایمن و درخواست تصمیم انسانی هنگام ابهام یا ریسک",
+        "capabilities": [
+          "توقف ایمن و درخواست تصمیم انسانی هنگام ابهام یا ریسک"
+        ],
         "accessMethod": "لایهٔ منطقی معماری؛ implementation واقعی هنوز نگاشت نشده",
         "permissions": "حداقل دسترسی؛ هر هزینه یا اقدام حساس نیازمند تأیید انسانی",
         "evidence": "جزء معماری هدف؛ این گره به‌تنهایی سرویس مستقل یا اتصال runtime را اثبات نمی‌کند",
