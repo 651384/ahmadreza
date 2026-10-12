@@ -44,9 +44,8 @@ function Workspace() {
   const onConnect = useCallback(params => setEdges(es => addEdge({
     ...params,
     id: 'manual-' + Date.now(),
-    label: 'ارتباط آزمایشی',
-    relation: 'UNVERIFIED',
-    status: 'NOT TESTED',
+    label: 'ارتباط پیشنهادی',
+    data: { status: 'NOT TESTED', evidence: 'اتصال محلی آزمایشی؛ هنوز در فایل canonical ثبت یا بررسی نشده' },
     markerEnd: { type: MarkerType.ArrowClosed }
   }, es)), [setEdges]);
   const chosen = nodes.find(n => n.id === selected);
