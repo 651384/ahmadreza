@@ -59,7 +59,7 @@ function Workspace() {
     nodes,
     edges: edges.map(({ markerEnd, ...e }) => e)
   }), [nodes, edges, revision]);
-  const verifiedEdges = edges.filter(e => e.status === 'VERIFIED').length;
+  const verifiedEdges = edges.filter(e => (e.data?.status || e.status) === 'VERIFIED').length;
   const plannedNodes = nodes.filter(n => n.data.status === 'PLANNED').length;
   const untestedNodes = nodes.filter(n => n.data.status === 'NOT TESTED').length;
   const detailRows = chosen ? [
@@ -74,13 +74,15 @@ function Workspace() {
   ].filter(([, value]) => value) : [];
 
   function exportGraph() {
-    const url = URL.createObjectURL(new Blob([JSON.stringify(graph, null, 2)], { type: 'application/json' }));
+    const nextRevision = revision + 1;
+    const exportPayload = { ...graph, revision: nextRevision, updatedAt: new Date().toISOString() };
+    const url = URL.createObjectURL(new Blob([JSON.stringify(exportPayload, null, 2)], { type: 'application/json' }));
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'simot-graph-v' + graph.schemaVersion + '-r' + revision + '.json';
+    a.download = 'simot-graph-v' + graph.schemaVersion + '-r' + nextRevision + '.json';
     a.click();
     URL.revokeObjectURL(url);
-    setRevision(r => r + 1);
+    setRevision(nextRevision);
     setNotice('خروجی JSON آماده شد؛ این فایل فقط روی دستگاه شما دانلود می‌شود و در Master Memory ذخیره نمی‌شود.');
   }
 
@@ -161,7 +163,7 @@ function Workspace() {
           <h4>{chosen.data.label}</h4>
           <span className={'status-pill ' + (statusClass[chosen.data.status] || 'unknown')}>{statusText[chosen.data.status] || chosen.data.status}</span>
           <p>{chosen.data.detail || 'توضیحات تکمیلی در دسترس نیست.'}</p>
-          {chosen.data.capabilities?.length > 0 && <div className="detail-section"><strong>قابلیت‌های ثبت‌شده</strong><ul>{chosen.data.capabilities.map(item => <li key={item}>{item}</li>)}</ul></div>}
+          {chosen.data.capabilities?.length > 0 && <div className="detail-section"><strong>قابلیت‌های ثبت‌شده</strong><ul>{(Array.isArray(chosen.data.capabilities) ? chosen.data.capabilities : [chosen.data.capabilities]).map((item, index) => <li key={index}>{item}</li>)}</ul></div>}
           {detailRows.map(([label, value]) => <div className="detail-row detail-row-stacked" key={label}><span>{label}</span><p>{value}</p></div>)}
           <div className="notice"><ShieldAlert size={16} /><span>وضعیت فقط همان ادعای ثبت‌شده را پوشش می‌دهد؛ شواهد تاریخی، آزمون جاری محسوب نمی‌شود.</span></div>
         </div> : <div className="empty-detail">
