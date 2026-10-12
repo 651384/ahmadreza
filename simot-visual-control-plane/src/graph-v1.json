@@ -2,8 +2,8 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 29,
-  "updatedAt": "2026-10-12T08:41:53.120Z",
+  "revision": 30,
+  "updatedAt": "2026-10-12T08:43:17.837Z",
   "nodes": [
     {
       "id": "simot-core",
@@ -1841,6 +1841,58 @@
         "nextAction": "در فاز پیاده‌سازی، هویت actor، scope، نسخه، expiry و نتیجهٔ تصمیم ثبت شود",
         "detail": "این گره نقش مالک/اپراتور را در معماری نشان می‌دهد؛ به معنی وجود سرویس هویت جدید یا فعال بودن تأیید در UI نیست."
       }
+    },
+    {
+      "id": "artifact-intake",
+      "type": "simotNode",
+      "position": {
+        "x": 1760,
+        "y": 470
+      },
+      "data": {
+        "label": "ورودی امن فایل و رسانه",
+        "kind": "security",
+        "status": "PLANNED",
+        "role": "پذیرش کنترل‌شدهٔ فایل، تصویر و سند ورودی",
+        "capabilities": [
+          "محدودیت اندازه و نوع فایل",
+          "اعتبارسنجی MIME و امضای فایل",
+          "قرنطینه و ارجاع با شناسهٔ artifact",
+          "حفظ metadata و منشأ"
+        ],
+        "accessMethod": "مسیر هدف در لایهٔ Client Channel؛ implementation تأیید نشده",
+        "permissions": "فقط فایل مجاز؛ محتوا پیش از بازرسی قابل اعتماد فرض نشود",
+        "evidence": "قرارداد معماری revision 30؛ پیاده‌سازی و اسکن زنده تأیید نشده",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "پس از تکمیل معماری، مسیر ذخیره‌سازی، محدودیت‌ها و سیاست نگهداری را با امکانات موجود تطبیق بده",
+        "detail": "فایل ورودی untrusted است؛ نباید مستقیم به مدل یا ابزار داده شود."
+      }
+    },
+    {
+      "id": "content-extractor",
+      "type": "simotNode",
+      "position": {
+        "x": 2040,
+        "y": 470
+      },
+      "data": {
+        "label": "استخراج محتوای فایل",
+        "kind": "runtime",
+        "status": "PLANNED",
+        "role": "استخراج متن/فراداده از فایل‌های مجاز پیش از برنامه‌ریزی",
+        "capabilities": [
+          "استخراج متن و metadata",
+          "OCR برای تصویر در صورت وجود ابزار مجاز",
+          "ثبت منبع و ارجاع به artifact",
+          "محدودسازی محتوا و اندازه"
+        ],
+        "accessMethod": "پس از artifact-intake و تحت data-classification؛ ابزار استخراج جاری هنوز انتخاب/تأیید نشده",
+        "permissions": "حداقل دسترسی؛ هیچ ارسال خارجی بدون بررسی طبقه‌بندی و مدل/هزینه",
+        "evidence": "قرارداد معماری revision 30؛ ابزارها و runtime بررسی نشده",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "در فاز تطبیق با قابلیت‌های موجود، از ایجاد سرویس یا هزینهٔ جدید پرهیز شود",
+        "detail": "استخراج محتوا به‌معنی اعتماد به دستورهای داخل فایل نیست؛ prompt injection داخل سند باید دادهٔ غیرقابل اعتماد تلقی شود."
+      }
     }
   ],
   "edges": [
@@ -3433,6 +3485,36 @@
       "status": "PLANNED",
       "evidence": "قرارداد معماری revision 29؛ مسیر هدف است و اجرای زنده اثبات نشده",
       "permission": "حداقل دسترسی؛ ثبت حساس تابع write guard و approval policy"
+    },
+    {
+      "id": "e-client-artifact-intake",
+      "source": "client-channel-adapters",
+      "target": "artifact-intake",
+      "label": "پذیرش فایل و رسانه",
+      "relation": "VALIDATES_UNTRUSTED_ARTIFACT",
+      "status": "PLANNED",
+      "evidence": "قرارداد معماری revision 30؛ مسیر هدف است و پیاده‌سازی اثبات نشده",
+      "permission": "اعتبارسنجی نوع/اندازه و قرنطینه پیش از پردازش"
+    },
+    {
+      "id": "e-artifact-extractor",
+      "source": "artifact-intake",
+      "target": "content-extractor",
+      "label": "تحویل artifact معتبر",
+      "relation": "PASSES_VALIDATED_ARTIFACT",
+      "status": "PLANNED",
+      "evidence": "قرارداد معماری revision 30؛ مسیر هدف است و پیاده‌سازی اثبات نشده",
+      "permission": "فقط artifact پذیرفته‌شده با شناسه و metadata"
+    },
+    {
+      "id": "e-extractor-ingress",
+      "source": "content-extractor",
+      "target": "request-ingress",
+      "label": "ورودی همراه با ارجاع و محتوای استخراج‌شده",
+      "relation": "SUBMITS_EXTRACTED_CONTEXT",
+      "status": "PLANNED",
+      "evidence": "قرارداد معماری revision 30؛ مسیر هدف است و پیاده‌سازی اثبات نشده",
+      "permission": "متن استخراج‌شده untrusted است؛ طبقه‌بندی و policy قبل از استفاده اعمال شود"
     }
   ]
 }
