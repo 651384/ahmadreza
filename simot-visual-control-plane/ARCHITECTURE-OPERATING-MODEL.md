@@ -1,8 +1,8 @@
 # SIMOT AI OS — Architecture Operating Model
 
 **Scope:** Companion reference for the React Flow architecture graph.  
-**Graph:** `simot-core-overview`, schema version 1, revision 32.  
-**Current graph size:** 74 nodes, 165 edges.  
+**Graph:** `simot-core-overview`, schema version 1, revision 33.  
+**Current graph size:** 74 nodes, 167 edges.  
 **Branch:** `feat/simot-visual-control-plane-react-flow`.
 
 > This document describes the target architecture. A graph node or edge is not proof that a component is deployed, connected, healthy, or verified. Status must be supported by current evidence.
@@ -78,7 +78,7 @@ The VPS Master Memory package remains the continuity source: `CONTINUITY_CONTRAC
 
 ## 6. Current phase and boundaries
 
-- Graph revision 32 contains 74 nodes and 165 edges.
+- Graph revision 33 contains 74 nodes and 167 edges.
 - The source-of-truth policy is connected to Master Memory, documents, code, UI, Notion, Asana, HubSpot, Cloudflare runtime evidence, context assembly, and data governance.
 - Release governance is linked to policy; monitoring is linked to failure handling; task lifecycle is linked to terminal result assembly.
 - `ARCHITECTURE.md`, this operating model, and `ARCHITECTURE-INDEX.md` are intended to describe the same graph revision; update their revision/count metadata together when the graph changes.
