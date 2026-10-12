@@ -2,8 +2,8 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 28,
-  "updatedAt": "2026-10-12T08:27:30.792Z",
+  "revision": 29,
+  "updatedAt": "2026-10-12T08:41:53.120Z",
   "nodes": [
     {
       "id": "simot-core",
@@ -2165,16 +2165,6 @@
       "permission": "فقط مدل معماری؛ مجوز اجرایی runtime تأیید نشده است. هر عملیات واقعی تابع هویت، scope و تأیید لازم است."
     },
     {
-      "id": "e-audit-memory",
-      "source": "audit-ledger",
-      "target": "master-memory",
-      "label": "RECORDS_TO",
-      "relation": "RECORDS_TO",
-      "status": "PLANNED",
-      "evidence": "ارتباط هدف معماری؛ شواهد پیاده‌سازی یا اتصال زنده ثبت نشده است.",
-      "permission": "فقط مدل معماری؛ مجوز اجرایی runtime تأیید نشده است. هر عملیات واقعی تابع هویت، scope و تأیید لازم است."
-    },
-    {
       "id": "e-adapters-github",
       "source": "integration-adapters",
       "target": "github",
@@ -2275,13 +2265,13 @@
       "status": "PLANNED"
     },
     {
-      "id": "e-master-api-memory",
+      "id": "e-master-api-memory-read",
       "source": "simot-master-api",
       "target": "master-memory",
-      "label": "READS_WRITES",
-      "relation": "READS_WRITES",
-      "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود.",
-      "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
+      "label": "خواندن وضعیت canonical از حافظه",
+      "relation": "READS_CANONICAL_STATE",
+      "evidence": "قرارداد معماری revision 29؛ مسیر هدف است و اجرای زنده اثبات نشده",
+      "permission": "READ_ONLY؛ دسترسی فقط از Master Memory API",
       "status": "PLANNED"
     },
     {
@@ -2401,16 +2391,6 @@
       "label": "EXECUTES",
       "relation": "EXECUTES",
       "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود.",
-      "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "PLANNED"
-    },
-    {
-      "id": "e-core-memory-api",
-      "source": "simot-core",
-      "target": "simot-master-api",
-      "label": "CALLS",
-      "relation": "CALLS",
-      "evidence": "مسیر معماری هدف برای دسترسی هسته به API؛ اتصال زنده بررسی نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
       "status": "PLANNED"
     },
@@ -2850,16 +2830,6 @@
       "target": "evidence-contract",
       "label": "USES_RECORD_SCHEMA",
       "relation": "USES_RECORD_SCHEMA",
-      "evidence": "معماری هدف؛ schema و اجرای واقعی هنوز آزمون نشده",
-      "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "PLANNED"
-    },
-    {
-      "id": "e-evidence-master-memory",
-      "source": "evidence-contract",
-      "target": "master-memory",
-      "label": "PERSISTS_CANONICAL_RECORD",
-      "relation": "PERSISTS_CANONICAL_RECORD",
       "evidence": "معماری هدف؛ schema و اجرای واقعی هنوز آزمون نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
       "status": "PLANNED"
@@ -3443,6 +3413,26 @@
       "status": "PLANNED",
       "evidence": "شکست نهایی مصرف پیام باید از مسیر مدیریت خطا و سیاست DLQ عبور کند؛ runtime آزمون نشده است.",
       "permission": "حد retry و علت شکست باید مشخص باشد؛ پیام به‌طور خام یا بی‌ردپا حذف نشود."
+    },
+    {
+      "id": "e-evidence-master-api",
+      "source": "evidence-contract",
+      "target": "simot-master-api",
+      "label": "ثبت رکورد canonical از مسیر API",
+      "relation": "PERSISTS_CANONICAL_RECORD",
+      "status": "PLANNED",
+      "evidence": "قرارداد معماری revision 29؛ مسیر هدف است و اجرای زنده اثبات نشده",
+      "permission": "از API موجود و write guard؛ بدون دسترسی مستقیم به storage"
+    },
+    {
+      "id": "e-audit-api",
+      "source": "audit-ledger",
+      "target": "simot-master-api",
+      "label": "ثبت Audit از مسیر API",
+      "relation": "PERSISTS_AUDIT_RECORD",
+      "status": "PLANNED",
+      "evidence": "قرارداد معماری revision 29؛ مسیر هدف است و اجرای زنده اثبات نشده",
+      "permission": "حداقل دسترسی؛ ثبت حساس تابع write guard و approval policy"
     }
   ]
 }
