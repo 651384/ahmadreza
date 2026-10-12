@@ -172,3 +172,8 @@ File-bearing requests must use `client-channel-adapters → artifact-intake → 
 ## Execution dispatch mode — revision 32
 
 The Gateway must route each task through `execution-dispatch-policy`, which chooses exactly one mode: `SYNC` to AI Workers or `ASYNC` through the existing queue and consumer. Remove bypass paths that let the Gateway dispatch the same task independently to both modes. Record the selected mode with task/correlation/idempotency identity; retries must not create a second task, and switching modes after dispatch requires explicit outcome reconciliation. This is a target contract, not runtime evidence.
+
+
+## D1 persistence boundary — revision 33
+
+Cloudflare D1 is modeled as runtime metadata storage only, subject to later inspection of the actual schema and binding. VPS Master Memory remains the sole canonical operational continuity source. D1 rows, queue metadata, and caches must not override canonical state. Persist only the minimum routing/correlation/deduplication/task metadata needed; secrets and raw sensitive payloads are excluded by default. Retention and actual deployed schema remain NOT TESTED.
