@@ -2,7 +2,7 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 37,
+  "revision": 38,
   "updatedAt": "2026-10-12T10:00:00.000Z",
   "nodes": [
     {
@@ -1972,6 +1972,33 @@
         "nextAction": "پس از گیت تکمیل معماری، موجودی پروژه‌ها/سرویس‌ها را از منابع فعلی reconcile کن؛ سرویس جدید نساز",
         "detail": "این رجیستری نمایه و ارجاع ساختاری است، نه منبع حقیقت موازی؛ وضعیت زنده فقط با شواهد معتبر هر منبع."
       }
+    },
+    {
+      "id": "architecture-acceptance-gate",
+      "type": "simotNode",
+      "position": {
+        "x": 2180,
+        "y": 1660
+      },
+      "data": {
+        "label": "Architecture Completion Gate",
+        "kind": "governance",
+        "status": "PLANNED",
+        "role": "تأیید پوشش معماری و سازگاری اسناد پیش از عبور به تطبیق کد/runtime و آزمون",
+        "capabilities": [
+          "پوشش لایه‌ها و جریان درخواست تا نتیجه",
+          "تعیین منبع حقیقت و مالک هر دامنه",
+          "بررسی مسیرهای خطا، مجوز و approval",
+          "هم‌خوانی graph و اسناد و version",
+          "ثبت شکاف‌های باقیمانده و تصمیم عبور"
+        ],
+        "accessMethod": "بازبینی ایستا و مستند؛ بدون build، تست، runtime probe یا تغییر زیرساخت",
+        "permissions": "این گیت فقط اجازهٔ عبور به مرحلهٔ بعد را پیشنهاد می‌کند؛ deploy/merge/write حساس همچنان approval مستقل می‌خواهد",
+        "evidence": "قرارداد تکمیل معماری revision 38؛ بررسی پوشش نهایی هنوز در جریان است",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "چک‌لیست پذیرش را برای هر دامنه با شواهد یا برچسب شکاف تکمیل کن؛ سپس فقط با تأیید کاربر وارد فاز کد/runtime شو",
+        "detail": "وجود این گره یا پاس‌شدن ممیزی ساختاری به‌تنهایی به معنی کامل یا عملیاتی بودن SIMOT نیست. هر قابلیت ناشناخته باید صریحاً ثبت شود."
+      }
     }
   ],
   "edges": [
@@ -3844,6 +3871,36 @@
       "status": "PLANNED",
       "evidence": "قرارداد معماری revision 37؛ mapping runtime بررسی نشده",
       "permission": "از ایجاد اتصال/credential یا هزینهٔ جدید بدون approval خودداری شود."
+    },
+    {
+      "id": "e-graph-validation-acceptance",
+      "source": "graph-validation-policy",
+      "target": "architecture-acceptance-gate",
+      "label": "تأمین نتایج یکپارچگی گراف",
+      "relation": "SUPPLIES_STATIC_INTEGRITY_RESULTS",
+      "status": "PLANNED",
+      "evidence": "قرارداد revision 38؛ ممیزی ساختاری تنها بخشی از پذیرش است",
+      "permission": "گزارش شناسه‌های یکتا، اتصال یال‌ها، metadata و هم‌خوانی schema؛ بدون اجرای برنامه."
+    },
+    {
+      "id": "e-change-review-acceptance",
+      "source": "graph-change-review",
+      "target": "architecture-acceptance-gate",
+      "label": "بازبینی پوشش و شکاف‌ها",
+      "relation": "REVIEWS_ARCHITECTURE_COVERAGE",
+      "status": "PLANNED",
+      "evidence": "قرارداد revision 38؛ پوشش دامنه‌ها باید مستند شود",
+      "permission": "شکاف‌ها پنهان یا خودکار VERIFIED نشوند؛ هر تصمیم و فرض ثبت شود."
+    },
+    {
+      "id": "e-acceptance-vcp",
+      "source": "architecture-acceptance-gate",
+      "target": "vcp",
+      "label": "تعیین آمادگی معماری برای مرحله بعد",
+      "relation": "GATES_PHASE_TRANSITION",
+      "status": "PLANNED",
+      "evidence": "قرارداد revision 38؛ مرحله بعد نیازمند تصمیم صریح انسانی است",
+      "permission": "گیت معماری مجوز deploy، merge، آزمون runtime یا تغییر حساس صادر نمی‌کند."
     }
   ]
 }
