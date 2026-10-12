@@ -2,8 +2,8 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 7,
-  "updatedAt": "2026-10-12T07:30:30.826Z",
+  "revision": 8,
+  "updatedAt": "2026-10-12T07:43:12.842Z",
   "nodes": [
     {
       "id": "simot-core",
@@ -1096,6 +1096,206 @@
         "nextAction": "تعریف قرارداد workflow و ارتباط آن با task lifecycle",
         "detail": "این گره مدل منطقی گردش‌کار است، نه ادعای وجود یک سرویس مستقل جدید."
       }
+    },
+    {
+      "id": "request-ingress",
+      "type": "simotNode",
+      "position": {
+        "x": 600,
+        "y": 2220
+      },
+      "data": {
+        "label": "Request Ingress / ورودی درخواست",
+        "kind": "runtime",
+        "status": "PLANNED",
+        "role": "دریافت درخواست از رابط‌ها و تبدیل به envelope استاندارد",
+        "capabilities": [
+          "OpenClaw",
+          "API Gateway",
+          "درخواست‌های دستی"
+        ],
+        "accessMethod": "لایهٔ منطقی معماری؛ نگاشت به implementation واقعی در مرحلهٔ بعد",
+        "permissions": "حداقل دسترسی؛ عملیات حساس پشت human approval gate",
+        "evidence": "جزء معماری هدف؛ وجود سرویس مستقل یا اتصال runtime از این گراف نتیجه نمی‌شود",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "تکمیل مدل معماری؛ سپس نگاشت به کد و سرویس واقعی",
+        "detail": "درخواست از رابط وارد می‌شود؛ کلاینت منبع حقیقت یا مغز orchestration نیست."
+      }
+    },
+    {
+      "id": "context-assembler",
+      "type": "simotNode",
+      "position": {
+        "x": 600,
+        "y": 2220
+      },
+      "data": {
+        "label": "Context & Memory Assembler",
+        "kind": "memory",
+        "status": "PLANNED",
+        "role": "ساخت context حداقلی از حافظهٔ canonical و شواهد مرتبط",
+        "capabilities": [
+          "خواندن CURRENT_STATE",
+          "خواندن تصمیم و شواهد مرتبط",
+          "حفظ منبع و زمان"
+        ],
+        "accessMethod": "لایهٔ منطقی معماری؛ نگاشت به implementation واقعی در مرحلهٔ بعد",
+        "permissions": "حداقل دسترسی؛ عملیات حساس پشت human approval gate",
+        "evidence": "جزء معماری هدف؛ وجود سرویس مستقل یا اتصال runtime از این گراف نتیجه نمی‌شود",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "تکمیل مدل معماری؛ سپس نگاشت به کد و سرویس واقعی",
+        "detail": "Context موقت است؛ حافظهٔ موازی یا منبع حقیقت جدید ساخته نمی‌شود."
+      }
+    },
+    {
+      "id": "planner",
+      "type": "simotNode",
+      "position": {
+        "x": 600,
+        "y": 2220
+      },
+      "data": {
+        "label": "Task Planner / برنامه‌ریز",
+        "kind": "core",
+        "status": "PLANNED",
+        "role": "تبدیل درخواست به طرح اجرایی، وابستگی و معیار پذیرش",
+        "capabilities": [
+          "تفکیک وظایف",
+          "وابستگی‌ها",
+          "معیار تکمیل"
+        ],
+        "accessMethod": "لایهٔ منطقی معماری؛ نگاشت به implementation واقعی در مرحلهٔ بعد",
+        "permissions": "حداقل دسترسی؛ عملیات حساس پشت human approval gate",
+        "evidence": "جزء معماری هدف؛ وجود سرویس مستقل یا اتصال runtime از این گراف نتیجه نمی‌شود",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "تکمیل مدل معماری؛ سپس نگاشت به کد و سرویس واقعی",
+        "detail": "برنامه‌ریزی با orchestration هماهنگ است و خودش اختیار عبور از سیاست را ندارد."
+      }
+    },
+    {
+      "id": "executor",
+      "type": "simotNode",
+      "position": {
+        "x": 600,
+        "y": 2220
+      },
+      "data": {
+        "label": "Task Executor / اجراکننده",
+        "kind": "core",
+        "status": "PLANNED",
+        "role": "اجرای گام‌های مجاز از طریق adapter و ابزارهای ثبت‌شده",
+        "capabilities": [
+          "اجرای مرحله‌ای",
+          "کنترل مجوز پیش از فراخوانی",
+          "ثبت نتیجه"
+        ],
+        "accessMethod": "لایهٔ منطقی معماری؛ نگاشت به implementation واقعی در مرحلهٔ بعد",
+        "permissions": "حداقل دسترسی؛ عملیات حساس پشت human approval gate",
+        "evidence": "جزء معماری هدف؛ وجود سرویس مستقل یا اتصال runtime از این گراف نتیجه نمی‌شود",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "تکمیل مدل معماری؛ سپس نگاشت به کد و سرویس واقعی",
+        "detail": "Executor فقط ابزارهای ثبت‌شده و مجاز را فراخوانی می‌کند؛ عملیات حساس به تأیید نیاز دارد."
+      }
+    },
+    {
+      "id": "result-assembler",
+      "type": "simotNode",
+      "position": {
+        "x": 600,
+        "y": 2220
+      },
+      "data": {
+        "label": "Result & Evidence Assembler",
+        "kind": "runtime",
+        "status": "PLANNED",
+        "role": "جمع‌آوری خروجی، وضعیت، خطا و شناسهٔ شواهد",
+        "capabilities": [
+          "نتیجهٔ وظیفه",
+          "منابع/شواهد",
+          "خطا و محدودیت"
+        ],
+        "accessMethod": "لایهٔ منطقی معماری؛ نگاشت به implementation واقعی در مرحلهٔ بعد",
+        "permissions": "حداقل دسترسی؛ عملیات حساس پشت human approval gate",
+        "evidence": "جزء معماری هدف؛ وجود سرویس مستقل یا اتصال runtime از این گراف نتیجه نمی‌شود",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "تکمیل مدل معماری؛ سپس نگاشت به کد و سرویس واقعی",
+        "detail": "خروجی باید میان نتیجهٔ واقعی، ادعا، و مورد آزمایش‌نشده تمایز بگذارد."
+      }
+    },
+    {
+      "id": "retry-idempotency",
+      "type": "simotNode",
+      "position": {
+        "x": 600,
+        "y": 2220
+      },
+      "data": {
+        "label": "Retry / Idempotency Control",
+        "kind": "security",
+        "status": "PLANNED",
+        "role": "کنترل تکرار، retry و جلوگیری از اثر جانبی مضاعف",
+        "capabilities": [
+          "شناسهٔ idempotency",
+          "سیاست retry",
+          "مدیریت شکست نهایی"
+        ],
+        "accessMethod": "لایهٔ منطقی معماری؛ نگاشت به implementation واقعی در مرحلهٔ بعد",
+        "permissions": "حداقل دسترسی؛ عملیات حساس پشت human approval gate",
+        "evidence": "جزء معماری هدف؛ وجود سرویس مستقل یا اتصال runtime از این گراف نتیجه نمی‌شود",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "تکمیل مدل معماری؛ سپس نگاشت به کد و سرویس واقعی",
+        "detail": "retry نباید عملیات حساس را بدون کنترل دوباره اجرا کند؛ پیام‌های تکراری باید قابل تشخیص باشند."
+      }
+    },
+    {
+      "id": "data-classification",
+      "type": "simotNode",
+      "position": {
+        "x": 600,
+        "y": 2220
+      },
+      "data": {
+        "label": "Data Classification & Retention",
+        "kind": "knowledge",
+        "status": "PLANNED",
+        "role": "طبقه‌بندی داده و تعیین قواعد نگهداری/انتقال",
+        "capabilities": [
+          "حداقل‌سازی داده",
+          "طبقه‌بندی حساسیت",
+          "قواعد نگهداری"
+        ],
+        "accessMethod": "لایهٔ منطقی معماری؛ نگاشت به implementation واقعی در مرحلهٔ بعد",
+        "permissions": "حداقل دسترسی؛ عملیات حساس پشت human approval gate",
+        "evidence": "جزء معماری هدف؛ وجود سرویس مستقل یا اتصال runtime از این گراف نتیجه نمی‌شود",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "تکمیل مدل معماری؛ سپس نگاشت به کد و سرویس واقعی",
+        "detail": "قواعد داده باید از policy و data governance تبعیت کنند؛ secretها در payload و گراف قرار نمی‌گیرند."
+      }
+    },
+    {
+      "id": "connector-permissions",
+      "type": "simotNode",
+      "position": {
+        "x": 600,
+        "y": 2220
+      },
+      "data": {
+        "label": "Connector Capability & Permission Map",
+        "kind": "security",
+        "status": "PLANNED",
+        "role": "ثبت قابلیت و مجوز هر connector به‌صورت مستقل",
+        "capabilities": [
+          "Read/write scopes",
+          "حدود دسترسی",
+          "دسترسی واقعی در برابر قابلیت نظری"
+        ],
+        "accessMethod": "لایهٔ منطقی معماری؛ نگاشت به implementation واقعی در مرحلهٔ بعد",
+        "permissions": "حداقل دسترسی؛ عملیات حساس پشت human approval gate",
+        "evidence": "جزء معماری هدف؛ وجود سرویس مستقل یا اتصال runtime از این گراف نتیجه نمی‌شود",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "تکمیل مدل معماری؛ سپس نگاشت به کد و سرویس واقعی",
+        "detail": "در دسترس بودن connector به معنی داشتن مجوز یا اتصال SIMOT نیست؛ هر عملیات باید scope مستقل داشته باشد."
+      }
     }
   ],
   "edges": [
@@ -1631,6 +1831,186 @@
       "data": {
         "status": "PLANNED",
         "evidence": "مسیر معماری هدف برای دسترسی هسته به API؛ اتصال زنده بررسی نشده."
+      }
+    },
+    {
+      "id": "e-ingress-envelope",
+      "source": "request-ingress",
+      "target": "simot-message-envelope",
+      "label": "CREATES",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
+      }
+    },
+    {
+      "id": "e-envelope-orchestration",
+      "source": "simot-message-envelope",
+      "target": "orchestration",
+      "label": "SUBMITS_TO",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
+      }
+    },
+    {
+      "id": "e-orchestration-context",
+      "source": "orchestration",
+      "target": "context-assembler",
+      "label": "REQUESTS_CONTEXT",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
+      }
+    },
+    {
+      "id": "e-context-memory-api",
+      "source": "context-assembler",
+      "target": "simot-master-api",
+      "label": "READS_CONTEXT",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
+      }
+    },
+    {
+      "id": "e-orchestration-planner",
+      "source": "orchestration",
+      "target": "planner",
+      "label": "PLANS",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
+      }
+    },
+    {
+      "id": "e-planner-task-lifecycle",
+      "source": "planner",
+      "target": "task-lifecycle",
+      "label": "DEFINES_STEPS",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
+      }
+    },
+    {
+      "id": "e-orchestration-executor",
+      "source": "orchestration",
+      "target": "executor",
+      "label": "DISPATCHES",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
+      }
+    },
+    {
+      "id": "e-executor-adapters",
+      "source": "executor",
+      "target": "integration-adapters",
+      "label": "CALLS_ALLOWED_TOOLS",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
+      }
+    },
+    {
+      "id": "e-executor-policy",
+      "source": "executor",
+      "target": "policy-engine",
+      "label": "CHECKS_BEFORE_ACTION",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
+      }
+    },
+    {
+      "id": "e-executor-approval",
+      "source": "executor",
+      "target": "approval-gate",
+      "label": "REQUESTS_APPROVAL",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
+      }
+    },
+    {
+      "id": "e-executor-retry",
+      "source": "executor",
+      "target": "retry-idempotency",
+      "label": "GUARDED_BY",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
+      }
+    },
+    {
+      "id": "e-executor-result",
+      "source": "executor",
+      "target": "result-assembler",
+      "label": "EMITS_RESULT",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
+      }
+    },
+    {
+      "id": "e-result-audit",
+      "source": "result-assembler",
+      "target": "audit-ledger",
+      "label": "RECORDS_EVIDENCE",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
+      }
+    },
+    {
+      "id": "e-result-memory",
+      "source": "result-assembler",
+      "target": "simot-master-api",
+      "label": "WRITES_AFTER_POLICY",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
+      }
+    },
+    {
+      "id": "e-policy-classification",
+      "source": "policy-engine",
+      "target": "data-classification",
+      "label": "APPLIES",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
+      }
+    },
+    {
+      "id": "e-registry-permissions",
+      "source": "tool-registry",
+      "target": "connector-permissions",
+      "label": "DECLARES",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
+      }
+    },
+    {
+      "id": "e-permissions-adapters",
+      "source": "connector-permissions",
+      "target": "integration-adapters",
+      "label": "SCOPES",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
+      }
+    },
+    {
+      "id": "e-envelope-retry",
+      "source": "simot-message-envelope",
+      "target": "retry-idempotency",
+      "label": "CARRIES_CORRELATION",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
       }
     }
   ]
