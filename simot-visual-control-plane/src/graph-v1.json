@@ -2,8 +2,8 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 14,
-  "updatedAt": "2026-10-12T07:49:44.859Z",
+  "revision": 15,
+  "updatedAt": "2026-10-12T07:50:49.973Z",
   "nodes": [
     {
       "id": "simot-core",
@@ -1519,6 +1519,62 @@
         "nextAction": "پس از تکمیل معماری، schema را با فایل‌های canonical تطبیق بده",
         "detail": "این قرارداد یک مدل منطقی است و جایگزین فایل‌های موجود Master Memory یا منبع حافظهٔ جدید نیست."
       }
+    },
+    {
+      "id": "connector-trust-matrix",
+      "type": "simotNode",
+      "position": {
+        "x": 1160,
+        "y": 1520
+      },
+      "data": {
+        "label": "Connector Trust & Access Matrix",
+        "kind": "security",
+        "status": "PLANNED",
+        "role": "تعریف مرز اعتماد و عملیات مجاز برای هر اتصال",
+        "capabilities": [
+          "Data domain per connector",
+          "Read/create/update/delete/execute scope",
+          "Requested vs granted vs observed access",
+          "Trust boundary and identity",
+          "Approval and audit requirements",
+          "Evidence freshness"
+        ],
+        "accessMethod": "مدل معماری در کنار Connector Capability & Permission Map؛ بدون ساخت سرویس جدید",
+        "permissions": "Read-only by default؛ دسترسی واقعی تا زمان بررسی evidence نامشخص است",
+        "evidence": "الزامات معماری و مرزبندی source-of-truth؛ دسترسی زنده در این مرحله بررسی نشده",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "در مرحلهٔ وریفای با تنظیمات و مجوزهای واقعی هر connector تطبیق داده شود",
+        "detail": "این گره یک مدل معماری است، نه رجیستری یا سرویس جدید؛ باید به همان ابزارها و connectorهای موجود نگاشت شود."
+      }
+    },
+    {
+      "id": "deployment-trust-boundaries",
+      "type": "simotNode",
+      "position": {
+        "x": 1440,
+        "y": 1520
+      },
+      "data": {
+        "label": "Deployment & Trust Boundaries",
+        "kind": "security",
+        "status": "PLANNED",
+        "role": "تفکیک سطح کلاینت، شبکهٔ خصوصی، VPS و cloud runtime",
+        "capabilities": [
+          "Phone/OpenClaw client boundary",
+          "Tailscale private operator path",
+          "VPS Master Memory boundary",
+          "Cloudflare Worker/VPC boundary",
+          "No public VCP requirement",
+          "No PC as permanent runtime"
+        ],
+        "accessMethod": "معماری موجود VPS + Tailscale + Cloudflare؛ topology نهایی نیازمند reconcile بعدی",
+        "permissions": "عدم افشای Master Memory عمومی؛ عدم تغییر route یا firewall بدون approval",
+        "evidence": "الزامات معماری پروژه و مسیر خصوصی VCP گزارش‌شده",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "در مرحلهٔ وریفای، مسیرهای موجود و trust boundaries با شواهد تازه تطبیق داده شوند",
+        "detail": "این گره مرزهای اعتماد را توصیف می‌کند؛ افزودن آن به گراف هیچ مسیر شبکه‌ای را تغییر نمی‌دهد."
+      }
     }
   ],
   "edges": [
@@ -2604,6 +2660,116 @@
       "data": {
         "status": "PLANNED",
         "evidence": "قرارداد هدف معماری؛ تطبیق و آزمون runtime به مرحلهٔ بعد موکول است"
+      }
+    },
+    {
+      "id": "e-adapters-trust-matrix",
+      "source": "integration-adapters",
+      "target": "connector-trust-matrix",
+      "label": "MAPPED_BY",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "مرزبندی هدف معماری؛ هیچ تنظیم runtime یا مجوزی در این تغییر دست‌کاری نشده"
+      }
+    },
+    {
+      "id": "e-trust-permissions",
+      "source": "connector-trust-matrix",
+      "target": "connector-permissions",
+      "label": "DEFINES_SCOPES",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "مرزبندی هدف معماری؛ هیچ تنظیم runtime یا مجوزی در این تغییر دست‌کاری نشده"
+      }
+    },
+    {
+      "id": "e-trust-identity",
+      "source": "connector-trust-matrix",
+      "target": "identity-access-boundary",
+      "label": "USES_IDENTITY_BOUNDARY",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "مرزبندی هدف معماری؛ هیچ تنظیم runtime یا مجوزی در این تغییر دست‌کاری نشده"
+      }
+    },
+    {
+      "id": "e-trust-approval",
+      "source": "connector-trust-matrix",
+      "target": "approval-gate",
+      "label": "GATES_SENSITIVE_OPERATIONS",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "مرزبندی هدف معماری؛ هیچ تنظیم runtime یا مجوزی در این تغییر دست‌کاری نشده"
+      }
+    },
+    {
+      "id": "e-trust-audit",
+      "source": "connector-trust-matrix",
+      "target": "audit-ledger",
+      "label": "REQUIRES_EVIDENCE",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "مرزبندی هدف معماری؛ هیچ تنظیم runtime یا مجوزی در این تغییر دست‌کاری نشده"
+      }
+    },
+    {
+      "id": "e-trust-source-policy",
+      "source": "connector-trust-matrix",
+      "target": "source-of-truth-policy",
+      "label": "ENFORCES_DATA_DOMAIN",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "مرزبندی هدف معماری؛ هیچ تنظیم runtime یا مجوزی در این تغییر دست‌کاری نشده"
+      }
+    },
+    {
+      "id": "e-topology-vps",
+      "source": "deployment-trust-boundaries",
+      "target": "vps",
+      "label": "PROTECTS_PRIVATE_RUNTIME",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "مرزبندی هدف معماری؛ هیچ تنظیم runtime یا مجوزی در این تغییر دست‌کاری نشده"
+      }
+    },
+    {
+      "id": "e-topology-cloudflare",
+      "source": "deployment-trust-boundaries",
+      "target": "cloudflare-gateway",
+      "label": "DEFINES_CLOUD_BOUNDARY",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "مرزبندی هدف معماری؛ هیچ تنظیم runtime یا مجوزی در این تغییر دست‌کاری نشده"
+      }
+    },
+    {
+      "id": "e-topology-tailscale",
+      "source": "deployment-trust-boundaries",
+      "target": "tailscale",
+      "label": "PREFERS_PRIVATE_OPERATOR_ACCESS",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "مرزبندی هدف معماری؛ هیچ تنظیم runtime یا مجوزی در این تغییر دست‌کاری نشده"
+      }
+    },
+    {
+      "id": "e-topology-client",
+      "source": "deployment-trust-boundaries",
+      "target": "phone-client",
+      "label": "ISOLATES_CLIENT_FROM_CANONICAL_MEMORY",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "مرزبندی هدف معماری؛ هیچ تنظیم runtime یا مجوزی در این تغییر دست‌کاری نشده"
+      }
+    },
+    {
+      "id": "e-topology-vcp",
+      "source": "deployment-trust-boundaries",
+      "target": "vcp",
+      "label": "KEEPS_UI_NONCANONICAL",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "مرزبندی هدف معماری؛ هیچ تنظیم runtime یا مجوزی در این تغییر دست‌کاری نشده"
       }
     }
   ]
