@@ -84,3 +84,12 @@ The VPS Master Memory package remains the continuity source: `CONTINUITY_CONTRAC
 - `ARCHITECTURE.md`, this operating model, and `ARCHITECTURE-INDEX.md` are intended to describe the same graph revision; update their revision/count metadata together when the graph changes.
 - No tests, build checks, runtime calls, production deploy, or merge are part of this phase.
 - Do not mark conceptual components VERIFIED without fresh evidence from their actual source.
+
+
+## Canonical memory access refinement (revision 29)
+
+- Context reads: `orchestration → context-assembler → simot-master-api → master-memory`.
+- Writes: `result-assembler` / `evidence-contract` / `audit-ledger → simot-master-api → canonical-memory-write-guard → master-memory` as applicable.
+- `simot-core` does not directly call the memory API or storage; context and results use their dedicated assembly stages.
+- The API-to-storage read edge is read-only. All mutations pass through the write guard. Hosting topology is not an application data-flow edge.
+- Every route remains `PLANNED` until implementation and runtime evidence are reconciled after the architecture-completion gate.
