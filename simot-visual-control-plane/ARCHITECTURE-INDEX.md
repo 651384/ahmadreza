@@ -1,14 +1,14 @@
 # SIMOT Visual Control Plane — Architecture Index & Handoff
 
 **Canonical graph artifact:** `simot-visual-control-plane/src/graph-v1.json`  
-**Graph:** `simot-core-overview`, schema version 1, revision 22  
-**Graph size:** 69 nodes, 153 edges  
+**Graph:** `simot-core-overview`, schema version 1, revision 23  
+**Graph size:** 70 nodes, 154 edges  
 **Working branch:** `feat/simot-visual-control-plane-react-flow`  
-**Latest graph commit:** `feb5daf3a1fa2f3704f3608fceb2a119270768dd`
+**Latest graph commit:** `447f53c89c1d3a1a231b8efbaaa233f5d6f2da8a`
 
 ## Architecture documents
 
-1. `ARCHITECTURE.md` — VCP implementation specification, reconciled to graph revision 22.
+1. `ARCHITECTURE.md` — VCP implementation specification, reconciled to graph revision 23.
 2. `ARCHITECTURE-OPERATING-MODEL.md` — core roles, source-of-truth hierarchy, request-to-result flow, continuity and safety.
 3. `ARCHITECTURE-CONTRACTS-REV14.md` — API/message envelope, response/acknowledgement, structured error, connector scope.
 4. `CONNECTOR-TRUST-BOUNDARIES-REV15.md` — connector trust matrix and intended deployment boundaries.
@@ -23,7 +23,7 @@
 - SIMOT Core, orchestration, task lifecycle, planner/executor, context and result assembly.
 - VPS Master Memory and continuity contract as canonical operational state.
 - Cloudflare Worker Gateway, VPC/service boundary, D1, queues/DLQ and AI Workers as distinct runtime roles.
-- OpenClaw/mobile client and Tailscale private operator access.
+- Client Channel Adapters for desktop/web, Android/OpenClaw, text/voice, and file/image/document flows; Tailscale private operator access.
 - GitHub, Notion, SharePoint/OneDrive, Asana, HubSpot, and Cloudflare integration adapters.
 - API/message contracts, correlation/idempotency, cancellation/timeout, structured failure and evidence records.
 - Data governance/classification, source-of-truth policy, connector scopes, identity/secrets boundaries and human approval.
@@ -35,10 +35,10 @@
 - **Tests/build/runtime probes:** NOT RUN in this phase by design.
 - **Graph and documents:** committed to the existing feature branch only.
 - **Inspector scope:** `src/App.jsx` now supports selecting a relationship to inspect its relation, status, evidence, and permission; manually drawn links also receive explicit contract fields. This is source-level work only and has not been built or tested.
-- **Documentation alignment:** `ARCHITECTURE.md`, `ARCHITECTURE-OPERATING-MODEL.md`, and this index now reference graph revision 22 and 69 nodes / 153 edges; all edges carry relation, status, evidence, and permission metadata at top level, with no duplicate nested status/evidence fields.
+- **Documentation alignment:** `ARCHITECTURE.md`, `ARCHITECTURE-OPERATING-MODEL.md`, and this index now reference graph revision 22 and 70 nodes / 154 edges; all edges carry relation, status, evidence, and permission metadata at top level, with no duplicate nested status/evidence fields.
 - **Runtime integration:** graph nodes are not proof of live connectivity or permissions. Keep PLANNED/NOT TESTED where evidence is absent.
 - **Deployment:** no public deployment and no merge to master.
-- **VPS sync:** The VPS checkout was last confirmed by the user at commit `2718411fcf4e728a7d505affa136bc469ec55bc6`, with graph revision 21 (69 nodes / 153 edges). Revision 22 and its documentation updates are newer on GitHub and still need a safe fast-forward sync to VPS. The service was reported active before revision 21 was committed. UI rendering of revision 21 has not been tested.
+- **VPS sync:** The VPS checkout was last confirmed by the user at commit `2718411fcf4e728a7d505affa136bc469ec55bc6`, with graph revision 21 (69 nodes / 153 edges). Revision 23 and its documentation updates are newer on GitHub and still need a safe fast-forward sync to VPS. The service was reported active before revision 21 was committed. UI rendering of revision 21 has not been tested.
 - **Safety:** no new costs, credentials, secrets, or infrastructure were created or changed.
 
 ## Next continuation
