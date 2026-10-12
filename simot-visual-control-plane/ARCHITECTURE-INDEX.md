@@ -16,7 +16,10 @@
 6. `GRAPH-GOVERNANCE-REV17.md` — graph schema, proposed change review, validation requirements, history and rollback.
 7. `MODEL-ROUTING-PRIVACY-COST-REV18.md` — free-first/local-first routing, data privacy, provider eligibility and cost gates.
 8. `MASTER-MEMORY-WRITE-GUARD-REV19.md` — guarded writes to the existing canonical VPS Master Memory.
-9. `EDGE-CONTRACT-REV20.md` — historical edge metadata and permission contract.\n10. `EDGE-CONTRACT-REV21.md` — complete edge status coverage and conservative unknown-status semantics.
+9. `EDGE-CONTRACT-REV20.md` — historical edge metadata and permission contract.
+10. `EDGE-CONTRACT-REV21.md` — historical edge status coverage and conservative unknown-status semantics.
+11. `EDGE-CONTRACT-REV22.md` — canonical top-level edge fields and status/evidence normalization.
+12. `CLIENT-CHANNEL-ROUTING-REV24.md` — request/response path through channel adapters and OpenClaw.
 
 ## Architecture scope represented in the graph
 
