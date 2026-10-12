@@ -4,7 +4,7 @@
 **Graph:** `simot-core-overview`, schema version 1, revision 20  
 **Graph size:** 69 nodes, 153 edges  
 **Working branch:** `feat/simot-visual-control-plane-react-flow`  
-**Latest graph commit:** `85c214c4c8260587bd3f06c7ef196b4221c0a547`
+**Latest graph commit:** `4547cced8e36cbc839d3eff12cbe8b1c4e8b002b`
 
 ## Architecture documents
 
@@ -16,6 +16,7 @@
 6. `GRAPH-GOVERNANCE-REV17.md` — graph schema, proposed change review, validation requirements, history and rollback.
 7. `MODEL-ROUTING-PRIVACY-COST-REV18.md` — free-first/local-first routing, data privacy, provider eligibility and cost gates.
 8. `MASTER-MEMORY-WRITE-GUARD-REV19.md` — guarded writes to the existing canonical VPS Master Memory.
+9. `EDGE-CONTRACT-REV20.md` — required edge metadata, evidence semantics, and permission boundaries.
 
 ## Architecture scope represented in the graph
 
@@ -36,7 +37,7 @@
 - **Documentation alignment:** `ARCHITECTURE.md`, `ARCHITECTURE-OPERATING-MODEL.md`, and this index now reference graph revision 20 and 69 nodes / 153 edges; all edges carry relation, status, evidence, and permission metadata.
 - **Runtime integration:** graph nodes are not proof of live connectivity or permissions. Keep PLANNED/NOT TESTED where evidence is absent.
 - **Deployment:** no public deployment and no merge to master.
-- **VPS sync:** The VPS checkout was fast-forwarded to branch commit `9c73d762a64943807604b40e4d249402d5ba198d`; the local graph was read and reported revision 20, 69 nodes / 153 edges; all edges carry relation, status, evidence, and permission metadata. The service was reported active. UI rendering of this revision has not been tested.
+- **VPS sync:** The VPS checkout was last confirmed at commit `9e6767c45f43a57156b21751c3a1407181becd5c`, with graph revision 19 (69 nodes / 153 edges). Revision 20 and its documentation updates are newer on GitHub and still need a safe fast-forward sync to VPS. The service was reported active before revision 20 was committed. UI rendering of revision 20 has not been tested.
 - **Safety:** no new costs, credentials, secrets, or infrastructure were created or changed.
 
 ## Next continuation
