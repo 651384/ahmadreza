@@ -4,7 +4,7 @@
 **Graph:** `simot-core-overview`, schema version 1, revision 29  
 **Graph size:** 71 nodes, 159 edges  
 **Working branch:** `feat/simot-visual-control-plane-react-flow`  
-**Latest graph commit:** `15d6620b1875a8cef5052b4faa53603750a7f56c`
+**Latest graph commit:** `0cfb58f82067b0e98c09cae0f16466807188c5ce`
 
 ## Architecture documents
 
