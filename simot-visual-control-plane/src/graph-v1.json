@@ -2006,7 +2006,7 @@
       "id": "e-gateway-core",
       "source": "cloudflare-gateway",
       "target": "request-ingress",
-      "label": "CALLS",
+      "label": "ROUTES_TO_INGRESS",
       "relation": "ROUTES_REQUEST_TO_INGRESS",
       "status": "NOT TESTED",
       "permission": "Gateway authentication and route scope must be enforced before ingress; no live permission is implied.",
