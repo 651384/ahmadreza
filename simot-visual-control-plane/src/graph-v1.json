@@ -2,8 +2,8 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 38,
-  "updatedAt": "2026-10-12T10:00:00.000Z",
+  "revision": 39,
+  "updatedAt": "2026-10-12T00:00:00.000Z",
   "nodes": [
     {
       "id": "simot-core",
@@ -2005,12 +2005,12 @@
     {
       "id": "e-gateway-core",
       "source": "cloudflare-gateway",
-      "target": "simot-core",
+      "target": "request-ingress",
       "label": "CALLS",
-      "relation": "CALLS",
+      "relation": "ROUTES_REQUEST_TO_INGRESS",
       "status": "NOT TESTED",
-      "permission": "UNKNOWN",
-      "evidence": "مسیر اجرایی در معماری؛ سلامت جاری تأیید نشده"
+      "permission": "Gateway authentication and route scope must be enforced before ingress; no live permission is implied.",
+      "evidence": "Revision 39 architecture audit: gateway ingress must enter through request-ingress rather than bypassing validation/envelope creation to call simot-core directly. This is a target-model correction; deployed route mapping has not been tested."
     },
     {
       "id": "e-worker-vpc",
