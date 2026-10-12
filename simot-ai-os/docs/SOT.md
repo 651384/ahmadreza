@@ -8,6 +8,7 @@
 - Status: LOCKED
 - Control plane: CLOUDFLARE
 - Local PC dependency: FALSE
+- Canonical operational-continuity memory: VPS MASTER MEMORY
 
 ## Required execution order
 
@@ -24,12 +25,13 @@
 
 ## Runtime architecture
 
-Active:
+Active runtime components:
 - Cloudflare Workers
 - Cloudflare D1
 - Cloudflare Queues / DLQ
 - Workers AI
 - runtime observability
+- existing Cloudflare VPC path to the VPS Master Memory service, subject to evidence-backed availability checks
 
 Dormant during BUILD:
 - Cloudflare Cron
@@ -43,26 +45,34 @@ No dormant capability may be reactivated implicitly.
 
 ## Source-of-truth roles
 
-- GitHub: versioned code and change control
-- Cloudflare D1: runtime state and control-plane records
-- Notion: canonical structured policy/decision knowledge
-- Microsoft OneDrive/SharePoint: canonical durable file/evidence memory
-- Asana: task execution state when connected
-- HubSpot: commercial SOT when connected and authorized
+- **VPS Master Memory:** canonical operational continuity, current task position, durable operational evidence, and task write-back. Existing VPS root: `/srv/simot-memory/`; existing local API: `http://127.0.0.1:9100`.
+- **Cloudflare Workers:** runtime orchestration/control plane and bounded worker execution.
+- **Cloudflare D1:** runtime state, control-plane records, task/worker registry, usage guards, and audit events. D1 is not a replacement or competing canonical copy of VPS Master Memory.
+- **Cloudflare Queues / DLQ:** durable runtime handoff and failed-message handling.
+- **Notion:** architecture, policies, and structured decisions.
+- **Microsoft SharePoint / OneDrive:** supporting documents, inputs, and evidence; not the canonical operational-continuity store.
+- **GitHub:** versioned code and change control.
+- **Asana:** execution/task state when connected and authorized.
+- **HubSpot:** commercial/CRM source of truth when connected and authorized.
+- **ChatGPT memory/history:** context only; never the operational source of truth.
 
-## Master Memory boundary
+## Master Memory boundary and integration
 
-D1 MUST NOT replace canonical Master Memory.
+The canonical Master Memory is the existing VPS service, not OneDrive/SharePoint.
 
-The runtime's reference-first memory contracts define the intended pattern:
-- store/transport memory references and metadata first;
-- retrieve canonical content on demand through an authorized Memory Retrieval Layer;
-- keep connector credentials outside source code;
-- fail closed when canonical memory cannot be retrieved or verified.
+The Cloudflare Worker uses the existing VPC service binding `SIMOT_MASTER_MEMORY` targeting `simot-master-memory`, with the existing `SIMOT_MASTER_MEMORY_TOKEN` secret. The existing adapter uses the VPS service API through that binding; historical E2E write/readback evidence has been recorded.
 
-Current state: `MASTER_MEMORY_NOT_AVAILABLE`.
+The previous `MASTER_MEMORY_NOT_AVAILABLE` statement and the claim that canonical Master Memory must be retrieved from OneDrive/SharePoint are superseded and must not be used as the current architecture description.
 
-The canonical OneDrive structure `SIMOT-AI-OS/MEMORY/{INDEX,INPUTS,EVIDENCE,OUTPUTS}` exists, but the current verified contents do not constitute a complete machine-readable SOT index. No live Worker-side OneDrive/SharePoint retrieval adapter is connected.
+Verification claims must remain distinct:
+- resource/configuration exists;
+- network path is available;
+- request is authenticated and authorized;
+- read succeeds;
+- write succeeds;
+- end-to-end write/readback matches.
+
+Use the most recent evidence for each claim. A historical E2E result is useful evidence but does not, by itself, prove current endpoint health. Do not create a duplicate memory system or move canonical continuity into D1.
 
 ## Change and authority rule
 
