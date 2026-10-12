@@ -2,8 +2,8 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 22,
-  "updatedAt": "2026-10-12T08:10:49.716Z",
+  "revision": 23,
+  "updatedAt": "2026-10-12T08:11:23.322Z",
   "nodes": [
     {
       "id": "simot-core",
@@ -1788,6 +1788,33 @@
         "nextAction": "پس از تکمیل معماری، قواعد را با API موجود و ساختار پنج فایل Master Memory تطبیق بده",
         "detail": "این گره سرویس حافظهٔ جدید نیست؛ کنترل منطقی روی همان VPS Master Memory و API موجود است."
       }
+    },
+    {
+      "id": "client-channel-adapters",
+      "type": "simotNode",
+      "position": {
+        "x": 1720,
+        "y": 1200
+      },
+      "data": {
+        "label": "Client Channel Adapters / کانال‌های کاربر",
+        "kind": "client",
+        "status": "PLANNED",
+        "role": "ورودی و خروجی استاندارد برای رابط‌های دسکتاپ، موبایل، متن، صوت و فایل/تصویر",
+        "capabilities": [
+          "Desktop/Web UI",
+          "Android / OpenClaw client",
+          "Text and voice input/output",
+          "File, image and document intake",
+          "Response delivery and correlation"
+        ],
+        "accessMethod": "از طریق قراردادهای ورودی/پیام و adapterهای مجاز؛ مسیرهای واقعی هر کانال باید جداگانه تأیید شوند",
+        "permissions": "حداقل دسترسی؛ client هیچ مالکیتی بر canonical memory ندارد؛ فایل‌ها و محتوای ورودی باید طبق data classification بررسی شوند",
+        "evidence": "نیازمندی معماری محصول؛ یکپارچگی کانال‌های چندگانه در این revision اجرا یا آزمایش نشده",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "پس از تکمیل معماری، کانال‌های موجود را با OpenClaw و مسیرهای مجاز تطبیق بده؛ قابلیت‌های آینده را از اتصال فعال تفکیک کن",
+        "detail": "این گره لایهٔ کانال است، نه مغز SIMOT. ورودی‌ها را به envelope استاندارد می‌سپارد و پاسخ را به کانال درخواست‌کننده برمی‌گرداند."
+      }
     }
   ],
   "edges": [
@@ -2574,11 +2601,11 @@
     {
       "id": "e-response-ingress",
       "source": "response-delivery",
-      "target": "request-ingress",
-      "label": "REPLIES_TO",
-      "relation": "REPLIES_TO",
-      "evidence": "ارتباط معماری هدف؛ در این مرحله تست runtime انجام نشده.",
-      "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
+      "target": "client-channel-adapters",
+      "label": "DELIVERS_RESPONSE",
+      "relation": "DELIVERS_RESPONSE",
+      "evidence": "مسیر معماری هدف برای تحویل پاسخ به کانال درخواست‌کننده؛ پیاده‌سازی زنده بررسی نشده",
+      "permission": "فقط پاسخ مرتبط با همان درخواست و scope مجاز؛ دادهٔ حساس باید طبق policy فیلتر شود",
       "status": "PLANNED"
     },
     {
@@ -3320,6 +3347,16 @@
       "evidence": "قواعد هدف نوشتن canonical؛ در این مرحله هیچ write واقعی اجرا یا آزمون نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
       "status": "PLANNED"
+    },
+    {
+      "id": "e-client-channels-ingress",
+      "source": "client-channel-adapters",
+      "target": "request-ingress",
+      "label": "SUBMITS_REQUEST",
+      "relation": "SUBMITS_REQUEST",
+      "status": "PLANNED",
+      "evidence": "کانال‌های ورودی به ingress استاندارد وصل می‌شوند؛ مسیر اجرایی کانال‌ها هنوز بررسی نشده",
+      "permission": "هویت و scope درخواست باید پیش از اجرا اعتبارسنجی شود؛ ورودی کاربر به‌عنوان دادهٔ غیرقابل‌اعتماد تلقی شود"
     }
   ]
 }
