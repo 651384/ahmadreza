@@ -2,8 +2,8 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 6,
-  "updatedAt": "2026-10-12T07:30:05.915Z",
+  "revision": 7,
+  "updatedAt": "2026-10-12T07:30:30.826Z",
   "nodes": [
     {
       "id": "simot-core",
@@ -1111,23 +1111,13 @@
     },
     {
       "id": "e-memory-core",
-      "source": "master-memory",
-      "target": "simot-core",
+      "source": "simot-core",
+      "target": "master-memory",
       "label": "READS",
       "relation": "READS",
       "status": "VERIFIED",
       "permission": "UNKNOWN",
       "evidence": "سابقهٔ تاریخی خواندن Continuity از Worker"
-    },
-    {
-      "id": "e-core-d1",
-      "source": "simot-core",
-      "target": "cloudflare-d1",
-      "label": "USES",
-      "relation": "USES",
-      "status": "NOT TESTED",
-      "permission": "UNKNOWN",
-      "evidence": "D1 فقط runtime؛ اتصال جاری تأیید نشده"
     },
     {
       "id": "e-worker-vpc",
@@ -1268,76 +1258,6 @@
       "status": "NOT TESTED",
       "permission": "UNKNOWN",
       "evidence": "وضعیت تاریخی مدل‌ها؛ اتصال جاری تست نشده"
-    },
-    {
-      "id": "e-core-notion",
-      "source": "simot-core",
-      "target": "notion",
-      "label": "USES",
-      "relation": "USES",
-      "status": "NOT TESTED",
-      "permission": "UNKNOWN",
-      "evidence": "اتصال به SIMOT اثبات نشده"
-    },
-    {
-      "id": "e-core-sharepoint",
-      "source": "simot-core",
-      "target": "sharepoint",
-      "label": "USES",
-      "relation": "USES",
-      "status": "NOT TESTED",
-      "permission": "UNKNOWN",
-      "evidence": "اتصال به SIMOT اثبات نشده"
-    },
-    {
-      "id": "e-core-asana",
-      "source": "simot-core",
-      "target": "asana",
-      "label": "USES",
-      "relation": "USES",
-      "status": "NOT TESTED",
-      "permission": "UNKNOWN",
-      "evidence": "اتصال به SIMOT اثبات نشده"
-    },
-    {
-      "id": "e-core-hubspot",
-      "source": "simot-core",
-      "target": "hubspot",
-      "label": "USES",
-      "relation": "USES",
-      "status": "NOT TESTED",
-      "permission": "UNKNOWN",
-      "evidence": "اتصال به SIMOT اثبات نشده"
-    },
-    {
-      "id": "e-chatgpt-claude",
-      "source": "chatgpt",
-      "target": "claude",
-      "label": "USES",
-      "relation": "USES",
-      "status": "BLOCKED",
-      "permission": "UNKNOWN",
-      "evidence": "مسیر بدون PC در ابزارهای فعلی پیدا نشد"
-    },
-    {
-      "id": "e-chatgpt-grok",
-      "source": "chatgpt",
-      "target": "grok",
-      "label": "USES",
-      "relation": "USES",
-      "status": "BLOCKED",
-      "permission": "UNKNOWN",
-      "evidence": "مسیر بدون PC در ابزارهای فعلی پیدا نشد"
-    },
-    {
-      "id": "e-chatgpt-arena",
-      "source": "chatgpt",
-      "target": "arena",
-      "label": "USES",
-      "relation": "USES",
-      "status": "BLOCKED",
-      "permission": "UNKNOWN",
-      "evidence": "مسیر بدون PC در ابزارهای فعلی پیدا نشد"
     },
     {
       "id": "e-core-orchestration",
@@ -1701,6 +1621,16 @@
       "data": {
         "status": "PLANNED",
         "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود."
+      }
+    },
+    {
+      "id": "e-core-memory-api",
+      "source": "simot-core",
+      "target": "simot-master-api",
+      "label": "CALLS",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "مسیر معماری هدف برای دسترسی هسته به API؛ اتصال زنده بررسی نشده."
       }
     }
   ]
