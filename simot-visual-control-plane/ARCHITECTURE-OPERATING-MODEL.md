@@ -1,7 +1,7 @@
 # SIMOT AI OS — Architecture Operating Model
 
 **Scope:** Companion reference for the React Flow architecture graph.  
-**Graph:** `simot-core-overview`, schema version 1, revision 38.  
+**Graph:** `simot-core-overview`, schema version 1, revision 39.  
 **Current graph size:** 77 nodes, 190 edges.  
 **Branch:** `feat/simot-visual-control-plane-react-flow`.
 
@@ -148,3 +148,8 @@ The registry is an index only. VPS Master Memory remains canonical for operation
 ## Architecture completion gate (revision 38)
 
 Before moving from architecture-only work to code/runtime reconciliation, use `ARCHITECTURE-COMPLETION-GATE-REV38.md`. Record PASS/GAP/NOT TESTED/BLOCKED per domain; do not infer completeness from graph size or structural integrity. The gate does not authorize deployment, merge, runtime tests, sensitive writes, or new costs.
+
+
+## Architecture coverage audit (revision 39)
+
+`ARCHITECTURE-COVERAGE-AUDIT-REV39.md` is the acceptance record for the ten conceptual domains. Outcome: PASS for the target architecture model, with build/runtime implementation evidence still NOT TESTED. Revision 39 routes the gateway through `request-ingress`; this is not proof of deployed route behavior. VPS sync remains confirmed only through revision 36.
