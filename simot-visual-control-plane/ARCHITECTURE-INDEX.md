@@ -8,7 +8,7 @@
 
 ## Architecture documents
 
-1. `ARCHITECTURE.md` — original VCP implementation specification; known to lag the latest graph revision.
+1. `ARCHITECTURE.md` — VCP implementation specification, reconciled to graph revision 19.
 2. `ARCHITECTURE-OPERATING-MODEL.md` — core roles, source-of-truth hierarchy, request-to-result flow, continuity and safety.
 3. `ARCHITECTURE-CONTRACTS-REV14.md` — API/message envelope, response/acknowledgement, structured error, connector scope.
 4. `CONNECTOR-TRUST-BOUNDARIES-REV15.md` — connector trust matrix and intended deployment boundaries.
@@ -33,10 +33,10 @@
 - **Phase:** architecture expansion in progress; the user requested architecture completion before testing/verification.
 - **Tests/build/runtime probes:** NOT RUN in this phase by design.
 - **Graph and documents:** committed to the existing feature branch only.
-- **Main document alignment:** BLOCKED previously by GitHub connector safety checks; companion documents and this index preserve the expanded architecture without claiming the original document was updated.
+- **Documentation alignment:** `ARCHITECTURE.md`, `ARCHITECTURE-OPERATING-MODEL.md`, and this index now reference graph revision 19 and 69 nodes / 153 edges.
 - **Runtime integration:** graph nodes are not proof of live connectivity or permissions. Keep PLANNED/NOT TESTED where evidence is absent.
 - **Deployment:** no public deployment and no merge to master.
-- **VPS sync:** GitHub branch edits do not by themselves prove that the VPS-hosted local checkout or running VCP has received these changes. The available Remote Desktop Commander device was offline at the last check; no remote VPS shell was available through that route.
+- **VPS sync:** The VPS checkout was fast-forwarded to branch commit `9c73d762a64943807604b40e4d249402d5ba198d`; the local graph was read and reported revision 19, 69 nodes / 153 edges. The service was reported active. UI rendering of this revision has not been tested.
 - **Safety:** no new costs, credentials, secrets, or infrastructure were created or changed.
 
 ## Next continuation
