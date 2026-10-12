@@ -150,3 +150,8 @@ OpenClaw درخواست‌ها را از مسیر `Client Channel Adapters` به
 - پوشش گراف شامل هسته و گردش‌کار، قرارداد پیام/API، حافظهٔ canonical، Gateway/VPC/D1/Queue/DLQ/AI Workers، کلاینت‌ها، آداپتورهای ابزار، حاکمیت داده، مرزهای اعتماد، سیاست هزینه/حریم خصوصی، چرخهٔ تأیید و نگهبان نوشتن Master Memory است.
 - اجزای معماری هدف و ارتباط‌های فاقد شواهد جاری باید `PLANNED` یا `NOT TESTED` بمانند؛ وجود در گراف ادعای پیاده‌سازی، اتصال یا سلامت زنده نیست.
 - این مرحله فقط هم‌ترازی مستندات و مدل معماری است؛ build، تست و وریفای runtime اجرا نشده و هیچ تغییری در Master Memory، Cloudflare deployment یا شاخهٔ اصلی انجام نشده است.
+
+
+## Canonical memory boundary — revision 29
+
+All logical reads and writes of VPS Master Memory must pass through `simot-master-api`. Context reads originate in `context-assembler`; result/evidence and audit persistence originate from their respective assemblers/ledger and pass through the API and `canonical-memory-write-guard` before storage mutation. Do not model a direct core-to-API shortcut or direct audit/evidence-to-storage writes. The VPS-to-memory edge is only a hosting/topology relationship. These paths are planned contracts, not proof of live implementation.
