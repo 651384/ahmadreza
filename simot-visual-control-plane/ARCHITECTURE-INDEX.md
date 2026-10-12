@@ -38,10 +38,10 @@
 - **Tests/build/runtime probes:** NOT RUN in this phase by design.
 - **Graph and documents:** committed to the existing feature branch only.
 - **Inspector scope:** `src/App.jsx` now supports selecting a relationship to inspect its relation, status, evidence, and permission; manually drawn links also receive explicit contract fields. This is source-level work only and has not been built or tested.
-- **Documentation alignment:** `ARCHITECTURE.md`, `ARCHITECTURE-OPERATING-MODEL.md`, and this index now reference graph revision 22 and 70 nodes / 155 edges; all edges carry relation, status, evidence, and permission metadata at top level, with no duplicate nested status/evidence fields.
+- **Documentation alignment:** `ARCHITECTURE.md`, `ARCHITECTURE-OPERATING-MODEL.md`, and this index reference graph revision 24 and 70 nodes / 155 edges; all edges carry relation, status, evidence, and permission metadata at top level, with no duplicate nested status/evidence fields.
 - **Runtime integration:** graph nodes are not proof of live connectivity or permissions. Keep PLANNED/NOT TESTED where evidence is absent.
 - **Deployment:** no public deployment and no merge to master.
-- **VPS sync:** The VPS checkout was last confirmed by the user at commit `2718411fcf4e728a7d505affa136bc469ec55bc6`, with graph revision 21 (69 nodes / 153 edges). Revision 24 and its documentation updates are newer on GitHub and still need a safe fast-forward sync to VPS. The service was reported active before revision 21 was committed. UI rendering of revision 21 has not been tested.
+- **VPS sync:** The user supplied PuTTY output confirming a successful fast-forward to commit `a676e4755e6c33dfd8c04ca9ee9fc58530cba7a7`, graph revision 24 (70 nodes / 155 edges), with the feature branch aligned to `origin`. The local `vite.config.js` modification and untracked `dist/`, `node_modules/`, and `package-lock.json` were preserved. This confirms source sync only; it does not verify UI rendering, build, service health, or live SIMOT integrations.
 - **Safety:** no new costs, credentials, secrets, or infrastructure were created or changed.
 
 ## Next continuation
