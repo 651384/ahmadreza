@@ -167,3 +167,8 @@ File-bearing requests must use `client-channel-adapters → artifact-intake → 
 ## Canonical memory recovery — revision 31
 
 `backup-rollback-policy` governs backup and recovery of the existing five-file VPS Master Memory package. A backup is a recoverability copy, not a competing source of truth. Any restore requires explicit owner approval, preservation of current state where feasible, integrity and cross-file checks, and recorded before/after evidence. No backup/restore mechanism or current backup health is implied by this model.
+
+
+## Execution dispatch mode — revision 32
+
+The Gateway must route each task through `execution-dispatch-policy`, which chooses exactly one mode: `SYNC` to AI Workers or `ASYNC` through the existing queue and consumer. Remove bypass paths that let the Gateway dispatch the same task independently to both modes. Record the selected mode with task/correlation/idempotency identity; retries must not create a second task, and switching modes after dispatch requires explicit outcome reconciliation. This is a target contract, not runtime evidence.
