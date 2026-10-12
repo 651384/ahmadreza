@@ -60,6 +60,8 @@ function Workspace() {
     edges: edges.map(({ markerEnd, ...e }) => e)
   }), [nodes, edges, revision]);
   const verifiedEdges = edges.filter(e => e.status === 'VERIFIED').length;
+  const plannedNodes = nodes.filter(n => n.data.status === 'PLANNED').length;
+  const untestedNodes = nodes.filter(n => n.data.status === 'NOT TESTED').length;
   const detailRows = chosen ? [
     ['شناسه پایدار', chosen.id],
     ['نوع', chosen.data.kind],
@@ -114,6 +116,8 @@ function Workspace() {
       <div className="metric"><div><small>اجزای معماری</small><strong>{nodes.length}</strong></div></div>
       <div className="metric"><div><small>ارتباط‌های جهت‌دار</small><strong>{edges.length}</strong></div></div>
       <div className="metric"><div><small>ارتباط‌های دارای شواهد تأیید</small><strong>{verifiedEdges}</strong></div></div>
+      <div className="metric"><div><small>اجزای برنامه‌ریزی‌شده</small><strong>{plannedNodes}</strong></div></div>
+      <div className="metric"><div><small>اجزای آزمایش‌نشده</small><strong>{untestedNodes}</strong></div></div>
     </section>
 
     <section className="workspace">
