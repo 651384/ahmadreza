@@ -93,3 +93,8 @@ The VPS Master Memory package remains the continuity source: `CONTINUITY_CONTRAC
 - `simot-core` does not directly call the memory API or storage; context and results use their dedicated assembly stages.
 - The API-to-storage read edge is read-only. All mutations pass through the write guard. Hosting topology is not an application data-flow edge.
 - Every route remains `PLANNED` until implementation and runtime evidence are reconciled after the architecture-completion gate.
+
+
+## User-supplied artifact handling (revision 30)
+
+File/image/document requests are distinct from text-only requests. The target route is `client-channel-adapters → artifact-intake → content-extractor → request-ingress`. Intake validates type/signature/size and records an artifact reference; extraction is limited to permitted existing capabilities. Raw content and extracted instructions remain untrusted, are subject to data classification, and must not override policy or approval. Do not assume malware scanning, OCR, storage, or external model access exists until separately evidenced. All paths are planned only.
