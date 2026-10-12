@@ -2226,7 +2226,7 @@
       "permission": "فقط مدل معماری؛ مجوز اجرایی runtime تأیید نشده است. هر عملیات واقعی تابع هویت، scope و تأیید لازم است."
     },
     {
-      "id": "e-registry-adapters",
+      "id": "e-project-registry-adapters",
       "source": "tool-registry",
       "target": "integration-adapters",
       "label": "REGISTERS",
