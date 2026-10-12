@@ -2,8 +2,8 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 17,
-  "updatedAt": "2026-10-12T07:51:47.437Z",
+  "revision": 18,
+  "updatedAt": "2026-10-12T07:52:08.197Z",
   "nodes": [
     {
       "id": "simot-core",
@@ -1380,18 +1380,24 @@
         "label": "Model & Cost Policy",
         "kind": "security",
         "status": "PLANNED",
-        "role": "security",
-        "capabilities": "انتخاب مدل با اولویت رایگان/محلی و کنترل هزینه",
+        "role": "انتخاب مدل بر اساس سیاست داده، قابلیت، هزینه و مجوز",
+        "capabilities": [
+          "Free-first and local-first where capable",
+          "No paid API/provider activation without explicit approval",
+          "No OpenAI paid API for Jarvis/SIMOT unless user explicitly changes the constraint",
+          "Classify data before choosing external model/provider",
+          "Provider allowlist by task, sensitivity, region and capability",
+          "Per-task cost ceiling and explicit approval for new spend",
+          "Fallback only to an approved provider/model",
+          "Record model/provider choice and reason without logging sensitive prompt payloads",
+          "Fail closed if privacy/cost eligibility cannot be determined"
+        ],
         "accessMethod": "لایهٔ منطقی معماری؛ implementation واقعی هنوز نگاشت نشده",
-        "permissions": "حداقل دسترسی؛ هر هزینه یا اقدام حساس نیازمند تأیید انسانی",
+        "permissions": "عدم ایجاد هزینه یا فعال‌سازی provider پولی بدون تأیید صریح؛ دادهٔ حساس به provider غیرمجاز ارسال نشود",
         "evidence": "جزء معماری هدف؛ این گره به‌تنهایی سرویس مستقل یا اتصال runtime را اثبات نمی‌کند",
         "lastVerified": "NOT TESTED",
-        "nextAction": "پس از تکمیل مدل، نگاشت به implementation و قراردادهای موجود",
-        "detail": [
-          "Local-first",
-          "محدودیت هزینه",
-          "ممنوعیت API پولی بدون تأیید"
-        ]
+        "nextAction": "بعداً فهرست providerها، مدل‌های محلی و سقف هزینه را با تنظیمات واقعی تطبیق بده",
+        "detail": "سیاست هدف free-first/local-first است. وجود provider در گراف به معنی مجازبودن، اتصال یا فعال‌بودن آن نیست."
       }
     },
     {
@@ -3118,6 +3124,56 @@
       "data": {
         "status": "PLANNED",
         "evidence": "معماری هدف برای کنترل گراف؛ اجرای validator یا rollback در این مرحله انجام نشده"
+      }
+    },
+    {
+      "id": "e-classification-model-router",
+      "source": "data-classification",
+      "target": "model-router",
+      "label": "FILTERS_ELIGIBLE_PROVIDERS",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "سیاست هدف free-first/privacy-first؛ تنظیمات provider و هزینه در این مرحله بررسی یا تغییر نشده"
+      }
+    },
+    {
+      "id": "e-model-policy-router",
+      "source": "model-cost-policy",
+      "target": "model-router",
+      "label": "GOVERNS_SELECTION",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "سیاست هدف free-first/privacy-first؛ تنظیمات provider و هزینه در این مرحله بررسی یا تغییر نشده"
+      }
+    },
+    {
+      "id": "e-model-policy-approval",
+      "source": "model-cost-policy",
+      "target": "approval-gate",
+      "label": "GATES_NEW_SPEND",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "سیاست هدف free-first/privacy-first؛ تنظیمات provider و هزینه در این مرحله بررسی یا تغییر نشده"
+      }
+    },
+    {
+      "id": "e-model-policy-audit",
+      "source": "model-cost-policy",
+      "target": "audit-ledger",
+      "label": "RECORDS_PROVIDER_DECISION",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "سیاست هدف free-first/privacy-first؛ تنظیمات provider و هزینه در این مرحله بررسی یا تغییر نشده"
+      }
+    },
+    {
+      "id": "e-model-policy-secrets",
+      "source": "model-cost-policy",
+      "target": "secrets-boundary",
+      "label": "PROTECTS_PROVIDER_CREDENTIALS",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "سیاست هدف free-first/privacy-first؛ تنظیمات provider و هزینه در این مرحله بررسی یا تغییر نشده"
       }
     }
   ]
