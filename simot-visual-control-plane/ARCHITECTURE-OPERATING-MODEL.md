@@ -113,3 +113,8 @@ Each task must select one execution mode: synchronous direct worker dispatch or 
 ## Runtime metadata versus canonical memory (revision 33)
 
 D1 may hold limited runtime metadata for Gateway/event/queue operation, but it is not a second Master Memory. Canonical state remains in VPS Master Memory and is read through the approved API. Metadata persistence must be minimal, classified, redacted, and governed by retention rules; actual D1 schema and deployed behavior remain unverified until the architecture-completion gate.
+
+
+## Cancellation and timeout propagation (revision 34)
+
+Register a bounded deadline at ingress; have executor and queue consumer honor cancellation and terminal state; fence retries after cancellation/timeout; and reject late results that conflict with the canonical task state/version. A timeout does not prove an external computation stopped. These are planned requirements, not verified runtime behavior.
