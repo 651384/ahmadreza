@@ -1,10 +1,10 @@
 # SIMOT Visual Control Plane — Architecture Index & Handoff
 
 **Canonical graph artifact:** `simot-visual-control-plane/src/graph-v1.json`  
-**Graph:** `simot-core-overview`, schema version 1, revision 34  
-**Graph size:** 74 nodes, 172 edges  
+**Graph:** `simot-core-overview`, schema version 1, revision 35  
+**Graph size:** 74 nodes, 177 edges  
 **Working branch:** `feat/simot-visual-control-plane-react-flow`  
-**Latest graph commit:** `f8644cc07b1ccdd69bd8145e9d5b23aed4598527`
+**Latest graph commit:** `dbc57b3c7b0792a83adc1ccf58ae7fb3ede26fee`
 
 ## Architecture documents
 
@@ -29,6 +29,7 @@
 19. `CANONICAL-MEMORY-RECOVERY-REV31.md` — guarded backup and restore requirements.
 20. `D1-RUNTIME-METADATA-BOUNDARY-REV33.md` — D1 metadata-only boundary; VPS Master Memory remains canonical.
 21. `CANCELLATION-DEADLINE-LATE-RESULT-REV34.md` — cancellation/timeout propagation and late-result fencing.
+22. `OPERATIONAL-AUTHORITY-ROLLBACK-GATES-REV35.md` — explicit human authority, deployment boundary controls, and gated graph rollback.
 
 ## Architecture scope represented in the graph
 
@@ -50,9 +51,9 @@
 - **Documentation alignment:** `ARCHITECTURE.md`, `ARCHITECTURE-OPERATING-MODEL.md`, and this index reference graph revision 34 and 74 nodes / 172 edges; all edges carry relation, status, evidence, and permission metadata at top level, with no duplicate nested status/evidence fields.
 - **Runtime integration:** graph nodes are not proof of live connectivity or permissions. Keep PLANNED/NOT TESTED where evidence is absent.
 - **Deployment:** no public deployment and no merge to master.
-- **VPS source sync — VERIFIED through revision 33:** User-provided PuTTY output confirms checkout commit `6f388a4f1cd2e5e424d9f02abf5eb8ac0de73097`, graph revision 33, 74 nodes, 167 edges, and no ahead/behind marker. Revision 34 is the current architecture target and is **NOT YET SYNCED** to VPS. The local `vite.config.js` modification and untracked `dist/`, `node_modules/`, and `package-lock.json` were preserved by the confirmed sync. UI rendering, build, service health, and live SIMOT integrations remain NOT TESTED.
+- **VPS source sync — VERIFIED through revision 33:** User-provided PuTTY output confirms checkout commit `6f388a4f1cd2e5e424d9f02abf5eb8ac0de73097`, graph revision 33, 74 nodes, 167 edges, and no ahead/behind marker. Revision 35 is the current architecture target and is **NOT YET SYNCED** to VPS. The local `vite.config.js` modification and untracked `dist/`, `node_modules/`, and `package-lock.json` were preserved by the confirmed sync. UI rendering, build, service health, and live SIMOT integrations remain NOT TESTED.
 - **Safety:** no new costs, credentials, secrets, or infrastructure were created or changed.
 
 ## Next continuation
 
-Continue architecture-only work on the feature branch until the model is complete. Revisions 29–31 define canonical memory access, artifact intake, and recovery controls; revision 32 makes sync/async dispatch mutually exclusive; revision 33 limits D1 to runtime metadata; revision 34 defines cancellation, deadline propagation, and late-result fencing. After the user confirms the architecture gate, reconcile the graph and documents with actual code/runtime evidence, then perform tests and verification. Before claiming the phone/VPS UI reflects the newest graph, obtain fresh evidence that the VPS checkout was updated and the interface is serving that revision.
+Continue architecture-only work on the feature branch until the model is complete. Revisions 29–31 define canonical memory access, artifact intake, and recovery controls; revision 32 makes sync/async dispatch mutually exclusive; revision 33 limits D1 to runtime metadata; revision 34 defines cancellation, deadline propagation, and late-result fencing; revision 35 defines authority and rollback gates. After the user confirms the architecture gate, reconcile the graph and documents with actual code/runtime evidence, then perform tests and verification. Before claiming the phone/VPS UI reflects the newest graph, obtain fresh evidence that the VPS checkout was updated and the interface is serving that revision.
