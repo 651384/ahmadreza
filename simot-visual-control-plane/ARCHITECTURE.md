@@ -182,3 +182,8 @@ Cloudflare D1 is modeled as runtime metadata storage only, subject to later insp
 ## Cancellation, deadlines, and late results — revision 34
 
 Cancellation and deadlines must propagate through ingress, executor, and queue consumer. A cancelled or expired task must not be revived by redelivery, retried after terminal state, or overwritten by a late result. The system must distinguish cancellation requested from cancellation completed and report explicit terminal outcomes. Runtime enforcement remains unverified.
+
+
+## Operational authority and rollback gates — revision 35
+
+Operational-mode transitions require explicit scoped human authorization. The policy engine governs deployment trust boundaries; public exposure, private-access changes, and infrastructure changes require human approval. Graph rollback must pass approval and change/release gates after diff review and preservation of the current revision/evidence. No approval is inferred from UI actions. These controls remain planned until implemented and evidenced.
