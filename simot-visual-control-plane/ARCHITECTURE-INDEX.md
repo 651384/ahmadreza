@@ -41,7 +41,7 @@
 - **Documentation alignment:** `ARCHITECTURE.md`, `ARCHITECTURE-OPERATING-MODEL.md`, and this index reference graph revision 24 and 70 nodes / 155 edges; all edges carry relation, status, evidence, and permission metadata at top level, with no duplicate nested status/evidence fields.
 - **Runtime integration:** graph nodes are not proof of live connectivity or permissions. Keep PLANNED/NOT TESTED where evidence is absent.
 - **Deployment:** no public deployment and no merge to master.
-- **VPS sync:** The user supplied PuTTY output confirming a successful fast-forward to commit `a676e4755e6c33dfd8c04ca9ee9fc58530cba7a7`, graph revision 24 (70 nodes / 155 edges), with the feature branch aligned to `origin`. The local `vite.config.js` modification and untracked `dist/`, `node_modules/`, and `package-lock.json` were preserved. This confirms source sync only; it does not verify UI rendering, build, service health, or live SIMOT integrations.
+- **VPS sync:** The user supplied PuTTY output confirming a successful fast-forward to commit `27c49c5afb466d3386612c658a233c6cb2dcb5f5`, graph revision 24 (70 nodes / 155 edges), with the feature branch aligned to `origin`. The local `vite.config.js` modification and untracked `dist/`, `node_modules/`, and `package-lock.json` were preserved. This confirms source sync only; it does not verify UI rendering, build, service health, or live SIMOT integrations.
 - **Safety:** no new costs, credentials, secrets, or infrastructure were created or changed.
 
 ## Next continuation
