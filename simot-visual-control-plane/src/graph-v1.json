@@ -2,8 +2,8 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 5,
-  "updatedAt": "2026-10-12T07:18:32.069Z",
+  "revision": 6,
+  "updatedAt": "2026-10-12T07:30:05.915Z",
   "nodes": [
     {
       "id": "simot-core",
@@ -886,6 +886,216 @@
         "nextAction": "بعداً فقط status sourceهای واقعی متصل شوند",
         "detail": "این گره برای کامل‌کردن نقشهٔ معماری اضافه شده است؛ وجود آن به معنی وجود یا سلامت سرویس مستقل نیست."
       }
+    },
+    {
+      "id": "simot-master-api",
+      "type": "simotNode",
+      "position": {
+        "x": 320,
+        "y": 890
+      },
+      "data": {
+        "label": "SIMOT Master Memory API",
+        "kind": "runtime",
+        "status": "PLANNED",
+        "role": "لایهٔ API میان Gateway و سرویس حافظهٔ VPS",
+        "capabilities": [
+          "API محلی موجود طبق سابقه",
+          "قرارداد خواندن وضعیت و شواهد",
+          "مرز احراز هویت"
+        ],
+        "accessMethod": "API سرویس simot-memory؛ مسیر دقیق از معماری موجود",
+        "permissions": "Read-only برای VCP؛ نوشتن حساس نیازمند تأیید",
+        "evidence": "جایگاه معماری بر اساس سابقهٔ سرویس موجود؛ نگاشت اجرایی این گره هنوز انجام نشده",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "پس از تکمیل گراف، نگاشت به سرویس و endpoint واقعی",
+        "detail": "این گره نمایندهٔ سطح API است و با فایل‌های Master Memory یا Worker Gateway یکی نیست."
+      }
+    },
+    {
+      "id": "cloudflare-ai-workers",
+      "type": "simotNode",
+      "position": {
+        "x": 600,
+        "y": 890
+      },
+      "data": {
+        "label": "Cloudflare AI Workers",
+        "kind": "runtime",
+        "status": "PLANNED",
+        "role": "اجرای وظایف AI و پردازش‌های ابری",
+        "capabilities": [
+          "اجرای کارهای AI",
+          "اتصال به سرویس‌های runtime طبق binding",
+          "پردازش وظایف تفویض‌شده"
+        ],
+        "accessMethod": "Cloudflare Workers موجود/هدف؛ فهرست واقعی باید به منابع نگاشت شود",
+        "permissions": "حداقل دسترسی؛ مدل یا سرویس پولی بدون اجازه فعال نشود",
+        "evidence": "لایه در معماری هدف؛ وجود و اتصال همهٔ Workerها در این گراف اثبات نشده",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "پس از تکمیل معماری، نگاشت هر Worker به نام و فایل واقعی",
+        "detail": "نمایش این لایه به معنی فعال‌بودن همهٔ AI Workerها نیست."
+      }
+    },
+    {
+      "id": "queue-consumer",
+      "type": "simotNode",
+      "position": {
+        "x": 880,
+        "y": 890
+      },
+      "data": {
+        "label": "Queue Consumer / Dispatcher",
+        "kind": "queue",
+        "status": "PLANNED",
+        "role": "دریافت رویداد از صف و توزیع وظیفه به پردازشگر مناسب",
+        "capabilities": [
+          "دریافت پیام",
+          "مدیریت retry",
+          "ارسال شکست نهایی به DLQ"
+        ],
+        "accessMethod": "Cloudflare Queue consumer؛ اتصال دقیق نیازمند نگاشت به Worker واقعی",
+        "permissions": "پردازش idempotent؛ عدم اجرای عملیات حساس بدون approval",
+        "evidence": "جزء معماری هدف؛ consumer فعال از این گراف اثبات نمی‌شود",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "نگاشت به consumer واقعی پس از تثبیت مدل معماری",
+        "detail": "صف به‌تنهایی کار را اجرا نمی‌کند؛ consumer باید صریح و قابل ردیابی باشد."
+      }
+    },
+    {
+      "id": "simot-message-envelope",
+      "type": "simotNode",
+      "position": {
+        "x": 1160,
+        "y": 890
+      },
+      "data": {
+        "label": "SIMOT Message Envelope",
+        "kind": "runtime",
+        "status": "PLANNED",
+        "role": "قرارداد استاندارد پیام و هم‌بستگی بین اجزا",
+        "capabilities": [
+          "MSG-ID",
+          "CORR-ID",
+          "REPLY-TO",
+          "FROM / TO",
+          "PART x/N"
+        ],
+        "accessMethod": "قرارداد داده و پیام SIMOT-MSG",
+        "permissions": "اعتبارسنجی فیلدها؛ جلوگیری از افشای secret در payload",
+        "evidence": "قرارداد پیام ثبت‌شده در معماری پروژه؛ پیاده‌سازی runtime این گره هنوز نگاشت نشده",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "تثبیت schema و اتصال به API/صف/لاگ",
+        "detail": "پیام‌ها باید شناسهٔ یکتا و correlation داشته باشند تا مسیر درخواست تا پاسخ قابل ردیابی باشد."
+      }
+    },
+    {
+      "id": "task-lifecycle",
+      "type": "simotNode",
+      "position": {
+        "x": 1440,
+        "y": 890
+      },
+      "data": {
+        "label": "Task Lifecycle / State Machine",
+        "kind": "core",
+        "status": "PLANNED",
+        "role": "مدیریت چرخهٔ عمر وظیفه از دریافت تا ثبت نتیجه",
+        "capabilities": [
+          "UNDERSTAND",
+          "RECONCILE",
+          "PLAN",
+          "EXECUTE",
+          "TEST",
+          "VERIFY",
+          "RECORD",
+          "CONTINUE"
+        ],
+        "accessMethod": "منطق orchestration و وضعیت canonical در Master Memory",
+        "permissions": "انتقال وضعیت با شواهد؛ human gate برای عملیات حساس",
+        "evidence": "چرخهٔ اجرایی در قرارداد پروژه تعریف شده؛ state machine مستقل هنوز نگاشت نشده",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "تعریف حالت‌ها، انتقال‌های مجاز و شرایط توقف",
+        "detail": "این مدل چرخهٔ وظیفه را تعریف می‌کند؛ ثبت canonical همچنان در VPS Master Memory می‌ماند."
+      }
+    },
+    {
+      "id": "identity-access-boundary",
+      "type": "simotNode",
+      "position": {
+        "x": 40,
+        "y": 1030
+      },
+      "data": {
+        "label": "Identity & Access Boundary",
+        "kind": "security",
+        "status": "PLANNED",
+        "role": "مرز هویت، احراز هویت و مجوز دسترسی بین اجزا",
+        "capabilities": [
+          "تفکیک کاربر/سرویس",
+          "حداقل دسترسی",
+          "جداکردن نام secret از مقدار secret"
+        ],
+        "accessMethod": "سازوکارهای احراز هویت موجود هر سرویس؛ بدون فرض یک سامانهٔ هویت جدید",
+        "permissions": "No secret values in graph/logs; sensitive writes require approval",
+        "evidence": "اصل امنیتی معماری؛ پیاده‌سازی واحد و کامل هنوز به منابع واقعی نگاشت نشده",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "ثبت مرز اعتماد برای هر اتصال و مجوز واقعی آن",
+        "detail": "این گره لایهٔ منطقی امنیت است؛ به معنی وجود سرویس IAM جداگانه نیست."
+      }
+    },
+    {
+      "id": "process-catalog",
+      "type": "simotNode",
+      "position": {
+        "x": 320,
+        "y": 1030
+      },
+      "data": {
+        "label": "Business Process & Data Catalog",
+        "kind": "knowledge",
+        "status": "PLANNED",
+        "role": "کاتالوگ فرایندها، موجودیت‌ها، داده‌ها و کنترل‌ها",
+        "capabilities": [
+          "71 فرایند",
+          "34 موجودیت",
+          "40 عنصر داده",
+          "15 کنترل/ریسک",
+          "12 زنجیرهٔ ارزش"
+        ],
+        "accessMethod": "مدل Data Governance ثبت‌شده در اسناد پروژه",
+        "permissions": "تعریف مالکیت، طبقه‌بندی و کنترل دسترسی داده",
+        "evidence": "شمارش‌ها در سابقهٔ حاکمیت داده ثبت شده‌اند؛ منبع اجرایی این گره در این مرحله دوباره بررسی نشده",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "پیوند دادن کاتالوگ به فرایندها و قراردادهای API/پیام",
+        "detail": "کاتالوگ برای هم‌راستایی داده و فرایند است و جایگزین Master Memory نیست."
+      }
+    },
+    {
+      "id": "business-workflows",
+      "type": "simotNode",
+      "position": {
+        "x": 600,
+        "y": 1030
+      },
+      "data": {
+        "label": "SIMOT Business Workflows",
+        "kind": "core",
+        "status": "PLANNED",
+        "role": "تعریف گردش‌کارهای کسب‌وکار که توسط هسته هماهنگ می‌شوند",
+        "capabilities": [
+          "تقسیم کار به وظایف",
+          "وابستگی و ترتیب اجرا",
+          "سیاست هزینه و مدل",
+          "ثبت خروجی و شواهد"
+        ],
+        "accessMethod": "تعریف workflow در لایهٔ orchestration",
+        "permissions": "کنترل سیاست و approval پیش از عملیات حساس",
+        "evidence": "قابلیت هدف معماری؛ workflow اجرایی کامل هنوز به کد واقعی نگاشت نشده",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "تعریف قرارداد workflow و ارتباط آن با task lifecycle",
+        "detail": "این گره مدل منطقی گردش‌کار است، نه ادعای وجود یک سرویس مستقل جدید."
+      }
     }
   ],
   "edges": [
@@ -1352,6 +1562,146 @@
       "label": "USES_SCHEMA",
       "relation": "USES_SCHEMA",
       "status": "PLANNED"
+    },
+    {
+      "id": "e-vps-master-api",
+      "source": "vps",
+      "target": "simot-master-api",
+      "label": "HOSTS",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود."
+      }
+    },
+    {
+      "id": "e-master-api-memory",
+      "source": "simot-master-api",
+      "target": "master-memory",
+      "label": "READS_WRITES",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود."
+      }
+    },
+    {
+      "id": "e-vpc-master-api",
+      "source": "cloudflare-vpc",
+      "target": "simot-master-api",
+      "label": "ROUTES_TO",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود."
+      }
+    },
+    {
+      "id": "e-gateway-ai-workers",
+      "source": "cloudflare-gateway",
+      "target": "cloudflare-ai-workers",
+      "label": "DISPATCHES_TO",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود."
+      }
+    },
+    {
+      "id": "e-eventbus-consumer",
+      "source": "event-bus",
+      "target": "queue-consumer",
+      "label": "DELIVERS_TO",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود."
+      }
+    },
+    {
+      "id": "e-consumer-ai-workers",
+      "source": "queue-consumer",
+      "target": "cloudflare-ai-workers",
+      "label": "DISPATCHES_TO",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود."
+      }
+    },
+    {
+      "id": "e-contracts-message-envelope",
+      "source": "api-contracts",
+      "target": "simot-message-envelope",
+      "label": "DEFINES",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود."
+      }
+    },
+    {
+      "id": "e-envelope-eventbus",
+      "source": "simot-message-envelope",
+      "target": "event-bus",
+      "label": "ENVELOPE_FOR",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود."
+      }
+    },
+    {
+      "id": "e-core-task-lifecycle",
+      "source": "simot-core",
+      "target": "task-lifecycle",
+      "label": "OWNS",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود."
+      }
+    },
+    {
+      "id": "e-orchestration-task-lifecycle",
+      "source": "orchestration",
+      "target": "task-lifecycle",
+      "label": "EXECUTES",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود."
+      }
+    },
+    {
+      "id": "e-policy-identity-boundary",
+      "source": "policy-engine",
+      "target": "identity-access-boundary",
+      "label": "ENFORCES",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود."
+      }
+    },
+    {
+      "id": "e-datagovernance-process-catalog",
+      "source": "data-governance",
+      "target": "process-catalog",
+      "label": "CATALOGS",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود."
+      }
+    },
+    {
+      "id": "e-process-business-workflows",
+      "source": "process-catalog",
+      "target": "business-workflows",
+      "label": "DEFINES",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود."
+      }
+    },
+    {
+      "id": "e-workflows-orchestration",
+      "source": "business-workflows",
+      "target": "orchestration",
+      "label": "EXECUTES",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود."
+      }
     }
   ]
 }
