@@ -4,7 +4,7 @@
 **Graph:** `simot-core-overview`, schema version 1, revision 38  
 **Graph size:** 77 nodes, 190 edges  
 **Working branch:** `feat/simot-visual-control-plane-react-flow`  
-**Latest graph commit:** `9589d8db33f29a33b696f1db30fd205e2dc96b1a`
+**Latest graph commit:** `0aacb2894e638295a1c2c546645e9009097042ab`
 
 ## Architecture documents
 
@@ -52,7 +52,7 @@
 - **Tests/build/runtime probes:** NOT RUN in this phase by design.
 - **Graph and documents:** committed to the existing feature branch only.
 - **Inspector scope:** `src/App.jsx` now supports selecting a relationship to inspect its relation, status, evidence, and permission; manually drawn links also receive explicit contract fields. This is source-level work only and has not been built or tested.
-- **Documentation alignment:** `ARCHITECTURE.md`, `ARCHITECTURE-OPERATING-MODEL.md`, and this index align to graph revision 38 and 76 nodes / 187 edges; all edges carry relation, status, evidence, and permission metadata at top level, with no duplicate nested status/evidence fields.
+- **Documentation alignment:** `ARCHITECTURE.md`, `ARCHITECTURE-OPERATING-MODEL.md`, and this index align to graph revision 38 and 77 nodes / 190 edges; all edges carry relation, status, evidence, and permission metadata at top level, with no duplicate nested status/evidence fields.
 - **Runtime integration:** graph nodes are not proof of live connectivity or permissions. Keep PLANNED/NOT TESTED where evidence is absent.
 - **Deployment:** no public deployment and no merge to master.
 - **VPS source sync — VERIFIED through revision 36:** User-provided PuTTY output confirms the VPS checkout was synced to revision 36 at commit `af7f20455dc0f5179465cb8184c72a1b9468dd71`, with 75 nodes and 182 edges. Revision 38 is the current architecture target and is **NOT YET SYNCED** to VPS. The local `vite.config.js` modification and untracked `dist/`, `node_modules/`, and `package-lock.json` were preserved by the confirmed sync. UI rendering, build, service health, and live SIMOT integrations remain NOT TESTED.
@@ -60,7 +60,7 @@
 
 ## Next continuation
 
-Continue architecture-only work on the feature branch until the model is complete. Revisions 29–31 define canonical memory access, artifact intake, and recovery controls; revision 32 makes sync/async dispatch mutually exclusive; revision 33 limits D1 to runtime metadata; revision 34 defines cancellation, deadline propagation, and late-result fencing; revision 35 defines authority and rollback gates; revision 36 defines evidence freshness and read-only reconciliation; revision 38 adds a unified read-first project/service registry. After the user confirms the architecture gate, reconcile the graph and documents with actual code/runtime evidence, then perform tests and verification. Before claiming the phone/VPS UI reflects the newest graph, obtain fresh evidence that the VPS checkout was updated and the interface is serving that revision.
+Continue architecture-only work on the feature branch until the model is complete. Revisions 29–31 define canonical memory access, artifact intake, and recovery controls; revision 32 makes sync/async dispatch mutually exclusive; revision 33 limits D1 to runtime metadata; revision 34 defines cancellation, deadline propagation, and late-result fencing; revision 35 defines authority and rollback gates; revision 36 defines evidence freshness and read-only reconciliation; revision 37 adds a unified read-first project/service registry; revision 38 formalizes the architecture completion gate. After the user confirms the architecture gate, reconcile the graph and documents with actual code/runtime evidence, then perform tests and verification. Before claiming the phone/VPS UI reflects the newest graph, obtain fresh evidence that the VPS checkout was updated and the interface is serving that revision.
 
 
 Revision 37 adds `project-service-registry` and five planned relationships. Revision 38 adds `architecture-acceptance-gate` and three planned relationships plus the acceptance checklist. No tests, build, runtime probes, deployment, or merge were performed.
