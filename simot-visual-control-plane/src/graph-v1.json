@@ -2,8 +2,8 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 2,
-  "updatedAt": "2026-10-12T05:22:00.000Z",
+  "revision": 3,
+  "updatedAt": "2026-10-12T06:30:00.000Z",
   "nodes": [
     {
       "id": "simot-core",
@@ -579,6 +579,313 @@
         "nextAction": "پیش از فعال‌کردن عملیات نوشتن، Approval و Audit واقعی طراحی شود",
         "detail": "این گره فعلاً نمای معماری است، نه کنترل امنیتی اجرایی."
       }
+    },
+    {
+      "id": "orchestration",
+      "type": "simotNode",
+      "position": {
+        "x": 380,
+        "y": 340
+      },
+      "data": {
+        "label": "موتور هماهنگی و گردش‌کار",
+        "kind": "core",
+        "status": "PLANNED",
+        "role": "اجرای جریان‌های کاری در SIMOT AI OS",
+        "capabilities": [
+          "Task lifecycle",
+          "Workflow routing",
+          "State transitions"
+        ],
+        "accessMethod": "ماژول معماری SIMOT؛ محل پیاده‌سازی جاری هنوز inventory نشده",
+        "permissions": "اصل کمترین دسترسی؛ اقدامات حساس پشت تأیید انسانی",
+        "evidence": "لایهٔ هدف معماری؛ پیاده‌سازی مستقل در این commit ادعا نمی‌شود",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "در مرحلهٔ بعد به کد/ماژول واقعی نگاشت شود",
+        "detail": "این گره برای کامل‌کردن نقشهٔ معماری اضافه شده است؛ وجود آن به معنی وجود یا سلامت سرویس مستقل نیست."
+      }
+    },
+    {
+      "id": "tool-registry",
+      "type": "simotNode",
+      "position": {
+        "x": 600,
+        "y": 340
+      },
+      "data": {
+        "label": "رجیستری ابزارها و اتصال‌ها",
+        "kind": "core",
+        "status": "PLANNED",
+        "role": "تعریف ابزارهای مجاز، قراردادها و capabilityها",
+        "capabilities": [
+          "Tool catalog",
+          "Input/output contracts",
+          "Permission metadata"
+        ],
+        "accessMethod": "لایهٔ منطقی معماری؛ سرویس مستقل تأیید نشده",
+        "permissions": "allowlist؛ هر connector فقط با مجوز واقعی",
+        "evidence": "جزء طراحی‌شده برای تکمیل معماری؛ هنوز به ماژول زنده نسبت داده نشده",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "فهرست ابزارها با connectorهای واقعی تطبیق داده شود",
+        "detail": "این گره برای کامل‌کردن نقشهٔ معماری اضافه شده است؛ وجود آن به معنی وجود یا سلامت سرویس مستقل نیست."
+      }
+    },
+    {
+      "id": "policy-engine",
+      "type": "simotNode",
+      "position": {
+        "x": 380,
+        "y": 470
+      },
+      "data": {
+        "label": "سیاست امنیت و مجوزها",
+        "kind": "security",
+        "status": "PLANNED",
+        "role": "اعمال سیاست‌های دسترسی، مرزبندی و رد عملیات غیرمجاز",
+        "capabilities": [
+          "Least privilege",
+          "Secret boundaries",
+          "Read-only default"
+        ],
+        "accessMethod": "لایهٔ سیاست در معماری؛ implementation جاری نیازمند بررسی",
+        "permissions": "عدم نمایش secret؛ عدم write حساس بدون approval",
+        "evidence": "الزامات پروژه و طرح معماری",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "پس از تکمیل گراف، به کنترل‌های کد واقعی نگاشت شود",
+        "detail": "این گره برای کامل‌کردن نقشهٔ معماری اضافه شده است؛ وجود آن به معنی وجود یا سلامت سرویس مستقل نیست."
+      }
+    },
+    {
+      "id": "model-router",
+      "type": "simotNode",
+      "position": {
+        "x": 1080,
+        "y": 650
+      },
+      "data": {
+        "label": "مسیریاب مدل‌های هوش مصنوعی",
+        "kind": "ai",
+        "status": "PLANNED",
+        "role": "انتخاب مدل براساس وظیفه، هزینه و دسترسی",
+        "capabilities": [
+          "Local-first",
+          "Provider abstraction",
+          "Fallback policy"
+        ],
+        "accessMethod": "هدف معماری؛ سرویس/ماژول مستقل هنوز تأیید نشده",
+        "permissions": "عدم استفاده از API پولی بدون تأیید",
+        "evidence": "محدودیت free-first و استفاده از مدل محلی در نیازمندی‌ها",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "مدل‌های واقعی و مسیرهای موجود بعداً inventory شوند",
+        "detail": "این گره برای کامل‌کردن نقشهٔ معماری اضافه شده است؛ وجود آن به معنی وجود یا سلامت سرویس مستقل نیست."
+      }
+    },
+    {
+      "id": "event-bus",
+      "type": "simotNode",
+      "position": {
+        "x": 800,
+        "y": 650
+      },
+      "data": {
+        "label": "لایهٔ رویدادها و صف",
+        "kind": "queue",
+        "status": "PLANNED",
+        "role": "انتقال رویدادهای غیرهمزمان میان اجزا",
+        "capabilities": [
+          "simot-events",
+          "Retry/DLQ concept",
+          "Event contracts"
+        ],
+        "accessMethod": "Cloudflare Queues در runtime ثبت‌شده؛ مصرف‌کنندهٔ جاری نامشخص",
+        "permissions": "رویدادهای حداقلی؛ بدون secrets در payload",
+        "evidence": "نام صف‌ها در معماری ثبت شده؛ جریان زنده اکنون بررسی نمی‌شود",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "بعداً producer/consumerها به کد واقعی نگاشت شوند",
+        "detail": "این گره برای کامل‌کردن نقشهٔ معماری اضافه شده است؛ وجود آن به معنی وجود یا سلامت سرویس مستقل نیست."
+      }
+    },
+    {
+      "id": "audit-ledger",
+      "type": "simotNode",
+      "position": {
+        "x": 600,
+        "y": 470
+      },
+      "data": {
+        "label": "دفتر شواهد و Audit",
+        "kind": "security",
+        "status": "PLANNED",
+        "role": "ثبت تصمیم‌ها، اقدام‌ها و شواهد قابل ردیابی",
+        "capabilities": [
+          "Evidence IDs",
+          "Actor/action/outcome",
+          "Write audit trail"
+        ],
+        "accessMethod": "EVIDENCE_INDEX و TASK_LOG در Master Memory؛ شکل audit اجرایی نیازمند بررسی",
+        "permissions": "ثبت قبل/بعد برای عملیات حساس؛ بدون token یا secret",
+        "evidence": "ساختار canonical memory در قرارداد پروژه",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "طرح audit به schema و مسیر واقعی نگاشت شود",
+        "detail": "این گره برای کامل‌کردن نقشهٔ معماری اضافه شده است؛ وجود آن به معنی وجود یا سلامت سرویس مستقل نیست."
+      }
+    },
+    {
+      "id": "data-governance",
+      "type": "simotNode",
+      "position": {
+        "x": 820,
+        "y": 340
+      },
+      "data": {
+        "label": "حاکمیت داده و قراردادها",
+        "kind": "knowledge",
+        "status": "PLANNED",
+        "role": "تعریف موجودیت‌ها، داده‌ها، کنترل‌ها و قواعد چرخهٔ عمر",
+        "capabilities": [
+          "Data Governance v2",
+          "Entity/data definitions",
+          "Retention and access controls"
+        ],
+        "accessMethod": "اسناد حاکمیت داده؛ منبع اجرایی دقیق باید inventory شود",
+        "permissions": "منبع حقیقت عملیاتی همچنان VPS Master Memory است",
+        "evidence": "ثبت تاریخی Data Governance v2 در زمینهٔ پروژه",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "شناسه و محل اسناد مرجع در فهرست معماری ثبت شود",
+        "detail": "این گره برای کامل‌کردن نقشهٔ معماری اضافه شده است؛ وجود آن به معنی وجود یا سلامت سرویس مستقل نیست."
+      }
+    },
+    {
+      "id": "integration-adapters",
+      "type": "simotNode",
+      "position": {
+        "x": 1080,
+        "y": 340
+      },
+      "data": {
+        "label": "آداپتورهای یکپارچه‌سازی",
+        "kind": "tool",
+        "status": "PLANNED",
+        "role": "جداسازی قرارداد SIMOT از API ابزارهای بیرونی",
+        "capabilities": [
+          "GitHub",
+          "Cloudflare",
+          "Notion",
+          "Asana",
+          "SharePoint/OneDrive",
+          "HubSpot"
+        ],
+        "accessMethod": "Connectorهای موجود؛ میزان اتصال به SIMOT هنوز بررسی نشده",
+        "permissions": "مجوز هر connector مستقل؛ خواندن/نوشتن تفکیک شود",
+        "evidence": "ابزارها در پروژه ثبت شده‌اند؛ اتصال به هسته فرض نشده",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "هر آداپتور به ابزار واقعی و scope مجاز متصل شود",
+        "detail": "این گره برای کامل‌کردن نقشهٔ معماری اضافه شده است؛ وجود آن به معنی وجود یا سلامت سرویس مستقل نیست."
+      }
+    },
+    {
+      "id": "secrets-boundary",
+      "type": "simotNode",
+      "position": {
+        "x": 150,
+        "y": 470
+      },
+      "data": {
+        "label": "مرز اسرار و پیکربندی",
+        "kind": "security",
+        "status": "PLANNED",
+        "role": "جداسازی secretها از گراف، لاگ و حافظهٔ عادی",
+        "capabilities": [
+          "Environment secrets",
+          "Token redaction",
+          "Credential rotation by approval"
+        ],
+        "accessMethod": "Secret bindings/config موجود؛ محل و مجوز جاری در این تغییر خوانده نمی‌شود",
+        "permissions": "مقادیر secret هرگز در گراف یا گزارش ظاهر نشوند",
+        "evidence": "الزامات امنیتی پروژه؛ جزئیات runtime نیازمند inventory",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "فقط نام bindingها و مرزهای اعتماد مستند شوند",
+        "detail": "این گره برای کامل‌کردن نقشهٔ معماری اضافه شده است؛ وجود آن به معنی وجود یا سلامت سرویس مستقل نیست."
+      }
+    },
+    {
+      "id": "continuity-contract",
+      "type": "simotNode",
+      "position": {
+        "x": 150,
+        "y": 650
+      },
+      "data": {
+        "label": "قرارداد تداوم و وضعیت",
+        "kind": "memory",
+        "status": "PLANNED",
+        "role": "حفظ وضعیت canonical، تصمیم‌ها، شواهد و task history",
+        "capabilities": [
+          "CURRENT_STATE.json",
+          "DECISIONS.json",
+          "EVIDENCE_INDEX.json",
+          "TASK_LOG.jsonl",
+          "CONTINUITY_CONTRACT.md"
+        ],
+        "accessMethod": "/srv/simot-memory/ و API محلی موجود طبق سوابق پروژه",
+        "permissions": "VPS Master Memory مرجع؛ ChatGPT context فقط کمکی",
+        "evidence": "ساختار پنج‌فایلی canonical در زمینهٔ پروژه",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "بعداً فیلدهای گراف با state واقعی read-only هم‌تراز شوند",
+        "detail": "این گره برای کامل‌کردن نقشهٔ معماری اضافه شده است؛ وجود آن به معنی وجود یا سلامت سرویس مستقل نیست."
+      }
+    },
+    {
+      "id": "api-contracts",
+      "type": "simotNode",
+      "position": {
+        "x": 820,
+        "y": 470
+      },
+      "data": {
+        "label": "قراردادهای API و پیام SIMOT",
+        "kind": "runtime",
+        "status": "PLANNED",
+        "role": "قالب مشترک درخواست، پاسخ، correlation و پیام‌ها",
+        "capabilities": [
+          "MSG-ID",
+          "CORR-ID",
+          "REPLY-TO",
+          "FROM/TO",
+          "PART x/N"
+        ],
+        "accessMethod": "قرارداد پیام ثبت‌شده؛ محل implementation باید inventory شود",
+        "permissions": "اعتبارسنجی schema و correlation id",
+        "evidence": "قالب SIMOT-MSG در قراردادهای زمینه‌ای پروژه",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "قراردادها با endpointهای واقعی مقایسه شوند",
+        "detail": "این گره برای کامل‌کردن نقشهٔ معماری اضافه شده است؛ وجود آن به معنی وجود یا سلامت سرویس مستقل نیست."
+      }
+    },
+    {
+      "id": "monitoring",
+      "type": "simotNode",
+      "position": {
+        "x": 1030,
+        "y": 470
+      },
+      "data": {
+        "label": "وضعیت، خطا و مشاهده‌پذیری",
+        "kind": "runtime",
+        "status": "PLANNED",
+        "role": "نمایش سلامت فقط با شواهد تازه و قابل ردیابی",
+        "capabilities": [
+          "Component status",
+          "Failure evidence",
+          "Last verified timestamp"
+        ],
+        "accessMethod": "طرح کنترلی VCP؛ منبع telemetry زنده هنوز inventory نشده",
+        "permissions": "UNKNOWN هرگز healthy نشان داده نشود",
+        "evidence": "قاعدهٔ VERIFIED/FAILED/BLOCKED/NOT TESTED پروژه",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "بعداً فقط status sourceهای واقعی متصل شوند",
+        "detail": "این گره برای کامل‌کردن نقشهٔ معماری اضافه شده است؛ وجود آن به معنی وجود یا سلامت سرویس مستقل نیست."
+      }
     }
   ],
   "edges": [
@@ -831,6 +1138,230 @@
       "status": "BLOCKED",
       "permission": "UNKNOWN",
       "evidence": "مسیر بدون PC در ابزارهای فعلی پیدا نشد"
+    },
+    {
+      "id": "e-core-orchestration",
+      "source": "simot-core",
+      "target": "orchestration",
+      "label": "OWNS",
+      "relation": "OWNS",
+      "status": "PLANNED"
+    },
+    {
+      "id": "e-core-tool-registry",
+      "source": "simot-core",
+      "target": "tool-registry",
+      "label": "USES",
+      "relation": "USES",
+      "status": "PLANNED"
+    },
+    {
+      "id": "e-core-policy",
+      "source": "simot-core",
+      "target": "policy-engine",
+      "label": "ENFORCED_BY",
+      "relation": "ENFORCED_BY",
+      "status": "PLANNED"
+    },
+    {
+      "id": "e-core-model-router",
+      "source": "simot-core",
+      "target": "model-router",
+      "label": "ROUTES_TO",
+      "relation": "ROUTES_TO",
+      "status": "PLANNED"
+    },
+    {
+      "id": "e-gateway-eventbus",
+      "source": "cloudflare-gateway",
+      "target": "event-bus",
+      "label": "PUBLISHES_TO",
+      "relation": "PUBLISHES_TO",
+      "status": "PLANNED"
+    },
+    {
+      "id": "e-core-audit",
+      "source": "simot-core",
+      "target": "audit-ledger",
+      "label": "RECORDS_TO",
+      "relation": "RECORDS_TO",
+      "status": "PLANNED"
+    },
+    {
+      "id": "e-memory-continuity",
+      "source": "master-memory",
+      "target": "continuity-contract",
+      "label": "IMPLEMENTS",
+      "relation": "IMPLEMENTS",
+      "status": "PLANNED"
+    },
+    {
+      "id": "e-core-datagovernance",
+      "source": "simot-core",
+      "target": "data-governance",
+      "label": "GOVERNED_BY",
+      "relation": "GOVERNED_BY",
+      "status": "PLANNED"
+    },
+    {
+      "id": "e-core-adapters",
+      "source": "simot-core",
+      "target": "integration-adapters",
+      "label": "USES",
+      "relation": "USES",
+      "status": "PLANNED"
+    },
+    {
+      "id": "e-policy-secrets",
+      "source": "policy-engine",
+      "target": "secrets-boundary",
+      "label": "PROTECTS",
+      "relation": "PROTECTS",
+      "status": "PLANNED"
+    },
+    {
+      "id": "e-core-api-contracts",
+      "source": "simot-core",
+      "target": "api-contracts",
+      "label": "USES",
+      "relation": "USES",
+      "status": "PLANNED"
+    },
+    {
+      "id": "e-core-monitoring",
+      "source": "simot-core",
+      "target": "monitoring",
+      "label": "OBSERVES",
+      "relation": "OBSERVES",
+      "status": "PLANNED"
+    },
+    {
+      "id": "e-registry-adapters",
+      "source": "tool-registry",
+      "target": "integration-adapters",
+      "label": "REGISTERS",
+      "relation": "REGISTERS",
+      "status": "PLANNED"
+    },
+    {
+      "id": "e-router-ollama",
+      "source": "model-router",
+      "target": "ollama",
+      "label": "CAN_ROUTE_TO",
+      "relation": "CAN_ROUTE_TO",
+      "status": "PLANNED"
+    },
+    {
+      "id": "e-router-cloud-models",
+      "source": "model-router",
+      "target": "claude",
+      "label": "OPTIONAL_PROVIDER",
+      "relation": "OPTIONAL_PROVIDER",
+      "status": "BLOCKED"
+    },
+    {
+      "id": "e-router-grok",
+      "source": "model-router",
+      "target": "grok",
+      "label": "OPTIONAL_PROVIDER",
+      "relation": "OPTIONAL_PROVIDER",
+      "status": "BLOCKED"
+    },
+    {
+      "id": "e-router-arena",
+      "source": "model-router",
+      "target": "arena",
+      "label": "OPTIONAL_PROVIDER",
+      "relation": "OPTIONAL_PROVIDER",
+      "status": "BLOCKED"
+    },
+    {
+      "id": "e-eventbus-d1",
+      "source": "event-bus",
+      "target": "cloudflare-d1",
+      "label": "PERSISTS_METADATA",
+      "relation": "PERSISTS_METADATA",
+      "status": "PLANNED"
+    },
+    {
+      "id": "e-audit-memory",
+      "source": "audit-ledger",
+      "target": "master-memory",
+      "label": "RECORDS_TO",
+      "relation": "RECORDS_TO",
+      "status": "PLANNED"
+    },
+    {
+      "id": "e-adapters-github",
+      "source": "integration-adapters",
+      "target": "github",
+      "label": "ADAPTER_FOR",
+      "relation": "ADAPTER_FOR",
+      "status": "PLANNED"
+    },
+    {
+      "id": "e-adapters-cloudflare",
+      "source": "integration-adapters",
+      "target": "cloudflare-gateway",
+      "label": "ADAPTER_FOR",
+      "relation": "ADAPTER_FOR",
+      "status": "PLANNED"
+    },
+    {
+      "id": "e-adapters-notion",
+      "source": "integration-adapters",
+      "target": "notion",
+      "label": "ADAPTER_FOR",
+      "relation": "ADAPTER_FOR",
+      "status": "PLANNED"
+    },
+    {
+      "id": "e-adapters-sharepoint",
+      "source": "integration-adapters",
+      "target": "sharepoint",
+      "label": "ADAPTER_FOR",
+      "relation": "ADAPTER_FOR",
+      "status": "PLANNED"
+    },
+    {
+      "id": "e-adapters-asana",
+      "source": "integration-adapters",
+      "target": "asana",
+      "label": "ADAPTER_FOR",
+      "relation": "ADAPTER_FOR",
+      "status": "PLANNED"
+    },
+    {
+      "id": "e-adapters-hubspot",
+      "source": "integration-adapters",
+      "target": "hubspot",
+      "label": "ADAPTER_FOR",
+      "relation": "ADAPTER_FOR",
+      "status": "PLANNED"
+    },
+    {
+      "id": "e-core-approval-gate",
+      "source": "simot-core",
+      "target": "approval-gate",
+      "label": "REQUIRES_FOR_SENSITIVE_ACTIONS",
+      "relation": "REQUIRES_FOR_SENSITIVE_ACTIONS",
+      "status": "PLANNED"
+    },
+    {
+      "id": "e-approval-audit",
+      "source": "approval-gate",
+      "target": "audit-ledger",
+      "label": "AUDITS",
+      "relation": "AUDITS",
+      "status": "PLANNED"
+    },
+    {
+      "id": "e-contracts-memory",
+      "source": "api-contracts",
+      "target": "master-memory",
+      "label": "USES_SCHEMA",
+      "relation": "USES_SCHEMA",
+      "status": "PLANNED"
     }
   ]
 }
