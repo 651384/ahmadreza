@@ -2,8 +2,8 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 25,
-  "updatedAt": "2026-10-12T08:18:38.632Z",
+  "revision": 26,
+  "updatedAt": "2026-10-12T08:21:21.715Z",
   "nodes": [
     {
       "id": "simot-core",
@@ -1815,6 +1815,32 @@
         "nextAction": "پس از تکمیل معماری، کانال‌های موجود را با OpenClaw و مسیرهای مجاز تطبیق بده؛ قابلیت‌های آینده را از اتصال فعال تفکیک کن",
         "detail": "این گره لایهٔ کانال است، نه مغز SIMOT. ورودی‌ها را به envelope استاندارد می‌سپارد و پاسخ را به کانال درخواست‌کننده برمی‌گرداند."
       }
+    },
+    {
+      "id": "human-operator",
+      "type": "simotNode",
+      "position": {
+        "x": 1760,
+        "y": 330
+      },
+      "data": {
+        "label": "مالک / اپراتور انسانی",
+        "kind": "security",
+        "status": "PLANNED",
+        "role": "مرجع تصمیم نهایی و تأیید عملیات حساس در SIMOT",
+        "capabilities": [
+          "تصمیم‌گیری صریح برای اقدام‌های حساس",
+          "تعیین محدوده، نسخه، مدت اعتبار و نتیجهٔ تأیید",
+          "دریافت ارجاع هنگام ابهام، ریسک یا شکست",
+          "کنترل رابط بصری بدون تبدیل UI به منبع حقیقت"
+        ],
+        "accessMethod": "تصمیم انسانی از مسیر تأیید ثبت‌شده؛ سازوکار اجرایی هنوز پیاده‌سازی نشده",
+        "permissions": "تأیید محدود به اقدام مشخص؛ تأیید انسانی جایگزین policy، احراز هویت یا مجوز ابزار نیست",
+        "evidence": "اصل حاکمیتی پروژه؛ مسیر اجرایی واحد برای ثبت هویت و تأیید هنوز نگاشت نشده",
+        "lastVerified": "PLANNED",
+        "nextAction": "در فاز پیاده‌سازی، هویت actor، scope، نسخه، expiry و نتیجهٔ تصمیم ثبت شود",
+        "detail": "این گره نقش مالک/اپراتور را در معماری نشان می‌دهد؛ به معنی وجود سرویس هویت جدید یا فعال بودن تأیید در UI نیست."
+      }
     }
   ],
   "edges": [
@@ -3367,6 +3393,36 @@
       "status": "PLANNED",
       "evidence": "پاسخ برای تحویل به رابط OpenClaw برمی‌گردد؛ مسیر جاری بررسی نشده",
       "permission": "عدم دسترسی مستقیم کلاینت به canonical memory؛ خروجی بر اساس مجوز درخواست"
+    },
+    {
+      "id": "e-operator-approval",
+      "source": "human-operator",
+      "target": "approval-gate",
+      "label": "DECIDES_APPROVAL",
+      "relation": "DECIDES_APPROVAL",
+      "status": "PLANNED",
+      "evidence": "مسیر تصمیم انسانی در معماری هدف؛ UI یا ثبت اجرایی تأیید هنوز پیاده‌سازی و آزمون نشده است.",
+      "permission": "فقط actor مجاز و احراز هویت‌شده؛ تأیید محدود به اقدام، scope، نسخه و زمان اعتبار مشخص؛ policy و مجوز ابزار همچنان لازم است."
+    },
+    {
+      "id": "e-operator-escalation",
+      "source": "human-operator",
+      "target": "human-escalation",
+      "label": "RESOLVES_ESCALATION",
+      "relation": "RESOLVES_ESCALATION",
+      "status": "PLANNED",
+      "evidence": "مسیر تصمیم انسانی در معماری هدف؛ UI یا ثبت اجرایی تأیید هنوز پیاده‌سازی و آزمون نشده است.",
+      "permission": "فقط actor مجاز و احراز هویت‌شده؛ تأیید محدود به اقدام، scope، نسخه و زمان اعتبار مشخص؛ policy و مجوز ابزار همچنان لازم است."
+    },
+    {
+      "id": "e-operator-vcp",
+      "source": "human-operator",
+      "target": "vcp",
+      "label": "OPERATES_CONTROL_PLANE",
+      "relation": "OPERATES_CONTROL_PLANE",
+      "status": "PLANNED",
+      "evidence": "مالک رابط را استفاده می‌کند؛ این رابطه مجوز اجرای عملیات یا write ایجاد نمی‌کند.",
+      "permission": "رابط نمایشی؛ هیچ دسترسی canonical از این ارتباط استنتاج نشود."
     }
   ]
 }
