@@ -160,3 +160,8 @@ All logical reads and writes of VPS Master Memory must pass through `simot-maste
 ## Secure file, image, and document intake — revision 30
 
 File-bearing requests must use `client-channel-adapters → artifact-intake → content-extractor → request-ingress`. Text-only requests may use the direct request-ingress path. Treat files and extracted text as untrusted; validate actual type and size, prevent active-content execution, retain artifact provenance, classify data before model routing, and fail closed on unsupported or ambiguous inputs. OCR/parsing tools, quarantine storage, and malware scanning are not assumed to exist; no new dependency or cost is authorized.
+
+
+## Canonical memory recovery — revision 31
+
+`backup-rollback-policy` governs backup and recovery of the existing five-file VPS Master Memory package. A backup is a recoverability copy, not a competing source of truth. Any restore requires explicit owner approval, preservation of current state where feasible, integrity and cross-file checks, and recorded before/after evidence. No backup/restore mechanism or current backup health is implied by this model.
