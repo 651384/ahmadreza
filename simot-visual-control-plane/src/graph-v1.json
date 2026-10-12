@@ -2,8 +2,8 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 10,
-  "updatedAt": "2026-10-12T07:44:15.311Z",
+  "revision": 11,
+  "updatedAt": "2026-10-12T07:46:28.277Z",
   "nodes": [
     {
       "id": "simot-core",
@@ -2317,6 +2317,66 @@
       "data": {
         "status": "PLANNED",
         "evidence": "سیاست منبع؛ اتصال runtime بررسی نشده."
+      }
+    },
+    {
+      "id": "e-source-architecture-policy",
+      "source": "source-of-truth-policy",
+      "target": "notion",
+      "label": "Notion: معماری و سیاست",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "معماری هدف؛ پیاده‌سازی و enforcement هنوز آزمون نشده"
+      }
+    },
+    {
+      "id": "e-source-task-records",
+      "source": "source-of-truth-policy",
+      "target": "asana",
+      "label": "Asana: وظایف",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "معماری هدف؛ پیاده‌سازی و enforcement هنوز آزمون نشده"
+      }
+    },
+    {
+      "id": "e-source-crm-records",
+      "source": "source-of-truth-policy",
+      "target": "hubspot",
+      "label": "HubSpot: CRM",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "معماری هدف؛ پیاده‌سازی و enforcement هنوز آزمون نشده"
+      }
+    },
+    {
+      "id": "e-source-runtime-evidence",
+      "source": "source-of-truth-policy",
+      "target": "cloudflare-gateway",
+      "label": "Cloudflare: شواهد runtime",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "معماری هدف؛ پیاده‌سازی و enforcement هنوز آزمون نشده"
+      }
+    },
+    {
+      "id": "e-source-context-enforcement",
+      "source": "source-of-truth-policy",
+      "target": "context-assembler",
+      "label": "اعمال سیاست منبع هنگام ساخت context",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "معماری هدف؛ پیاده‌سازی و enforcement هنوز آزمون نشده"
+      }
+    },
+    {
+      "id": "e-source-data-governance",
+      "source": "source-of-truth-policy",
+      "target": "data-governance",
+      "label": "هم‌راستایی با حاکمیت داده",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "معماری هدف؛ پیاده‌سازی و enforcement هنوز آزمون نشده"
       }
     }
   ]
