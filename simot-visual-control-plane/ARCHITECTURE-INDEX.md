@@ -1,15 +1,15 @@
 # SIMOT Visual Control Plane — Architecture Index & Handoff
 
 **Canonical graph artifact:** `simot-visual-control-plane/src/graph-v1.json`  
-**Graph:** `simot-core-overview`, schema version 1, revision 38  
+**Graph:** `simot-core-overview`, schema version 1, revision 39  
 **Graph size:** 77 nodes, 190 edges  
 **Working branch:** `feat/simot-visual-control-plane-react-flow`  
-**Latest graph commit:** `0aacb2894e638295a1c2c546645e9009097042ab`
+**Latest graph commit:** `a6eab7df5e8dbc1a0f0f53f2de0db28d4e80b812`
 
 ## Architecture documents
 
-1. `ARCHITECTURE.md` — VCP implementation specification, reconciled to graph revision 38.
-2. `ARCHITECTURE-OPERATING-MODEL.md` — core roles, source-of-truth hierarchy, request-to-result flow, continuity and safety, reconciled to graph revision 38.
+1. `ARCHITECTURE.md` — VCP implementation specification, reconciled to graph revision 39.
+2. `ARCHITECTURE-OPERATING-MODEL.md` — core roles, source-of-truth hierarchy, request-to-result flow, continuity and safety, reconciled to graph revision 39.
 3. `ARCHITECTURE-CONTRACTS-REV14.md` — API/message envelope, response/acknowledgement, structured error, connector scope.
 4. `CONNECTOR-TRUST-BOUNDARIES-REV15.md` — connector trust matrix and intended deployment boundaries.
 5. `OPERATIONAL-SAFETY-POLICY-REV16.md` — operational modes, classification, approval scope, backup/recovery policy.
@@ -32,7 +32,8 @@
 22. `OPERATIONAL-AUTHORITY-ROLLBACK-GATES-REV35.md` — explicit human authority, deployment boundary controls, and gated graph rollback.
 23. `EVIDENCE-FRESHNESS-RECONCILIATION-REV36.md` — evidence provenance, source-specific freshness, stale status handling, and read-only reconciliation.
 24. `PROJECT-SERVICE-REGISTRY-REV37.md` — unified read-first project/service inventory without a competing source of truth.
-25. `ARCHITECTURE-COMPLETION-GATE-REV38.md` — explicit acceptance checklist before moving from architecture-only work to code/runtime reconciliation.
+25. `ARCHITECTURE-COMPLETION-GATE-REV38.md` — historical acceptance checklist before moving from architecture-only work to code/runtime reconciliation.
+26. `ARCHITECTURE-COVERAGE-AUDIT-REV39.md` — completed ten-domain conceptual coverage audit and explicit runtime evidence boundary.
 
 ## Architecture scope represented in the graph
 
@@ -60,7 +61,12 @@
 
 ## Next continuation
 
-Continue architecture-only work on the feature branch until the model is complete. Revisions 29–31 define canonical memory access, artifact intake, and recovery controls; revision 32 makes sync/async dispatch mutually exclusive; revision 33 limits D1 to runtime metadata; revision 34 defines cancellation, deadline propagation, and late-result fencing; revision 35 defines authority and rollback gates; revision 36 defines evidence freshness and read-only reconciliation; revision 37 adds a unified read-first project/service registry; revision 38 formalizes the architecture completion gate. After the user confirms the architecture gate, reconcile the graph and documents with actual code/runtime evidence, then perform tests and verification. Before claiming the phone/VPS UI reflects the newest graph, obtain fresh evidence that the VPS checkout was updated and the interface is serving that revision.
+Continue architecture-only work on the feature branch until the model is complete. Revisions 29–31 define canonical memory access, artifact intake, and recovery controls; revision 32 makes sync/async dispatch mutually exclusive; revision 33 limits D1 to runtime metadata; revision 34 defines cancellation, deadline propagation, and late-result fencing; revision 35 defines authority and rollback gates; revision 36 defines evidence freshness and read-only reconciliation; revision 37 adds a unified read-first project/service registry; revision 38 formalizes the architecture completion gate; revision 39 records the coverage audit and routes gateway ingress through request validation. After the user confirms the architecture gate, reconcile the graph and documents with actual code/runtime evidence, then perform tests and verification. Before claiming the phone/VPS UI reflects the newest graph, obtain fresh evidence that the VPS checkout was updated and the interface is serving that revision.
 
 
 Revision 37 adds `project-service-registry` and five planned relationships. Revision 38 adds `architecture-acceptance-gate` and three planned relationships plus the acceptance checklist. No tests, build, runtime probes, deployment, or merge were performed.
+
+
+## Revision 39 audit result
+
+Architecture coverage is `PASS (conceptual coverage)`; graph static integrity is PASS. Build/tests/runtime and live integrations remain NOT TESTED. The gateway ingress edge correction is in the feature branch only. VPS remains confirmed through revision 36; revision 39 is NOT YET SYNCED. Continue only after explicit owner approval for the test/runtime reconciliation phase.
