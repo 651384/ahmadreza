@@ -1,6 +1,6 @@
 # معماری SIMOT AI OS — مشخصات پیاده‌سازی VCP
 
-**گراف مرجع:** `src/graph-v1.json`، schema v1، revision 39، شامل 77 گره و 190 یال.
+**گراف مرجع:** `src/graph-v1.json`، schema v1، revision 40، شامل 77 گره و 190 یال.
 
 > این سند مشخصات نسخه‌بندی‌شدهٔ رابط معماری است؛ منبع حقیقت وضعیت عملیاتی نیست. منبع حقیقت عملیاتی SIMOT، VPS Master Memory است. وجود هر جزء در این سند یا گراف، به‌تنهایی وجود سرویس، اتصال زنده یا سلامت آن را اثبات نمی‌کند.
 
@@ -210,3 +210,8 @@ Operational-mode transitions require explicit scoped human authorization. The po
 ## Architecture coverage audit — revision 39
 
 بازبینی پوشش معماری در `ARCHITECTURE-COVERAGE-AUDIT-REV39.md` ثبت شده است. نتیجهٔ مدل معماری `PASS (conceptual coverage)` است؛ این نتیجه معادل پیاده‌سازی یا سلامت runtime نیست. مسیر Gateway در گراف اکنون از `request-ingress` عبور می‌کند. build، تست برنامه، runtime و همگام‌سازی VPS در این revision انجام نشده‌اند.
+
+
+## Graph schema validation — revision 40
+
+`GRAPH-VALIDATION-AUDIT-REV40.md` records the static schema audit. It corrected `human-escalation.data.capabilities` to an array as required by `scripts/validate-graph.mjs`. Static checks pass; the Node validator command, Vite build, browser test and VPS runtime remain NOT TESTED due to unavailable terminal/network access in this pass.
