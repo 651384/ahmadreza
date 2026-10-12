@@ -2,8 +2,8 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 18,
-  "updatedAt": "2026-10-12T07:52:08.197Z",
+  "revision": 19,
+  "updatedAt": "2026-10-12T07:53:33.242Z",
   "nodes": [
     {
       "id": "simot-core",
@@ -1759,6 +1759,35 @@
         "nextAction": "بعداً عملیات rollback را به پیشنهاد و approval متصل کن",
         "detail": "تاریخچهٔ Git موجود است؛ rollback از داخل UI هنوز قابلیتی تأییدشده نیست."
       }
+    },
+    {
+      "id": "canonical-memory-write-guard",
+      "type": "simotNode",
+      "position": {
+        "x": 1160,
+        "y": 1840
+      },
+      "data": {
+        "label": "Canonical Memory Write Guard",
+        "kind": "security",
+        "status": "PLANNED",
+        "role": "کنترل نوشتن معتبر و قابل‌بازیابی به VPS Master Memory",
+        "capabilities": [
+          "Validate target file/schema before write",
+          "Human approval for sensitive mutations",
+          "Optimistic concurrency / stale-version conflict detection",
+          "Idempotency and correlation for retries",
+          "Preserve prior state and avoid silent overwrite",
+          "Append task/evidence outcome with redaction",
+          "Return explicit success/failure and evidence reference"
+        ],
+        "accessMethod": "لایهٔ سیاست بین SIMOT Master API و فایل‌های canonical موجود؛ implementation واقعی هنوز نگاشت نشده",
+        "permissions": "Read-only default for VCP; sensitive writes require explicit approval; no secret values in evidence",
+        "evidence": "الزامات canonical continuity و human approval پروژه؛ enforcement اجرایی در این مرحله آزمون نشده",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "پس از تکمیل معماری، قواعد را با API موجود و ساختار پنج فایل Master Memory تطبیق بده",
+        "detail": "این گره سرویس حافظهٔ جدید نیست؛ کنترل منطقی روی همان VPS Master Memory و API موجود است."
+      }
     }
   ],
   "edges": [
@@ -3174,6 +3203,66 @@
       "data": {
         "status": "PLANNED",
         "evidence": "سیاست هدف free-first/privacy-first؛ تنظیمات provider و هزینه در این مرحله بررسی یا تغییر نشده"
+      }
+    },
+    {
+      "id": "e-master-api-write-guard",
+      "source": "simot-master-api",
+      "target": "canonical-memory-write-guard",
+      "label": "GATES_MUTATIONS",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "قواعد هدف نوشتن canonical؛ در این مرحله هیچ write واقعی اجرا یا آزمون نشده"
+      }
+    },
+    {
+      "id": "e-write-guard-memory",
+      "source": "canonical-memory-write-guard",
+      "target": "master-memory",
+      "label": "VALIDATES_AND_WRITES",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "قواعد هدف نوشتن canonical؛ در این مرحله هیچ write واقعی اجرا یا آزمون نشده"
+      }
+    },
+    {
+      "id": "e-write-guard-approval",
+      "source": "canonical-memory-write-guard",
+      "target": "approval-gate",
+      "label": "REQUIRES_APPROVAL_WHEN_SENSITIVE",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "قواعد هدف نوشتن canonical؛ در این مرحله هیچ write واقعی اجرا یا آزمون نشده"
+      }
+    },
+    {
+      "id": "e-write-guard-audit",
+      "source": "canonical-memory-write-guard",
+      "target": "audit-ledger",
+      "label": "RECORDS_WRITE_OUTCOME",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "قواعد هدف نوشتن canonical؛ در این مرحله هیچ write واقعی اجرا یا آزمون نشده"
+      }
+    },
+    {
+      "id": "e-write-guard-lifecycle",
+      "source": "canonical-memory-write-guard",
+      "target": "task-lifecycle",
+      "label": "ENFORCES_TASK_STATE",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "قواعد هدف نوشتن canonical؛ در این مرحله هیچ write واقعی اجرا یا آزمون نشده"
+      }
+    },
+    {
+      "id": "e-write-guard-identity",
+      "source": "canonical-memory-write-guard",
+      "target": "identity-access-boundary",
+      "label": "CHECKS_CALLER_AUTHORITY",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "قواعد هدف نوشتن canonical؛ در این مرحله هیچ write واقعی اجرا یا آزمون نشده"
       }
     }
   ]
