@@ -2,8 +2,8 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 36,
-  "updatedAt": "2026-10-12T09:00:00.000Z",
+  "revision": 37,
+  "updatedAt": "2026-10-12T10:00:00.000Z",
   "nodes": [
     {
       "id": "simot-core",
@@ -1946,6 +1946,32 @@
         "nextAction": "پس از تکمیل معماری، منابع شواهد و freshness rule هر منبع را با مالک منبع تطبیق بده",
         "detail": "شاهد تاریخی نباید به‌عنوان سلامت جاری نمایش داده شود. نبود timestamp، منبع یا scope کافی یعنی وضعیت جاری نامعلوم است؛ TTL عمومی و یکسان برای همهٔ منابع فرض نمی‌شود."
       }
+    },
+    {
+      "id": "project-service-registry",
+      "type": "simotNode",
+      "position": {
+        "x": 2040,
+        "y": 1260
+      },
+      "data": {
+        "label": "Project & Service Registry",
+        "kind": "registry",
+        "status": "PLANNED",
+        "role": "فهرست مرجع پروژه‌ها، سرویس‌ها و وابستگی‌های عملیاتی SIMOT",
+        "capabilities": [
+          "شناسه و مالک پروژه/سرویس",
+          "ارجاع به repository و runtime",
+          "وابستگی‌ها و lifecycle",
+          "وضعیت مبتنی بر شواهد منبع"
+        ],
+        "accessMethod": "طرح معماری؛ باید از منابع موجود استخراج شود و منبع حافظهٔ موازی نسازد",
+        "permissions": "Read-first؛ هر تغییر حساس تحت approval و write guard؛ secretها در رجیستری ذخیره نشوند",
+        "evidence": "شکاف پوشش معماری در revision 36؛ پیاده‌سازی/اتصال این رجیستری بررسی یا اجرا نشده",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "پس از گیت تکمیل معماری، موجودی پروژه‌ها/سرویس‌ها را از منابع فعلی reconcile کن؛ سرویس جدید نساز",
+        "detail": "این رجیستری نمایه و ارجاع ساختاری است، نه منبع حقیقت موازی؛ وضعیت زنده فقط با شواهد معتبر هر منبع."
+      }
     }
   ],
   "edges": [
@@ -3768,6 +3794,56 @@
       "status": "PLANNED",
       "evidence": "قرارداد معماری revision 36؛ enforcement خروجی هنوز پیاده‌سازی نشده",
       "permission": "ادعای VERIFIED فقط برای همان component/claim و scope دارای شاهد معتبر مجاز است."
+    },
+    {
+      "id": "e-source-project-service-registry",
+      "source": "source-of-truth-policy",
+      "target": "project-service-registry",
+      "label": "دامنه و مرجع هر رکورد",
+      "relation": "GOVERNS_RECORD_AUTHORITY",
+      "status": "PLANNED",
+      "evidence": "قرارداد معماری revision 37؛ نگاشت منابع هنوز اجرا نشده",
+      "permission": "برای هر فیلد منبع معتبر تعیین شود؛ VPS Master Memory مرجع تداوم/وضعیت عملیاتی باقی بماند."
+    },
+    {
+      "id": "e-registry-tool-registry",
+      "source": "project-service-registry",
+      "target": "tool-registry",
+      "label": "ارجاع به قابلیت‌ها و ابزارهای موجود",
+      "relation": "REFERENCES_REGISTERED_CAPABILITIES",
+      "status": "PLANNED",
+      "evidence": "قرارداد معماری revision 37؛ پیوند رجیستری‌ها هنوز پیاده‌سازی نشده",
+      "permission": "فقط ابزارهای کشف‌شده و مجاز ارجاع داده شوند؛ رجیستری دوم برای همان قابلیت ساخته نشود."
+    },
+    {
+      "id": "e-registry-monitoring",
+      "source": "monitoring",
+      "target": "project-service-registry",
+      "label": "وضعیت سرویس با شاهد منبع",
+      "relation": "ANNOTATES_SERVICE_STATUS_WITH_EVIDENCE",
+      "status": "PLANNED",
+      "evidence": "قرارداد معماری revision 37؛ وضعیت زنده از منابع هنوز جمع‌آوری نمی‌شود",
+      "permission": "بدون شواهد جاری وضعیت NOT TESTED/UNKNOWN بماند؛ دادهٔ تاریخی سلامت جاری تلقی نشود."
+    },
+    {
+      "id": "e-registry-vcp",
+      "source": "project-service-registry",
+      "target": "vcp",
+      "label": "نمایش فهرست و وابستگی‌ها",
+      "relation": "SUPPLIES_INVENTORY_VIEW",
+      "status": "PLANNED",
+      "evidence": "قرارداد معماری revision 37؛ رابط هنوز این نمایه را مصرف نمی‌کند",
+      "permission": "رابط فقط نمایش‌دهنده باشد؛ مرجع canonical را تغییر ندهد."
+    },
+    {
+      "id": "e-registry-adapters",
+      "source": "project-service-registry",
+      "target": "integration-adapters",
+      "label": "پیوند به آداپتورهای موجود",
+      "relation": "MAPS_EXISTING_INTEGRATIONS",
+      "status": "PLANNED",
+      "evidence": "قرارداد معماری revision 37؛ mapping runtime بررسی نشده",
+      "permission": "از ایجاد اتصال/credential یا هزینهٔ جدید بدون approval خودداری شود."
     }
   ]
 }
