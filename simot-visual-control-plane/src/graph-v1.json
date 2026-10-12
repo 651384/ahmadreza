@@ -2,8 +2,8 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 21,
-  "updatedAt": "2026-10-12T08:07:16.616Z",
+  "revision": 22,
+  "updatedAt": "2026-10-12T08:10:49.716Z",
   "nodes": [
     {
       "id": "simot-core",
@@ -2236,1526 +2236,1090 @@
       "source": "vps",
       "target": "simot-master-api",
       "label": "HOSTS",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود."
-      },
       "relation": "HOSTS",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-master-api-memory",
       "source": "simot-master-api",
       "target": "master-memory",
       "label": "READS_WRITES",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود."
-      },
       "relation": "READS_WRITES",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-vpc-master-api",
       "source": "cloudflare-vpc",
       "target": "simot-master-api",
       "label": "ROUTES_TO",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود."
-      },
       "relation": "ROUTES_TO",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-gateway-ai-workers",
       "source": "cloudflare-gateway",
       "target": "cloudflare-ai-workers",
       "label": "DISPATCHES_TO",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود."
-      },
       "relation": "DISPATCHES_TO",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-eventbus-consumer",
       "source": "event-bus",
       "target": "queue-consumer",
       "label": "DELIVERS_TO",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود."
-      },
       "relation": "DELIVERS_TO",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-consumer-ai-workers",
       "source": "queue-consumer",
       "target": "cloudflare-ai-workers",
       "label": "DISPATCHES_TO",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود."
-      },
       "relation": "DISPATCHES_TO",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-contracts-message-envelope",
       "source": "api-contracts",
       "target": "simot-message-envelope",
       "label": "DEFINES",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود."
-      },
       "relation": "DEFINES",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-envelope-eventbus",
       "source": "simot-message-envelope",
       "target": "event-bus",
       "label": "ENVELOPE_FOR",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود."
-      },
       "relation": "ENVELOPE_FOR",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-core-task-lifecycle",
       "source": "simot-core",
       "target": "task-lifecycle",
       "label": "OWNS",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود."
-      },
       "relation": "OWNS",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-orchestration-task-lifecycle",
       "source": "orchestration",
       "target": "task-lifecycle",
       "label": "EXECUTES",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود."
-      },
       "relation": "EXECUTES",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-policy-identity-boundary",
       "source": "policy-engine",
       "target": "identity-access-boundary",
       "label": "ENFORCES",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود."
-      },
       "relation": "ENFORCES",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-datagovernance-process-catalog",
       "source": "data-governance",
       "target": "process-catalog",
       "label": "CATALOGS",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود."
-      },
       "relation": "CATALOGS",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-process-business-workflows",
       "source": "process-catalog",
       "target": "business-workflows",
       "label": "DEFINES",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود."
-      },
       "relation": "DEFINES",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-workflows-orchestration",
       "source": "business-workflows",
       "target": "orchestration",
       "label": "EXECUTES",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود."
-      },
       "relation": "EXECUTES",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-core-memory-api",
       "source": "simot-core",
       "target": "simot-master-api",
       "label": "CALLS",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "مسیر معماری هدف برای دسترسی هسته به API؛ اتصال زنده بررسی نشده."
-      },
       "relation": "CALLS",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "مسیر معماری هدف برای دسترسی هسته به API؛ اتصال زنده بررسی نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-ingress-envelope",
       "source": "request-ingress",
       "target": "simot-message-envelope",
       "label": "CREATES",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
-      },
       "relation": "CREATES",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-envelope-orchestration",
       "source": "simot-message-envelope",
       "target": "orchestration",
       "label": "SUBMITS_TO",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
-      },
       "relation": "SUBMITS_TO",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-orchestration-context",
       "source": "orchestration",
       "target": "context-assembler",
       "label": "REQUESTS_CONTEXT",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
-      },
       "relation": "REQUESTS_CONTEXT",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-context-memory-api",
       "source": "context-assembler",
       "target": "simot-master-api",
       "label": "READS_CONTEXT",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
-      },
       "relation": "READS_CONTEXT",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-orchestration-planner",
       "source": "orchestration",
       "target": "planner",
       "label": "PLANS",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
-      },
       "relation": "PLANS",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-planner-task-lifecycle",
       "source": "planner",
       "target": "task-lifecycle",
       "label": "DEFINES_STEPS",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
-      },
       "relation": "DEFINES_STEPS",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-orchestration-executor",
       "source": "orchestration",
       "target": "executor",
       "label": "DISPATCHES",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
-      },
       "relation": "DISPATCHES",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-executor-adapters",
       "source": "executor",
       "target": "integration-adapters",
       "label": "CALLS_ALLOWED_TOOLS",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
-      },
       "relation": "CALLS_ALLOWED_TOOLS",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-executor-policy",
       "source": "executor",
       "target": "policy-engine",
       "label": "CHECKS_BEFORE_ACTION",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
-      },
       "relation": "CHECKS_BEFORE_ACTION",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-executor-approval",
       "source": "executor",
       "target": "approval-gate",
       "label": "REQUESTS_APPROVAL",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
-      },
       "relation": "REQUESTS_APPROVAL",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-executor-retry",
       "source": "executor",
       "target": "retry-idempotency",
       "label": "GUARDED_BY",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
-      },
       "relation": "GUARDED_BY",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-executor-result",
       "source": "executor",
       "target": "result-assembler",
       "label": "EMITS_RESULT",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
-      },
       "relation": "EMITS_RESULT",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-result-audit",
       "source": "result-assembler",
       "target": "audit-ledger",
       "label": "RECORDS_EVIDENCE",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
-      },
       "relation": "RECORDS_EVIDENCE",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-result-memory",
       "source": "result-assembler",
       "target": "simot-master-api",
       "label": "WRITES_AFTER_POLICY",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
-      },
       "relation": "WRITES_AFTER_POLICY",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-policy-classification",
       "source": "policy-engine",
       "target": "data-classification",
       "label": "APPLIES",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
-      },
       "relation": "APPLIES",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-registry-permissions",
       "source": "tool-registry",
       "target": "connector-permissions",
       "label": "DECLARES",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
-      },
       "relation": "DECLARES",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-permissions-adapters",
       "source": "connector-permissions",
       "target": "integration-adapters",
       "label": "SCOPES",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
-      },
       "relation": "SCOPES",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-envelope-retry",
       "source": "simot-message-envelope",
       "target": "retry-idempotency",
       "label": "CARRIES_CORRELATION",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
-      },
       "relation": "CARRIES_CORRELATION",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-result-response",
       "source": "result-assembler",
       "target": "response-delivery",
       "label": "FORMATS",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط معماری هدف؛ در این مرحله تست runtime انجام نشده."
-      },
       "relation": "FORMATS",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط معماری هدف؛ در این مرحله تست runtime انجام نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-response-ingress",
       "source": "response-delivery",
       "target": "request-ingress",
       "label": "REPLIES_TO",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط معماری هدف؛ در این مرحله تست runtime انجام نشده."
-      },
       "relation": "REPLIES_TO",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط معماری هدف؛ در این مرحله تست runtime انجام نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-retry-failure",
       "source": "retry-idempotency",
       "target": "failure-handler",
       "label": "ESCALATES",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط معماری هدف؛ در این مرحله تست runtime انجام نشده."
-      },
       "relation": "ESCALATES",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط معماری هدف؛ در این مرحله تست runtime انجام نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-failure-dlq",
       "source": "failure-handler",
       "target": "cloudflare-dlq",
       "label": "SENDS_FINAL_FAILURE",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط معماری هدف؛ در این مرحله تست runtime انجام نشده."
-      },
       "relation": "SENDS_FINAL_FAILURE",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط معماری هدف؛ در این مرحله تست runtime انجام نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-failure-human",
       "source": "failure-handler",
       "target": "human-escalation",
       "label": "ESCALATES_TO",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط معماری هدف؛ در این مرحله تست runtime انجام نشده."
-      },
       "relation": "ESCALATES_TO",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط معماری هدف؛ در این مرحله تست runtime انجام نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-router-cost-policy",
       "source": "model-router",
       "target": "model-cost-policy",
       "label": "GOVERNED_BY",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط معماری هدف؛ در این مرحله تست runtime انجام نشده."
-      },
       "relation": "GOVERNED_BY",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط معماری هدف؛ در این مرحله تست runtime انجام نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-policy-cost",
       "source": "policy-engine",
       "target": "model-cost-policy",
       "label": "ENFORCES",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط معماری هدف؛ در این مرحله تست runtime انجام نشده."
-      },
       "relation": "ENFORCES",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط معماری هدف؛ در این مرحله تست runtime انجام نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-approval-human-escalation",
       "source": "human-escalation",
       "target": "approval-gate",
       "label": "REQUESTS_DECISION",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط معماری هدف؛ در این مرحله تست runtime انجام نشده."
-      },
       "relation": "REQUESTS_DECISION",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط معماری هدف؛ در این مرحله تست runtime انجام نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-release-approval",
       "source": "change-release-gate",
       "target": "approval-gate",
       "label": "REQUIRES",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط معماری هدف؛ در این مرحله تست runtime انجام نشده."
-      },
       "relation": "REQUIRES",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط معماری هدف؛ در این مرحله تست runtime انجام نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-release-audit",
       "source": "change-release-gate",
       "target": "audit-ledger",
       "label": "RECORDS_CHANGE",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط معماری هدف؛ در این مرحله تست runtime انجام نشده."
-      },
       "relation": "RECORDS_CHANGE",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط معماری هدف؛ در این مرحله تست runtime انجام نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-policy-source-hierarchy",
       "source": "policy-engine",
       "target": "source-of-truth-policy",
       "label": "ENFORCES",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط معماری هدف؛ اجرا بررسی نشده."
-      },
       "relation": "ENFORCES",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط معماری هدف؛ اجرا بررسی نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-source-master-memory",
       "source": "source-of-truth-policy",
       "target": "master-memory",
       "label": "OPERATIONAL_SOURCE",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "سیاست منبع؛ اتصال runtime بررسی نشده."
-      },
       "relation": "OPERATIONAL_SOURCE",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "سیاست منبع؛ اتصال runtime بررسی نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-source-docs",
       "source": "source-of-truth-policy",
       "target": "sharepoint",
       "label": "DOCUMENTS_AND_EVIDENCE",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "سیاست منبع؛ اتصال runtime بررسی نشده."
-      },
       "relation": "DOCUMENTS_AND_EVIDENCE",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "سیاست منبع؛ اتصال runtime بررسی نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-source-code",
       "source": "source-of-truth-policy",
       "target": "github",
       "label": "CODE_AND_VERSION",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "سیاست منبع؛ اتصال runtime بررسی نشده."
-      },
       "relation": "CODE_AND_VERSION",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "سیاست منبع؛ اتصال runtime بررسی نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-source-ui",
       "source": "source-of-truth-policy",
       "target": "vcp",
       "label": "DISPLAY_ONLY",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "سیاست منبع؛ اتصال runtime بررسی نشده."
-      },
       "relation": "DISPLAY_ONLY",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "سیاست منبع؛ اتصال runtime بررسی نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-source-architecture-policy",
       "source": "source-of-truth-policy",
       "target": "notion",
       "label": "Notion: معماری و سیاست",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "معماری هدف؛ پیاده‌سازی و enforcement هنوز آزمون نشده"
-      },
       "relation": "Notion: معماری و سیاست",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "معماری هدف؛ پیاده‌سازی و enforcement هنوز آزمون نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-source-task-records",
       "source": "source-of-truth-policy",
       "target": "asana",
       "label": "Asana: وظایف",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "معماری هدف؛ پیاده‌سازی و enforcement هنوز آزمون نشده"
-      },
       "relation": "Asana: وظایف",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "معماری هدف؛ پیاده‌سازی و enforcement هنوز آزمون نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-source-crm-records",
       "source": "source-of-truth-policy",
       "target": "hubspot",
       "label": "HubSpot: CRM",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "معماری هدف؛ پیاده‌سازی و enforcement هنوز آزمون نشده"
-      },
       "relation": "HubSpot: CRM",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "معماری هدف؛ پیاده‌سازی و enforcement هنوز آزمون نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-source-runtime-evidence",
       "source": "source-of-truth-policy",
       "target": "cloudflare-gateway",
       "label": "Cloudflare: شواهد runtime",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "معماری هدف؛ پیاده‌سازی و enforcement هنوز آزمون نشده"
-      },
       "relation": "Cloudflare: شواهد runtime",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "معماری هدف؛ پیاده‌سازی و enforcement هنوز آزمون نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-source-context-enforcement",
       "source": "source-of-truth-policy",
       "target": "context-assembler",
       "label": "اعمال سیاست منبع هنگام ساخت context",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "معماری هدف؛ پیاده‌سازی و enforcement هنوز آزمون نشده"
-      },
       "relation": "اعمال سیاست منبع هنگام ساخت context",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "معماری هدف؛ پیاده‌سازی و enforcement هنوز آزمون نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-source-data-governance",
       "source": "source-of-truth-policy",
       "target": "data-governance",
       "label": "هم‌راستایی با حاکمیت داده",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "معماری هدف؛ پیاده‌سازی و enforcement هنوز آزمون نشده"
-      },
       "relation": "هم‌راستایی با حاکمیت داده",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "معماری هدف؛ پیاده‌سازی و enforcement هنوز آزمون نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-policy-release-gate",
       "source": "policy-engine",
       "target": "change-release-gate",
       "label": "GOVERNS_CHANGES",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط معماری هدف؛ پیاده‌سازی runtime هنوز نگاشت یا آزمون نشده"
-      },
       "relation": "GOVERNS_CHANGES",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط معماری هدف؛ پیاده‌سازی runtime هنوز نگاشت یا آزمون نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-monitoring-failure-handler",
       "source": "monitoring",
       "target": "failure-handler",
       "label": "ROUTES_DETECTED_FAILURES",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط معماری هدف؛ پیاده‌سازی runtime هنوز نگاشت یا آزمون نشده"
-      },
       "relation": "ROUTES_DETECTED_FAILURES",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط معماری هدف؛ پیاده‌سازی runtime هنوز نگاشت یا آزمون نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-lifecycle-result-state",
       "source": "task-lifecycle",
       "target": "result-assembler",
       "label": "EMITS_TERMINAL_TASK_STATE",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "ارتباط معماری هدف؛ پیاده‌سازی runtime هنوز نگاشت یا آزمون نشده"
-      },
       "relation": "EMITS_TERMINAL_TASK_STATE",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "ارتباط معماری هدف؛ پیاده‌سازی runtime هنوز نگاشت یا آزمون نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-lifecycle-cancellation-timeout",
       "source": "task-lifecycle",
       "target": "task-cancellation-timeout",
       "label": "GOVERNS_CANCEL_TIMEOUT",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "معماری هدف؛ schema و اجرای واقعی هنوز آزمون نشده"
-      },
       "relation": "GOVERNS_CANCEL_TIMEOUT",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "معماری هدف؛ schema و اجرای واقعی هنوز آزمون نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-cancel-audit",
       "source": "task-cancellation-timeout",
       "target": "audit-ledger",
       "label": "RECORDS_TERMINAL_REASON",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "معماری هدف؛ schema و اجرای واقعی هنوز آزمون نشده"
-      },
       "relation": "RECORDS_TERMINAL_REASON",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "معماری هدف؛ schema و اجرای واقعی هنوز آزمون نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-lifecycle-evidence-contract",
       "source": "task-lifecycle",
       "target": "evidence-contract",
       "label": "USES_RECORD_SCHEMA",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "معماری هدف؛ schema و اجرای واقعی هنوز آزمون نشده"
-      },
       "relation": "USES_RECORD_SCHEMA",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "معماری هدف؛ schema و اجرای واقعی هنوز آزمون نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-evidence-master-memory",
       "source": "evidence-contract",
       "target": "master-memory",
       "label": "PERSISTS_CANONICAL_RECORD",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "معماری هدف؛ schema و اجرای واقعی هنوز آزمون نشده"
-      },
       "relation": "PERSISTS_CANONICAL_RECORD",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "معماری هدف؛ schema و اجرای واقعی هنوز آزمون نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-evidence-audit",
       "source": "evidence-contract",
       "target": "audit-ledger",
       "label": "DEFINES_AUDIT_EVIDENCE",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "معماری هدف؛ schema و اجرای واقعی هنوز آزمون نشده"
-      },
       "relation": "DEFINES_AUDIT_EVIDENCE",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "معماری هدف؛ schema و اجرای واقعی هنوز آزمون نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-api-ingress-contract",
       "source": "api-contracts",
       "target": "request-ingress",
       "label": "VALIDATES_REQUEST",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "قرارداد هدف معماری؛ تطبیق و آزمون runtime به مرحلهٔ بعد موکول است"
-      },
       "relation": "VALIDATES_REQUEST",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "قرارداد هدف معماری؛ تطبیق و آزمون runtime به مرحلهٔ بعد موکول است",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-api-response-contract",
       "source": "api-contracts",
       "target": "response-delivery",
       "label": "SHAPES_RESPONSE",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "قرارداد هدف معماری؛ تطبیق و آزمون runtime به مرحلهٔ بعد موکول است"
-      },
       "relation": "SHAPES_RESPONSE",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "قرارداد هدف معماری؛ تطبیق و آزمون runtime به مرحلهٔ بعد موکول است",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-api-error-contract",
       "source": "api-contracts",
       "target": "failure-handler",
       "label": "STRUCTURES_ERROR",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "قرارداد هدف معماری؛ تطبیق و آزمون runtime به مرحلهٔ بعد موکول است"
-      },
       "relation": "STRUCTURES_ERROR",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "قرارداد هدف معماری؛ تطبیق و آزمون runtime به مرحلهٔ بعد موکول است",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-envelope-response",
       "source": "simot-message-envelope",
       "target": "response-delivery",
       "label": "CORRELATES_REPLY",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "قرارداد هدف معماری؛ تطبیق و آزمون runtime به مرحلهٔ بعد موکول است"
-      },
       "relation": "CORRELATES_REPLY",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "قرارداد هدف معماری؛ تطبیق و آزمون runtime به مرحلهٔ بعد موکول است",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-executor-permission-check",
       "source": "executor",
       "target": "connector-permissions",
       "label": "CHECKS_GRANTED_SCOPE",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "قرارداد هدف معماری؛ تطبیق و آزمون runtime به مرحلهٔ بعد موکول است"
-      },
       "relation": "CHECKS_GRANTED_SCOPE",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "قرارداد هدف معماری؛ تطبیق و آزمون runtime به مرحلهٔ بعد موکول است",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-permission-approval-gate",
       "source": "connector-permissions",
       "target": "approval-gate",
       "label": "REQUIRES_APPROVAL_FOR_SENSITIVE_SCOPE",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "قرارداد هدف معماری؛ تطبیق و آزمون runtime به مرحلهٔ بعد موکول است"
-      },
       "relation": "REQUIRES_APPROVAL_FOR_SENSITIVE_SCOPE",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "قرارداد هدف معماری؛ تطبیق و آزمون runtime به مرحلهٔ بعد موکول است",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-failure-evidence-contract",
       "source": "failure-handler",
       "target": "evidence-contract",
       "label": "RECORDS_ERROR_OUTCOME",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "قرارداد هدف معماری؛ تطبیق و آزمون runtime به مرحلهٔ بعد موکول است"
-      },
       "relation": "RECORDS_ERROR_OUTCOME",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "قرارداد هدف معماری؛ تطبیق و آزمون runtime به مرحلهٔ بعد موکول است",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-ingress-identity-check",
       "source": "request-ingress",
       "target": "identity-access-boundary",
       "label": "AUTHENTICATES_REQUEST",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "قرارداد هدف معماری؛ تطبیق و آزمون runtime به مرحلهٔ بعد موکول است"
-      },
       "relation": "AUTHENTICATES_REQUEST",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "قرارداد هدف معماری؛ تطبیق و آزمون runtime به مرحلهٔ بعد موکول است",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-adapters-trust-matrix",
       "source": "integration-adapters",
       "target": "connector-trust-matrix",
       "label": "MAPPED_BY",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "مرزبندی هدف معماری؛ هیچ تنظیم runtime یا مجوزی در این تغییر دست‌کاری نشده"
-      },
       "relation": "MAPPED_BY",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "مرزبندی هدف معماری؛ هیچ تنظیم runtime یا مجوزی در این تغییر دست‌کاری نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-trust-permissions",
       "source": "connector-trust-matrix",
       "target": "connector-permissions",
       "label": "DEFINES_SCOPES",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "مرزبندی هدف معماری؛ هیچ تنظیم runtime یا مجوزی در این تغییر دست‌کاری نشده"
-      },
       "relation": "DEFINES_SCOPES",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "مرزبندی هدف معماری؛ هیچ تنظیم runtime یا مجوزی در این تغییر دست‌کاری نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-trust-identity",
       "source": "connector-trust-matrix",
       "target": "identity-access-boundary",
       "label": "USES_IDENTITY_BOUNDARY",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "مرزبندی هدف معماری؛ هیچ تنظیم runtime یا مجوزی در این تغییر دست‌کاری نشده"
-      },
       "relation": "USES_IDENTITY_BOUNDARY",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "مرزبندی هدف معماری؛ هیچ تنظیم runtime یا مجوزی در این تغییر دست‌کاری نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-trust-approval",
       "source": "connector-trust-matrix",
       "target": "approval-gate",
       "label": "GATES_SENSITIVE_OPERATIONS",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "مرزبندی هدف معماری؛ هیچ تنظیم runtime یا مجوزی در این تغییر دست‌کاری نشده"
-      },
       "relation": "GATES_SENSITIVE_OPERATIONS",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "مرزبندی هدف معماری؛ هیچ تنظیم runtime یا مجوزی در این تغییر دست‌کاری نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-trust-audit",
       "source": "connector-trust-matrix",
       "target": "audit-ledger",
       "label": "REQUIRES_EVIDENCE",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "مرزبندی هدف معماری؛ هیچ تنظیم runtime یا مجوزی در این تغییر دست‌کاری نشده"
-      },
       "relation": "REQUIRES_EVIDENCE",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "مرزبندی هدف معماری؛ هیچ تنظیم runtime یا مجوزی در این تغییر دست‌کاری نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-trust-source-policy",
       "source": "connector-trust-matrix",
       "target": "source-of-truth-policy",
       "label": "ENFORCES_DATA_DOMAIN",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "مرزبندی هدف معماری؛ هیچ تنظیم runtime یا مجوزی در این تغییر دست‌کاری نشده"
-      },
       "relation": "ENFORCES_DATA_DOMAIN",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "مرزبندی هدف معماری؛ هیچ تنظیم runtime یا مجوزی در این تغییر دست‌کاری نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-topology-vps",
       "source": "deployment-trust-boundaries",
       "target": "vps",
       "label": "PROTECTS_PRIVATE_RUNTIME",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "مرزبندی هدف معماری؛ هیچ تنظیم runtime یا مجوزی در این تغییر دست‌کاری نشده"
-      },
       "relation": "PROTECTS_PRIVATE_RUNTIME",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "مرزبندی هدف معماری؛ هیچ تنظیم runtime یا مجوزی در این تغییر دست‌کاری نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-topology-cloudflare",
       "source": "deployment-trust-boundaries",
       "target": "cloudflare-gateway",
       "label": "DEFINES_CLOUD_BOUNDARY",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "مرزبندی هدف معماری؛ هیچ تنظیم runtime یا مجوزی در این تغییر دست‌کاری نشده"
-      },
       "relation": "DEFINES_CLOUD_BOUNDARY",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "مرزبندی هدف معماری؛ هیچ تنظیم runtime یا مجوزی در این تغییر دست‌کاری نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-topology-tailscale",
       "source": "deployment-trust-boundaries",
       "target": "tailscale",
       "label": "PREFERS_PRIVATE_OPERATOR_ACCESS",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "مرزبندی هدف معماری؛ هیچ تنظیم runtime یا مجوزی در این تغییر دست‌کاری نشده"
-      },
       "relation": "PREFERS_PRIVATE_OPERATOR_ACCESS",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "مرزبندی هدف معماری؛ هیچ تنظیم runtime یا مجوزی در این تغییر دست‌کاری نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-topology-client",
       "source": "deployment-trust-boundaries",
       "target": "phone-client",
       "label": "ISOLATES_CLIENT_FROM_CANONICAL_MEMORY",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "مرزبندی هدف معماری؛ هیچ تنظیم runtime یا مجوزی در این تغییر دست‌کاری نشده"
-      },
       "relation": "ISOLATES_CLIENT_FROM_CANONICAL_MEMORY",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "مرزبندی هدف معماری؛ هیچ تنظیم runtime یا مجوزی در این تغییر دست‌کاری نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-topology-vcp",
       "source": "deployment-trust-boundaries",
       "target": "vcp",
       "label": "KEEPS_UI_NONCANONICAL",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "مرزبندی هدف معماری؛ هیچ تنظیم runtime یا مجوزی در این تغییر دست‌کاری نشده"
-      },
       "relation": "KEEPS_UI_NONCANONICAL",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "مرزبندی هدف معماری؛ هیچ تنظیم runtime یا مجوزی در این تغییر دست‌کاری نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-mode-policy-engine",
       "source": "operational-mode-policy",
       "target": "policy-engine",
       "label": "CONSTRAINS_EXECUTION",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "سیاست هدف؛ عملیات backup/rollback یا enforcement در این مرحله اجرا نشده"
-      },
       "relation": "CONSTRAINS_EXECUTION",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "سیاست هدف؛ عملیات backup/rollback یا enforcement در این مرحله اجرا نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-mode-approval",
       "source": "operational-mode-policy",
       "target": "approval-gate",
       "label": "GATES_MODE_TRANSITION",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "سیاست هدف؛ عملیات backup/rollback یا enforcement در این مرحله اجرا نشده"
-      },
       "relation": "GATES_MODE_TRANSITION",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "سیاست هدف؛ عملیات backup/rollback یا enforcement در این مرحله اجرا نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-mode-monitoring",
       "source": "operational-mode-policy",
       "target": "monitoring",
       "label": "EXPOSES_MODE_STATUS",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "سیاست هدف؛ عملیات backup/rollback یا enforcement در این مرحله اجرا نشده"
-      },
       "relation": "EXPOSES_MODE_STATUS",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "سیاست هدف؛ عملیات backup/rollback یا enforcement در این مرحله اجرا نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-classification-context",
       "source": "data-classification",
       "target": "context-assembler",
       "label": "FILTERS_CONTEXT",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "سیاست هدف؛ عملیات backup/rollback یا enforcement در این مرحله اجرا نشده"
-      },
       "relation": "FILTERS_CONTEXT",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "سیاست هدف؛ عملیات backup/rollback یا enforcement در این مرحله اجرا نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-classification-connectors",
       "source": "data-classification",
       "target": "connector-trust-matrix",
       "label": "RESTRICTS_DATA_TRANSFER",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "سیاست هدف؛ عملیات backup/rollback یا enforcement در این مرحله اجرا نشده"
-      },
       "relation": "RESTRICTS_DATA_TRANSFER",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "سیاست هدف؛ عملیات backup/rollback یا enforcement در این مرحله اجرا نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-rollback-release",
       "source": "backup-rollback-policy",
       "target": "change-release-gate",
       "label": "REQUIRES_RECOVERY_PLAN",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "سیاست هدف؛ عملیات backup/rollback یا enforcement در این مرحله اجرا نشده"
-      },
       "relation": "REQUIRES_RECOVERY_PLAN",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "سیاست هدف؛ عملیات backup/rollback یا enforcement در این مرحله اجرا نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-rollback-audit",
       "source": "backup-rollback-policy",
       "target": "audit-ledger",
       "label": "RECORDS_RECOVERY_EVIDENCE",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "سیاست هدف؛ عملیات backup/rollback یا enforcement در این مرحله اجرا نشده"
-      },
       "relation": "RECORDS_RECOVERY_EVIDENCE",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "سیاست هدف؛ عملیات backup/rollback یا enforcement در این مرحله اجرا نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-release-backup",
       "source": "change-release-gate",
       "target": "backup-rollback-policy",
       "label": "CHECKS_RECOVERY_READINESS",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "سیاست هدف؛ عملیات backup/rollback یا enforcement در این مرحله اجرا نشده"
-      },
       "relation": "CHECKS_RECOVERY_READINESS",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "سیاست هدف؛ عملیات backup/rollback یا enforcement در این مرحله اجرا نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-vcp-graph-schema",
       "source": "vcp",
       "target": "graph-schema-registry",
       "label": "USES_VERSIONED_MODEL",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "معماری هدف برای کنترل گراف؛ اجرای validator یا rollback در این مرحله انجام نشده"
-      },
       "relation": "USES_VERSIONED_MODEL",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "معماری هدف برای کنترل گراف؛ اجرای validator یا rollback در این مرحله انجام نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-schema-validation",
       "source": "graph-schema-registry",
       "target": "graph-validation-policy",
       "label": "VALIDATED_BY",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "معماری هدف برای کنترل گراف؛ اجرای validator یا rollback در این مرحله انجام نشده"
-      },
       "relation": "VALIDATED_BY",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "معماری هدف برای کنترل گراف؛ اجرای validator یا rollback در این مرحله انجام نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-vcp-change-review",
       "source": "vcp",
       "target": "graph-change-review",
       "label": "PROPOSES_CHANGES",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "معماری هدف برای کنترل گراف؛ اجرای validator یا rollback در این مرحله انجام نشده"
-      },
       "relation": "PROPOSES_CHANGES",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "معماری هدف برای کنترل گراف؛ اجرای validator یا rollback در این مرحله انجام نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-review-change-gate",
       "source": "graph-change-review",
       "target": "change-release-gate",
       "label": "REQUIRES_REVIEW",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "معماری هدف برای کنترل گراف؛ اجرای validator یا rollback در این مرحله انجام نشده"
-      },
       "relation": "REQUIRES_REVIEW",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "معماری هدف برای کنترل گراف؛ اجرای validator یا rollback در این مرحله انجام نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-review-audit",
       "source": "graph-change-review",
       "target": "audit-ledger",
       "label": "RECORDS_PROPOSAL",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "معماری هدف برای کنترل گراف؛ اجرای validator یا rollback در این مرحله انجام نشده"
-      },
       "relation": "RECORDS_PROPOSAL",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "معماری هدف برای کنترل گراف؛ اجرای validator یا rollback در این مرحله انجام نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-validation-review",
       "source": "graph-validation-policy",
       "target": "graph-change-review",
       "label": "GATES_ACCEPTANCE",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "معماری هدف برای کنترل گراف؛ اجرای validator یا rollback در این مرحله انجام نشده"
-      },
       "relation": "GATES_ACCEPTANCE",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "معماری هدف برای کنترل گراف؛ اجرای validator یا rollback در این مرحله انجام نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-history-github",
       "source": "graph-history-rollback",
       "target": "github",
       "label": "REFERENCES_COMMITS",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "معماری هدف برای کنترل گراف؛ اجرای validator یا rollback در این مرحله انجام نشده"
-      },
       "relation": "REFERENCES_COMMITS",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "معماری هدف برای کنترل گراف؛ اجرای validator یا rollback در این مرحله انجام نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-history-review",
       "source": "graph-history-rollback",
       "target": "graph-change-review",
       "label": "PROPOSES_REVERT",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "معماری هدف برای کنترل گراف؛ اجرای validator یا rollback در این مرحله انجام نشده"
-      },
       "relation": "PROPOSES_REVERT",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "معماری هدف برای کنترل گراف؛ اجرای validator یا rollback در این مرحله انجام نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-history-audit",
       "source": "graph-history-rollback",
       "target": "audit-ledger",
       "label": "RECORDS_REVERSION",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "معماری هدف برای کنترل گراف؛ اجرای validator یا rollback در این مرحله انجام نشده"
-      },
       "relation": "RECORDS_REVERSION",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "معماری هدف برای کنترل گراف؛ اجرای validator یا rollback در این مرحله انجام نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-classification-model-router",
       "source": "data-classification",
       "target": "model-router",
       "label": "FILTERS_ELIGIBLE_PROVIDERS",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "سیاست هدف free-first/privacy-first؛ تنظیمات provider و هزینه در این مرحله بررسی یا تغییر نشده"
-      },
       "relation": "FILTERS_ELIGIBLE_PROVIDERS",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "سیاست هدف free-first/privacy-first؛ تنظیمات provider و هزینه در این مرحله بررسی یا تغییر نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-model-policy-router",
       "source": "model-cost-policy",
       "target": "model-router",
       "label": "GOVERNS_SELECTION",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "سیاست هدف free-first/privacy-first؛ تنظیمات provider و هزینه در این مرحله بررسی یا تغییر نشده"
-      },
       "relation": "GOVERNS_SELECTION",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "سیاست هدف free-first/privacy-first؛ تنظیمات provider و هزینه در این مرحله بررسی یا تغییر نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-model-policy-approval",
       "source": "model-cost-policy",
       "target": "approval-gate",
       "label": "GATES_NEW_SPEND",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "سیاست هدف free-first/privacy-first؛ تنظیمات provider و هزینه در این مرحله بررسی یا تغییر نشده"
-      },
       "relation": "GATES_NEW_SPEND",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "سیاست هدف free-first/privacy-first؛ تنظیمات provider و هزینه در این مرحله بررسی یا تغییر نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-model-policy-audit",
       "source": "model-cost-policy",
       "target": "audit-ledger",
       "label": "RECORDS_PROVIDER_DECISION",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "سیاست هدف free-first/privacy-first؛ تنظیمات provider و هزینه در این مرحله بررسی یا تغییر نشده"
-      },
       "relation": "RECORDS_PROVIDER_DECISION",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "سیاست هدف free-first/privacy-first؛ تنظیمات provider و هزینه در این مرحله بررسی یا تغییر نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-model-policy-secrets",
       "source": "model-cost-policy",
       "target": "secrets-boundary",
       "label": "PROTECTS_PROVIDER_CREDENTIALS",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "سیاست هدف free-first/privacy-first؛ تنظیمات provider و هزینه در این مرحله بررسی یا تغییر نشده"
-      },
       "relation": "PROTECTS_PROVIDER_CREDENTIALS",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "سیاست هدف free-first/privacy-first؛ تنظیمات provider و هزینه در این مرحله بررسی یا تغییر نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-master-api-write-guard",
       "source": "simot-master-api",
       "target": "canonical-memory-write-guard",
       "label": "GATES_MUTATIONS",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "قواعد هدف نوشتن canonical؛ در این مرحله هیچ write واقعی اجرا یا آزمون نشده"
-      },
       "relation": "GATES_MUTATIONS",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "قواعد هدف نوشتن canonical؛ در این مرحله هیچ write واقعی اجرا یا آزمون نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-write-guard-memory",
       "source": "canonical-memory-write-guard",
       "target": "master-memory",
       "label": "VALIDATES_AND_WRITES",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "قواعد هدف نوشتن canonical؛ در این مرحله هیچ write واقعی اجرا یا آزمون نشده"
-      },
       "relation": "VALIDATES_AND_WRITES",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "قواعد هدف نوشتن canonical؛ در این مرحله هیچ write واقعی اجرا یا آزمون نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-write-guard-approval",
       "source": "canonical-memory-write-guard",
       "target": "approval-gate",
       "label": "REQUIRES_APPROVAL_WHEN_SENSITIVE",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "قواعد هدف نوشتن canonical؛ در این مرحله هیچ write واقعی اجرا یا آزمون نشده"
-      },
       "relation": "REQUIRES_APPROVAL_WHEN_SENSITIVE",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "قواعد هدف نوشتن canonical؛ در این مرحله هیچ write واقعی اجرا یا آزمون نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-write-guard-audit",
       "source": "canonical-memory-write-guard",
       "target": "audit-ledger",
       "label": "RECORDS_WRITE_OUTCOME",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "قواعد هدف نوشتن canonical؛ در این مرحله هیچ write واقعی اجرا یا آزمون نشده"
-      },
       "relation": "RECORDS_WRITE_OUTCOME",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "قواعد هدف نوشتن canonical؛ در این مرحله هیچ write واقعی اجرا یا آزمون نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-write-guard-lifecycle",
       "source": "canonical-memory-write-guard",
       "target": "task-lifecycle",
       "label": "ENFORCES_TASK_STATE",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "قواعد هدف نوشتن canonical؛ در این مرحله هیچ write واقعی اجرا یا آزمون نشده"
-      },
       "relation": "ENFORCES_TASK_STATE",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "قواعد هدف نوشتن canonical؛ در این مرحله هیچ write واقعی اجرا یا آزمون نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     },
     {
       "id": "e-write-guard-identity",
       "source": "canonical-memory-write-guard",
       "target": "identity-access-boundary",
       "label": "CHECKS_CALLER_AUTHORITY",
-      "data": {
-        "status": "PLANNED",
-        "evidence": "قواعد هدف نوشتن canonical؛ در این مرحله هیچ write واقعی اجرا یا آزمون نشده"
-      },
       "relation": "CHECKS_CALLER_AUTHORITY",
-      "evidence": "شاهد موجود در گراف برای این ارتباط ثبت نشده؛ از وضعیت فعلی نتیجهٔ عملیاتی استنتاج نشود.",
+      "evidence": "قواعد هدف نوشتن canonical؛ در این مرحله هیچ write واقعی اجرا یا آزمون نشده",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "NOT TESTED"
+      "status": "PLANNED"
     }
   ]
 }
