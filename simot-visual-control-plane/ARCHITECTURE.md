@@ -1,6 +1,6 @@
 # معماری SIMOT AI OS — مشخصات پیاده‌سازی VCP
 
-**گراف مرجع:** `src/graph-v1.json`، schema v1، revision 35، شامل 74 گره و 177 یال.
+**گراف مرجع:** `src/graph-v1.json`، schema v1، revision 36، شامل 75 گره و 182 یال.
 
 > این سند مشخصات نسخه‌بندی‌شدهٔ رابط معماری است؛ منبع حقیقت وضعیت عملیاتی نیست. منبع حقیقت عملیاتی SIMOT، VPS Master Memory است. وجود هر جزء در این سند یا گراف، به‌تنهایی وجود سرویس، اتصال زنده یا سلامت آن را اثبات نمی‌کند.
 
@@ -187,3 +187,13 @@ Cancellation and deadlines must propagate through ingress, executor, and queue c
 ## Operational authority and rollback gates — revision 35
 
 Operational-mode transitions require explicit scoped human authorization. The policy engine governs deployment trust boundaries; public exposure, private-access changes, and infrastructure changes require human approval. Graph rollback must pass approval and change/release gates after diff review and preservation of the current revision/evidence. No approval is inferred from UI actions. These controls remain planned until implemented and evidenced.
+
+
+## Revision 36 — تازگی شواهد و تطبیق وضعیت
+
+- هر وضعیت قابل نمایش باید به شاهد مشخص، منبع، دامنهٔ ادعا و زمان مشاهده متصل باشد؛ زمان ثبت رکورد با زمان مشاهده یکی فرض نمی‌شود.
+- شاهد تاریخی، وجود تنظیمات، نام binding یا موفقیت build به‌تنهایی سلامت جاری یک endpoint یا سرویس را ثابت نمی‌کند.
+- قاعدهٔ تازگی باید بر اساس منبع و نوع ادعا تعریف شود؛ TTL عمومی و یکسان برای همهٔ اتصال‌ها فرض نمی‌شود.
+- اگر منبع، scope، timestamp یا شاهد کافی موجود نیست، وضعیت جاری باید `NOT TESTED` / نامعلوم بماند. شاهد قدیمی فقط به‌عنوان سابقه نمایش داده می‌شود.
+- تطبیق شواهد در این فاز read-only است و نباید وضعیت canonical را خودکار تغییر دهد؛ ثبت هر نتیجهٔ عملیاتی فقط از API موجود و تحت write guard مجاز است.
+- گره `evidence-freshness-policy` و پنج ارتباط revision 36 همگی `PLANNED` هستند؛ هیچ enforcement یا اتصال runtime با این تغییر ایجاد نشده است.
