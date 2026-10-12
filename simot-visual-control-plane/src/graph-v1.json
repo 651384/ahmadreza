@@ -2,8 +2,8 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 8,
-  "updatedAt": "2026-10-12T07:43:12.842Z",
+  "revision": 9,
+  "updatedAt": "2026-10-12T07:43:37.749Z",
   "nodes": [
     {
       "id": "simot-core",
@@ -1296,6 +1296,131 @@
         "nextAction": "تکمیل مدل معماری؛ سپس نگاشت به کد و سرویس واقعی",
         "detail": "در دسترس بودن connector به معنی داشتن مجوز یا اتصال SIMOT نیست؛ هر عملیات باید scope مستقل داشته باشد."
       }
+    },
+    {
+      "id": "response-delivery",
+      "type": "simotNode",
+      "position": {
+        "x": 1160,
+        "y": 2670
+      },
+      "data": {
+        "label": "Response Delivery / پاسخ به درخواست‌کننده",
+        "kind": "runtime",
+        "status": "PLANNED",
+        "role": "runtime",
+        "capabilities": "تحویل پاسخ و وضعیت وظیفه به همان رابط درخواست‌کننده",
+        "accessMethod": "لایهٔ منطقی معماری؛ implementation واقعی هنوز نگاشت نشده",
+        "permissions": "حداقل دسترسی؛ هر هزینه یا اقدام حساس نیازمند تأیید انسانی",
+        "evidence": "جزء معماری هدف؛ این گره به‌تنهایی سرویس مستقل یا اتصال runtime را اثبات نمی‌کند",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "پس از تکمیل مدل، نگاشت به implementation و قراردادهای موجود",
+        "detail": [
+          "نتیجهٔ نهایی",
+          "وضعیت/محدودیت",
+          "شناسهٔ وظیفه و شواهد"
+        ]
+      }
+    },
+    {
+      "id": "failure-handler",
+      "type": "simotNode",
+      "position": {
+        "x": 1440,
+        "y": 2670
+      },
+      "data": {
+        "label": "Failure Handler / مدیریت خطا",
+        "kind": "runtime",
+        "status": "PLANNED",
+        "role": "runtime",
+        "capabilities": "مدیریت خطاهای قابل بازیابی و غیرقابل بازیابی",
+        "accessMethod": "لایهٔ منطقی معماری؛ implementation واقعی هنوز نگاشت نشده",
+        "permissions": "حداقل دسترسی؛ هر هزینه یا اقدام حساس نیازمند تأیید انسانی",
+        "evidence": "جزء معماری هدف؛ این گره به‌تنهایی سرویس مستقل یا اتصال runtime را اثبات نمی‌کند",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "پس از تکمیل مدل، نگاشت به implementation و قراردادهای موجود",
+        "detail": [
+          "طبقه‌بندی خطا",
+          "Retry کنترل‌شده",
+          "DLQ و ارجاع انسانی"
+        ]
+      }
+    },
+    {
+      "id": "model-cost-policy",
+      "type": "simotNode",
+      "position": {
+        "x": 40,
+        "y": 2820
+      },
+      "data": {
+        "label": "Model & Cost Policy",
+        "kind": "security",
+        "status": "PLANNED",
+        "role": "security",
+        "capabilities": "انتخاب مدل با اولویت رایگان/محلی و کنترل هزینه",
+        "accessMethod": "لایهٔ منطقی معماری؛ implementation واقعی هنوز نگاشت نشده",
+        "permissions": "حداقل دسترسی؛ هر هزینه یا اقدام حساس نیازمند تأیید انسانی",
+        "evidence": "جزء معماری هدف؛ این گره به‌تنهایی سرویس مستقل یا اتصال runtime را اثبات نمی‌کند",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "پس از تکمیل مدل، نگاشت به implementation و قراردادهای موجود",
+        "detail": [
+          "Local-first",
+          "محدودیت هزینه",
+          "ممنوعیت API پولی بدون تأیید"
+        ]
+      }
+    },
+    {
+      "id": "change-release-gate",
+      "type": "simotNode",
+      "position": {
+        "x": 320,
+        "y": 2820
+      },
+      "data": {
+        "label": "Change & Release Gate",
+        "kind": "security",
+        "status": "PLANNED",
+        "role": "security",
+        "capabilities": "کنترل تغییرات، merge و انتشار عملیاتی",
+        "accessMethod": "لایهٔ منطقی معماری؛ implementation واقعی هنوز نگاشت نشده",
+        "permissions": "حداقل دسترسی؛ هر هزینه یا اقدام حساس نیازمند تأیید انسانی",
+        "evidence": "جزء معماری هدف؛ این گره به‌تنهایی سرویس مستقل یا اتصال runtime را اثبات نمی‌کند",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "پس از تکمیل مدل، نگاشت به implementation و قراردادهای موجود",
+        "detail": [
+          "شاخهٔ جداگانه",
+          "بازبینی diff",
+          "تأیید پیش از production"
+        ]
+      }
+    },
+    {
+      "id": "human-escalation",
+      "type": "simotNode",
+      "position": {
+        "x": 600,
+        "y": 2820
+      },
+      "data": {
+        "label": "Human Escalation / ارجاع به مالک",
+        "kind": "security",
+        "status": "PLANNED",
+        "role": "security",
+        "capabilities": "توقف ایمن و درخواست تصمیم انسانی هنگام ابهام یا ریسک",
+        "accessMethod": "لایهٔ منطقی معماری؛ implementation واقعی هنوز نگاشت نشده",
+        "permissions": "حداقل دسترسی؛ هر هزینه یا اقدام حساس نیازمند تأیید انسانی",
+        "evidence": "جزء معماری هدف؛ این گره به‌تنهایی سرویس مستقل یا اتصال runtime را اثبات نمی‌کند",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "پس از تکمیل مدل، نگاشت به implementation و قراردادهای موجود",
+        "detail": [
+          "ابهام مجوز",
+          "ریسک داده/هزینه",
+          "شکست تکرارشونده"
+        ]
+      }
     }
   ],
   "edges": [
@@ -2011,6 +2136,106 @@
       "data": {
         "status": "PLANNED",
         "evidence": "ارتباط معماری هدف؛ runtime در این مرحله تست یا وریفای نشده."
+      }
+    },
+    {
+      "id": "e-result-response",
+      "source": "result-assembler",
+      "target": "response-delivery",
+      "label": "FORMATS",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط معماری هدف؛ در این مرحله تست runtime انجام نشده."
+      }
+    },
+    {
+      "id": "e-response-ingress",
+      "source": "response-delivery",
+      "target": "request-ingress",
+      "label": "REPLIES_TO",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط معماری هدف؛ در این مرحله تست runtime انجام نشده."
+      }
+    },
+    {
+      "id": "e-retry-failure",
+      "source": "retry-idempotency",
+      "target": "failure-handler",
+      "label": "ESCALATES",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط معماری هدف؛ در این مرحله تست runtime انجام نشده."
+      }
+    },
+    {
+      "id": "e-failure-dlq",
+      "source": "failure-handler",
+      "target": "cloudflare-dlq",
+      "label": "SENDS_FINAL_FAILURE",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط معماری هدف؛ در این مرحله تست runtime انجام نشده."
+      }
+    },
+    {
+      "id": "e-failure-human",
+      "source": "failure-handler",
+      "target": "human-escalation",
+      "label": "ESCALATES_TO",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط معماری هدف؛ در این مرحله تست runtime انجام نشده."
+      }
+    },
+    {
+      "id": "e-router-cost-policy",
+      "source": "model-router",
+      "target": "model-cost-policy",
+      "label": "GOVERNED_BY",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط معماری هدف؛ در این مرحله تست runtime انجام نشده."
+      }
+    },
+    {
+      "id": "e-policy-cost",
+      "source": "policy-engine",
+      "target": "model-cost-policy",
+      "label": "ENFORCES",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط معماری هدف؛ در این مرحله تست runtime انجام نشده."
+      }
+    },
+    {
+      "id": "e-approval-human-escalation",
+      "source": "human-escalation",
+      "target": "approval-gate",
+      "label": "REQUESTS_DECISION",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط معماری هدف؛ در این مرحله تست runtime انجام نشده."
+      }
+    },
+    {
+      "id": "e-release-approval",
+      "source": "change-release-gate",
+      "target": "approval-gate",
+      "label": "REQUIRES",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط معماری هدف؛ در این مرحله تست runtime انجام نشده."
+      }
+    },
+    {
+      "id": "e-release-audit",
+      "source": "change-release-gate",
+      "target": "audit-ledger",
+      "label": "RECORDS_CHANGE",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط معماری هدف؛ در این مرحله تست runtime انجام نشده."
       }
     }
   ]
