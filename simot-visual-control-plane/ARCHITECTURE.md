@@ -177,3 +177,8 @@ The Gateway must route each task through `execution-dispatch-policy`, which choo
 ## D1 persistence boundary — revision 33
 
 Cloudflare D1 is modeled as runtime metadata storage only, subject to later inspection of the actual schema and binding. VPS Master Memory remains the sole canonical operational continuity source. D1 rows, queue metadata, and caches must not override canonical state. Persist only the minimum routing/correlation/deduplication/task metadata needed; secrets and raw sensitive payloads are excluded by default. Retention and actual deployed schema remain NOT TESTED.
+
+
+## Cancellation, deadlines, and late results — revision 34
+
+Cancellation and deadlines must propagate through ingress, executor, and queue consumer. A cancelled or expired task must not be revived by redelivery, retried after terminal state, or overwritten by a late result. The system must distinguish cancellation requested from cancellation completed and report explicit terminal outcomes. Runtime enforcement remains unverified.
