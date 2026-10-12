@@ -52,4 +52,4 @@
 
 ## Next continuation
 
-Continue architecture-only work on the feature branch until the model is complete. Revision 29 clarifies API-mediated canonical memory access; revision 30 adds a guarded artifact intake and content-extraction path. After the user confirms the architecture gate, reconcile the graph and documents with actual code/runtime evidence, then perform tests and verification. Before claiming the phone/VPS UI reflects the newest graph, obtain fresh evidence that the VPS checkout was updated and the interface is serving that revision.
+Continue architecture-only work on the feature branch until the model is complete. Revision 29 clarifies API-mediated canonical memory access; revision 30 adds guarded artifact intake and content extraction; revision 31 defines approval-gated backup and recovery requirements for the existing canonical memory. After the user confirms the architecture gate, reconcile the graph and documents with actual code/runtime evidence, then perform tests and verification. Before claiming the phone/VPS UI reflects the newest graph, obtain fresh evidence that the VPS checkout was updated and the interface is serving that revision.
