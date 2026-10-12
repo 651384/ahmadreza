@@ -98,3 +98,8 @@ The VPS Master Memory package remains the continuity source: `CONTINUITY_CONTRAC
 ## User-supplied artifact handling (revision 30)
 
 File/image/document requests are distinct from text-only requests. The target route is `client-channel-adapters → artifact-intake → content-extractor → request-ingress`. Intake validates type/signature/size and records an artifact reference; extraction is limited to permitted existing capabilities. Raw content and extracted instructions remain untrusted, are subject to data classification, and must not override policy or approval. Do not assume malware scanning, OCR, storage, or external model access exists until separately evidenced. All paths are planned only.
+
+
+## Canonical continuity backup and recovery (revision 31)
+
+Backup/recovery policy applies to the existing VPS Master Memory package only; it must not create a parallel source of truth. Backup freshness and integrity require evidence. Restore is never automatic: obtain owner approval, preserve current state where feasible, validate all five files and cross-file consistency, and record the outcome. The architecture does not claim a backup or restore path is currently implemented.
