@@ -41,7 +41,7 @@
 - **Documentation alignment:** `ARCHITECTURE.md`, `ARCHITECTURE-OPERATING-MODEL.md`, and this index reference graph revision 25 and 70 nodes / 155 edges; all edges carry relation, status, evidence, and permission metadata at top level, with no duplicate nested status/evidence fields.
 - **Runtime integration:** graph nodes are not proof of live connectivity or permissions. Keep PLANNED/NOT TESTED where evidence is absent.
 - **Deployment:** no public deployment and no merge to master.
-- **VPS sync:** The user supplied PuTTY output confirming a successful fast-forward to commit `27c49c5afb466d3386612c658a233c6cb2dcb5f5`, graph revision 24 (70 nodes / 155 edges), with the feature branch aligned to `origin`. GitHub now contains graph revision 25; this newer graph revision has not yet been synced to VPS. The local `vite.config.js` modification and untracked `dist/`, `node_modules/`, and `package-lock.json` were preserved. This confirms source sync only; it does not verify UI rendering, build, service health, or live SIMOT integrations.
+- **VPS source sync — VERIFIED:** The user supplied PuTTY output confirming a successful fast-forward from `27c49c5` to `669c420ba2c880cf9ad61553a9387eea410de6cb`. The VPS checkout reports graph revision 25, 70 nodes, 155 edges, and `feat/simot-visual-control-plane-react-flow...origin/feat/simot-visual-control-plane-react-flow` with no ahead/behind marker. The local `vite.config.js` modification and untracked `dist/`, `node_modules/`, and `package-lock.json` remain preserved. Scope is source synchronization only: UI rendering, build, service health, and live SIMOT integrations remain NOT TESTED.
 - **Safety:** no new costs, credentials, secrets, or infrastructure were created or changed.
 
 ## Next continuation
