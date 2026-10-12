@@ -1,14 +1,14 @@
 # SIMOT Visual Control Plane — Architecture Index & Handoff
 
 **Canonical graph artifact:** `simot-visual-control-plane/src/graph-v1.json`  
-**Graph:** `simot-core-overview`, schema version 1, revision 28  
-**Graph size:** 71 nodes, 160 edges  
+**Graph:** `simot-core-overview`, schema version 1, revision 29  
+**Graph size:** 71 nodes, 159 edges  
 **Working branch:** `feat/simot-visual-control-plane-react-flow`  
 **Latest graph commit:** `15d6620b1875a8cef5052b4faa53603750a7f56c`
 
 ## Architecture documents
 
-1. `ARCHITECTURE.md` — VCP implementation specification, reconciled to graph revision 28.
+1. `ARCHITECTURE.md` — VCP implementation specification, reconciled to graph revision 29.
 2. `ARCHITECTURE-OPERATING-MODEL.md` — core roles, source-of-truth hierarchy, request-to-result flow, continuity and safety.
 3. `ARCHITECTURE-CONTRACTS-REV14.md` — API/message envelope, response/acknowledgement, structured error, connector scope.
 4. `CONNECTOR-TRUST-BOUNDARIES-REV15.md` — connector trust matrix and intended deployment boundaries.
@@ -23,6 +23,7 @@
 13. `HUMAN-OPERATOR-APPROVAL-REV26.md` — explicit human decision actor, scoped approval, and escalation contract.
 14. `MEMORY-ACCESS-BOUNDARY-REV27.md` — guarded API-only access to canonical VPS Master Memory.
 15. `QUEUE-CONSUMER-CONTRACT-REV28.md` — asynchronous queue lifecycle, idempotency, failure, and DLQ contract.
+16. `CANONICAL-MEMORY-ACCESS-REV29.md` — single API boundary for reads, guarded writes, audit, and evidence persistence.
 
 ## Architecture scope represented in the graph
 
@@ -41,12 +42,12 @@
 - **Tests/build/runtime probes:** NOT RUN in this phase by design.
 - **Graph and documents:** committed to the existing feature branch only.
 - **Inspector scope:** `src/App.jsx` now supports selecting a relationship to inspect its relation, status, evidence, and permission; manually drawn links also receive explicit contract fields. This is source-level work only and has not been built or tested.
-- **Documentation alignment:** `ARCHITECTURE.md`, `ARCHITECTURE-OPERATING-MODEL.md`, and this index reference graph revision 28 and 71 nodes / 160 edges; all edges carry relation, status, evidence, and permission metadata at top level, with no duplicate nested status/evidence fields.
+- **Documentation alignment:** `ARCHITECTURE.md`, `ARCHITECTURE-OPERATING-MODEL.md`, and this index reference graph revision 29 and 71 nodes / 159 edges; all edges carry relation, status, evidence, and permission metadata at top level, with no duplicate nested status/evidence fields.
 - **Runtime integration:** graph nodes are not proof of live connectivity or permissions. Keep PLANNED/NOT TESTED where evidence is absent.
 - **Deployment:** no public deployment and no merge to master.
-- **VPS source sync — VERIFIED through revision 25:** The user supplied PuTTY output confirming a successful fast-forward to commit `669c420ba2c880cf9ad61553a9387eea410de6cb`; at that point the VPS checkout reported graph revision 25, 70 nodes, 155 edges, and no ahead/behind marker. Graph revision 28 was then committed on GitHub as `15d6620b1875a8cef5052b4faa53603750a7f56c` and is **NOT YET SYNCED** to VPS. The local `vite.config.js` modification and untracked `dist/`, `node_modules/`, and `package-lock.json` were preserved by the confirmed sync. UI rendering, build, service health, and live SIMOT integrations remain NOT TESTED.
+- **VPS source sync — VERIFIED through revision 28:** The user supplied PuTTY output confirming a successful fast-forward to commit `669c420ba2c880cf9ad61553a9387eea410de6cb`; the latest user-provided PuTTY output confirms VPS checkout commit `75caa38d4da737383fcd6fe7fe24be2557c58513`, graph revision 28, 71 nodes, 160 edges, and no ahead/behind marker. Graph revision 29 is the current architecture target; the new revision is **NOT YET SYNCED** to VPS. The local `vite.config.js` modification and untracked `dist/`, `node_modules/`, and `package-lock.json` were preserved by the confirmed sync. UI rendering, build, service health, and live SIMOT integrations remain NOT TESTED.
 - **Safety:** no new costs, credentials, secrets, or infrastructure were created or changed.
 
 ## Next continuation
 
-Continue architecture-only work on the feature branch until the model is complete. After the user confirms the architecture gate, reconcile the graph and documents with actual code/runtime evidence, then perform tests and verification. Before claiming the phone/VPS UI reflects the newest graph, obtain fresh evidence that the VPS checkout was updated and the interface is serving that revision.
+Continue architecture-only work on the feature branch until the model is complete. Revision 29 clarifies that all canonical memory access is API-mediated and all mutations are write-guarded. After the user confirms the architecture gate, reconcile the graph and documents with actual code/runtime evidence, then perform tests and verification. Before claiming the phone/VPS UI reflects the newest graph, obtain fresh evidence that the VPS checkout was updated and the interface is serving that revision.
