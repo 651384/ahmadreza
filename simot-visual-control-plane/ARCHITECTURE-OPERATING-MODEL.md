@@ -1,8 +1,8 @@
 # SIMOT AI OS — Architecture Operating Model
 
 **Scope:** Companion reference for the React Flow architecture graph.  
-**Graph:** `simot-core-overview`, schema version 1, revision 23.  
-**Current graph size:** 70 nodes, 154 edges.  
+**Graph:** `simot-core-overview`, schema version 1, revision 24.  
+**Current graph size:** 70 nodes, 155 edges.  
 **Branch:** `feat/simot-visual-control-plane-react-flow`.
 
 > This document describes the target architecture. A graph node or edge is not proof that a component is deployed, connected, healthy, or verified. Status must be supported by current evidence.
@@ -25,7 +25,7 @@ The source-of-truth policy must be applied when assembling context and coordinat
 
 ## 2. Request-to-result flow
 
-1. **Client Channel Adapters** represent desktop/web, Android/OpenClaw, text/voice, and file/image/document channels; each channel remains a client, not a separate brain.
+1. **Client Channel Adapters** represent desktop/web, Android/OpenClaw, text/voice, and file/image/document channels; each channel remains a client, not a separate brain. OpenClaw forwards client requests through this layer.
 2. **Request ingress** validates the request and builds the standard envelope.
 3. **SIMOT message envelope** carries correlation/reply identifiers and part sequencing where required.
 3. **Orchestration** coordinates the task lifecycle.
@@ -75,7 +75,7 @@ The VPS Master Memory package remains the continuity source: `CONTINUITY_CONTRAC
 
 ## 6. Current phase and boundaries
 
-- Graph revision 23 contains 70 nodes and 154 edges.
+- Graph revision 24 contains 70 nodes and 155 edges.
 - The source-of-truth policy is connected to Master Memory, documents, code, UI, Notion, Asana, HubSpot, Cloudflare runtime evidence, context assembly, and data governance.
 - Release governance is linked to policy; monitoring is linked to failure handling; task lifecycle is linked to terminal result assembly.
 - `ARCHITECTURE.md`, this operating model, and `ARCHITECTURE-INDEX.md` are intended to describe the same graph revision; update their revision/count metadata together when the graph changes.
