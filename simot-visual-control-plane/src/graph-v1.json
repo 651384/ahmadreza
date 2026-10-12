@@ -2,8 +2,8 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 23,
-  "updatedAt": "2026-10-12T08:11:23.322Z",
+  "revision": 24,
+  "updatedAt": "2026-10-12T08:12:50.498Z",
   "nodes": [
     {
       "id": "simot-core",
@@ -1949,16 +1949,6 @@
       "evidence": "مصرف‌کننده/مسیر جاری بررسی نشده"
     },
     {
-      "id": "e-openclaw-core",
-      "source": "openclaw",
-      "target": "simot-core",
-      "label": "CALLS",
-      "relation": "CALLS",
-      "status": "NOT TESTED",
-      "permission": "UNKNOWN",
-      "evidence": "اتصال عملیاتی جاری تست نشده"
-    },
-    {
       "id": "e-phone-openclaw",
       "source": "phone-client",
       "target": "openclaw",
@@ -2596,16 +2586,6 @@
       "relation": "FORMATS",
       "evidence": "ارتباط معماری هدف؛ در این مرحله تست runtime انجام نشده.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "PLANNED"
-    },
-    {
-      "id": "e-response-ingress",
-      "source": "response-delivery",
-      "target": "client-channel-adapters",
-      "label": "DELIVERS_RESPONSE",
-      "relation": "DELIVERS_RESPONSE",
-      "evidence": "مسیر معماری هدف برای تحویل پاسخ به کانال درخواست‌کننده؛ پیاده‌سازی زنده بررسی نشده",
-      "permission": "فقط پاسخ مرتبط با همان درخواست و scope مجاز؛ دادهٔ حساس باید طبق policy فیلتر شود",
       "status": "PLANNED"
     },
     {
@@ -3357,6 +3337,36 @@
       "status": "PLANNED",
       "evidence": "کانال‌های ورودی به ingress استاندارد وصل می‌شوند؛ مسیر اجرایی کانال‌ها هنوز بررسی نشده",
       "permission": "هویت و scope درخواست باید پیش از اجرا اعتبارسنجی شود؛ ورودی کاربر به‌عنوان دادهٔ غیرقابل‌اعتماد تلقی شود"
+    },
+    {
+      "id": "e-response-client-channels",
+      "source": "response-delivery",
+      "target": "client-channel-adapters",
+      "label": "DELIVERS_RESPONSE",
+      "relation": "DELIVERS_RESPONSE",
+      "status": "PLANNED",
+      "evidence": "پاسخ از مسیر استاندارد به کانال درخواست‌کننده بازمی‌گردد؛ اجرای زنده بررسی نشده",
+      "permission": "فقط پاسخ همان درخواست و scope مجاز؛ فیلتر دادهٔ حساس طبق policy"
+    },
+    {
+      "id": "e-openclaw-client-channels",
+      "source": "openclaw",
+      "target": "client-channel-adapters",
+      "label": "FORWARDS_CLIENT_REQUESTS",
+      "relation": "FORWARDS_CLIENT_REQUESTS",
+      "status": "PLANNED",
+      "evidence": "OpenClaw در نقش رابط/پل، درخواست کلاینت را به لایهٔ کانال SIMOT می‌سپارد؛ اتصال جاری بررسی نشده",
+      "permission": "OpenClaw کلاینت است نه مغز؛ فقط درخواست‌های مجاز و احراز هویت‌شده"
+    },
+    {
+      "id": "e-client-channels-openclaw",
+      "source": "client-channel-adapters",
+      "target": "openclaw",
+      "label": "DELIVERS_RESPONSE_TO_BRIDGE",
+      "relation": "DELIVERS_RESPONSE_TO_BRIDGE",
+      "status": "PLANNED",
+      "evidence": "پاسخ برای تحویل به رابط OpenClaw برمی‌گردد؛ مسیر جاری بررسی نشده",
+      "permission": "عدم دسترسی مستقیم کلاینت به canonical memory؛ خروجی بر اساس مجوز درخواست"
     }
   ]
 }
