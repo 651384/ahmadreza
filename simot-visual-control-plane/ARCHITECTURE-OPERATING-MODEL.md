@@ -103,3 +103,8 @@ File/image/document requests are distinct from text-only requests. The target ro
 ## Canonical continuity backup and recovery (revision 31)
 
 Backup/recovery policy applies to the existing VPS Master Memory package only; it must not create a parallel source of truth. Backup freshness and integrity require evidence. Restore is never automatic: obtain owner approval, preserve current state where feasible, validate all five files and cross-file consistency, and record the outcome. The architecture does not claim a backup or restore path is currently implemented.
+
+
+## Single-mode execution dispatch (revision 32)
+
+Each task must select one execution mode: synchronous direct worker dispatch or asynchronous queue dispatch. The gateway does not independently send the same task to both. The dispatch decision is tied to task ID, correlation ID, idempotency key, policy version, and outcome. Unknown/ambiguous mode fails closed; retry and mode switching must reconcile prior dispatch before another dispatch. All paths are planned only.
