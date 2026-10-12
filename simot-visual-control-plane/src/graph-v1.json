@@ -2,8 +2,8 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 4,
-  "updatedAt": "2026-10-12T06:40:00.000Z",
+  "revision": 5,
+  "updatedAt": "2026-10-12T07:18:32.069Z",
   "nodes": [
     {
       "id": "simot-core",
@@ -1098,16 +1098,6 @@
       "status": "NOT TESTED",
       "permission": "UNKNOWN",
       "evidence": "اتصال به SIMOT اثبات نشده"
-    },
-    {
-      "id": "e-core-approval",
-      "source": "simot-core",
-      "target": "approval-gate",
-      "label": "DEPENDS_ON",
-      "relation": "DEPENDS_ON",
-      "status": "PLANNED",
-      "permission": "UNKNOWN",
-      "evidence": "کنترل انسانی پیش از عملیات حساس لازم است"
     },
     {
       "id": "e-chatgpt-claude",
