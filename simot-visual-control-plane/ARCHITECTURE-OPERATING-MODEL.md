@@ -1,8 +1,8 @@
 # SIMOT AI OS — Architecture Operating Model
 
 **Scope:** Companion reference for the React Flow architecture graph.  
-**Graph:** `simot-core-overview`, schema version 1, revision 36.  
-**Current graph size:** 75 nodes, 182 edges.  
+**Graph:** `simot-core-overview`, schema version 1, revision 37.  
+**Current graph size:** 76 nodes, 187 edges.  
 **Branch:** `feat/simot-visual-control-plane-react-flow`.
 
 > This document describes the target architecture. A graph node or edge is not proof that a component is deployed, connected, healthy, or verified. Status must be supported by current evidence.
@@ -76,9 +76,13 @@ For this architecture-building phase, implementation of the graph comes first. T
 
 The VPS Master Memory package remains the continuity source: `CONTINUITY_CONTRACT.md`, `CURRENT_STATE.json`, `DECISIONS.json`, `EVIDENCE_INDEX.json`, and `TASK_LOG.jsonl`.
 
+## Project and service inventory (revision 37)
+
+The planned `project-service-registry` is a read-first index of projects, services, repositories, runtime references, dependencies, lifecycle, and source authority. It must reuse existing sources and must not become a parallel memory. Repository presence is not deployment evidence; service health requires scoped, current evidence from its owning runtime. Missing/stale evidence remains unknown. The node and five edges are PLANNED; no live inventory or integration has been executed.
+
 ## 6. Current phase and boundaries
 
-- Current graph revision 36 contains 75 nodes and 182 edges.
+- Current graph revision 37 contains 76 nodes and 187 edges.
 - The source-of-truth policy is connected to Master Memory, documents, code, UI, Notion, Asana, HubSpot, Cloudflare runtime evidence, context assembly, and data governance.
 - Release governance is linked to policy; monitoring is linked to failure handling; task lifecycle is linked to terminal result assembly.
 - `ARCHITECTURE.md`, this operating model, `ARCHITECTURE-INDEX.md`, and revision contract documents must describe the same current graph revision; update current revision/count metadata together when the graph changes.
@@ -134,3 +138,8 @@ The human operator authorizes scoped operational-mode transitions. The policy en
 - Missing/insufficient provenance or stale evidence means current status remains unknown / `NOT TESTED`; historical evidence may still be displayed as historical.
 - Reconciliation is read-only during architecture work. It must not automatically mutate canonical status; operational write-back remains behind the existing API and write guard.
 - The revision 36 policy and its five edges are `PLANNED`; no runtime enforcement has been claimed.
+
+
+## Project/service registry contract (revision 37)
+
+The registry is an index only. VPS Master Memory remains canonical for operational continuity; GitHub, Cloudflare, Notion, SharePoint/OneDrive, Asana, and HubSpot retain their assigned authoritative domains. No secret values are stored. Reconciliation is read-only and does not automatically write canonical status.
