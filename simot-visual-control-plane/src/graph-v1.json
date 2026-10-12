@@ -2,8 +2,8 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 24,
-  "updatedAt": "2026-10-12T08:12:50.498Z",
+  "revision": 25,
+  "updatedAt": "2026-10-12T08:00:00.000Z",
   "nodes": [
     {
       "id": "simot-core",
@@ -1834,9 +1834,9 @@
       "target": "master-memory",
       "label": "READS",
       "relation": "READS",
-      "status": "VERIFIED",
-      "permission": "UNKNOWN",
-      "evidence": "سابقهٔ تاریخی خواندن Continuity از Worker"
+      "status": "PLANNED",
+      "permission": "فقط ارتباط معماری هدف؛ مسیر اجرایی و مجوز واقعی هسته تأیید نشده است.",
+      "evidence": "این ارتباط برای هستهٔ منطقی SIMOT در معماری هدف تعریف شده است؛ شاهد تاریخی خواندن از Worker، اجرای مستقیم این مسیر از SIMOT Core را اثبات نمی‌کند."
     },
     {
       "id": "e-worker-vpc",
