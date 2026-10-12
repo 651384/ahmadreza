@@ -1,8 +1,8 @@
 # SIMOT AI OS — Architecture Operating Model
 
 **Scope:** Companion reference for the React Flow architecture graph.  
-**Graph:** `simot-core-overview`, schema version 1, revision 34.  
-**Current graph size:** 74 nodes, 172 edges.  
+**Graph:** `simot-core-overview`, schema version 1, revision 35.  
+**Current graph size:** 74 nodes, 177 edges.  
 **Branch:** `feat/simot-visual-control-plane-react-flow`.
 
 > This document describes the target architecture. A graph node or edge is not proof that a component is deployed, connected, healthy, or verified. Status must be supported by current evidence.
