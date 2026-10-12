@@ -2,8 +2,8 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 13,
-  "updatedAt": "2026-10-12T07:48:14.819Z",
+  "revision": 14,
+  "updatedAt": "2026-10-12T07:49:44.859Z",
   "nodes": [
     {
       "id": "simot-core",
@@ -849,18 +849,19 @@
         "status": "PLANNED",
         "role": "قالب مشترک درخواست، پاسخ، correlation و پیام‌ها",
         "capabilities": [
-          "MSG-ID",
-          "CORR-ID",
-          "REPLY-TO",
-          "FROM/TO",
-          "PART x/N"
+          "Request: request_id / MSG-ID, CORR-ID, REPLY-TO, FROM, TO, timestamp, schema_version",
+          "Response: correlation_id, task_id, status, result or structured error, evidence_refs",
+          "Message parts: PART x/N with validation of expected count and ordering",
+          "Schema/version validation and rejection of malformed payloads",
+          "No secrets in request, response, or error payloads",
+          "Explicit async acknowledgement versus terminal result"
         ],
         "accessMethod": "قرارداد پیام ثبت‌شده؛ محل implementation باید inventory شود",
         "permissions": "اعتبارسنجی schema و correlation id",
         "evidence": "قالب SIMOT-MSG در قراردادهای زمینه‌ای پروژه",
         "lastVerified": "NOT TESTED",
-        "nextAction": "قراردادها با endpointهای واقعی مقایسه شوند",
-        "detail": "این گره برای کامل‌کردن نقشهٔ معماری اضافه شده است؛ وجود آن به معنی وجود یا سلامت سرویس مستقل نیست."
+        "nextAction": "پس از پایان معماری، schema پیشنهادی را با endpointها و قالب‌های موجود تطبیق بده",
+        "detail": "هدف قرارداد API/پیام: درخواست، acknowledgement، پاسخ نهایی و خطا باید از هم متمایز باشند. فیلدهای بالا مدل پیشنهادی‌اند و تا مرحلهٔ تست با endpointهای موجود تطبیق داده نشده‌اند."
       }
     },
     {
@@ -976,18 +977,20 @@
         "status": "PLANNED",
         "role": "قرارداد استاندارد پیام و هم‌بستگی بین اجزا",
         "capabilities": [
-          "MSG-ID",
-          "CORR-ID",
-          "REPLY-TO",
-          "FROM / TO",
-          "PART x/N"
+          "MSG-ID: شناسهٔ یکتای پیام",
+          "CORR-ID: شناسهٔ هم‌بستگی سرتاسری",
+          "REPLY-TO: مسیر/شناسهٔ پاسخ",
+          "FROM / TO: فرستنده و مقصد",
+          "PART x/N: شماره و تعداد بخش‌ها",
+          "Timestamp and schema version (target contract)",
+          "Idempotency key where side effects can repeat"
         ],
         "accessMethod": "قرارداد داده و پیام SIMOT-MSG",
         "permissions": "اعتبارسنجی فیلدها؛ جلوگیری از افشای secret در payload",
         "evidence": "قرارداد پیام ثبت‌شده در معماری پروژه؛ پیاده‌سازی runtime این گره هنوز نگاشت نشده",
         "lastVerified": "NOT TESTED",
         "nextAction": "تثبیت schema و اتصال به API/صف/لاگ",
-        "detail": "پیام‌ها باید شناسهٔ یکتا و correlation داشته باشند تا مسیر درخواست تا پاسخ قابل ردیابی باشد."
+        "detail": "Envelope هدف باید امکان ردیابی درخواست تا پاسخ، تشخیص تکرار و بازسازی پیام چندبخشی را فراهم کند؛ این تعریف هنوز با runtime تطبیق داده نشده است."
       }
     },
     {
@@ -1284,16 +1287,19 @@
         "status": "PLANNED",
         "role": "ثبت قابلیت و مجوز هر connector به‌صورت مستقل",
         "capabilities": [
-          "Read/write scopes",
-          "حدود دسترسی",
-          "دسترسی واقعی در برابر قابلیت نظری"
+          "Per-connector operation matrix: READ / CREATE / UPDATE / DELETE / EXECUTE",
+          "Declared capability is not the same as granted permission",
+          "Separate requested scope, granted scope, and observed access evidence",
+          "Read-only default; writes disabled unless explicitly authorized",
+          "Human approval for sensitive writes, deletion, release, secrets, or costs",
+          "Record connector owner, data domain, trust boundary, and evidence freshness"
         ],
         "accessMethod": "لایهٔ منطقی معماری؛ نگاشت به implementation واقعی در مرحلهٔ بعد",
         "permissions": "حداقل دسترسی؛ عملیات حساس پشت human approval gate",
         "evidence": "جزء معماری هدف؛ وجود سرویس مستقل یا اتصال runtime از این گراف نتیجه نمی‌شود",
         "lastVerified": "NOT TESTED",
-        "nextAction": "تکمیل مدل معماری؛ سپس نگاشت به کد و سرویس واقعی",
-        "detail": "در دسترس بودن connector به معنی داشتن مجوز یا اتصال SIMOT نیست؛ هر عملیات باید scope مستقل داشته باشد."
+        "nextAction": "بعداً هر connector را با permission matrix و شواهد واقعی نگاشت کن",
+        "detail": "برای هر connector باید قابلیت نظری، scope مجاز و دسترسی واقعی جداگانه ثبت شوند. این گره مجوزهای واقعی را اثبات نمی‌کند و هیچ write را فعال نمی‌کند."
       }
     },
     {
@@ -1308,17 +1314,20 @@
         "kind": "runtime",
         "status": "PLANNED",
         "role": "runtime",
-        "capabilities": "تحویل پاسخ و وضعیت وظیفه به همان رابط درخواست‌کننده",
+        "capabilities": [
+          "Return request/task correlation identifiers",
+          "Distinguish ACCEPTED / IN_PROGRESS from terminal outcome",
+          "Return SUCCEEDED / FAILED / BLOCKED / CANCELLED / TIMED_OUT explicitly",
+          "Structured error without secret or sensitive internals",
+          "Evidence references and timestamps where permitted",
+          "Client-safe response independent of internal stack traces"
+        ],
         "accessMethod": "لایهٔ منطقی معماری؛ implementation واقعی هنوز نگاشت نشده",
         "permissions": "حداقل دسترسی؛ هر هزینه یا اقدام حساس نیازمند تأیید انسانی",
         "evidence": "جزء معماری هدف؛ این گره به‌تنهایی سرویس مستقل یا اتصال runtime را اثبات نمی‌کند",
         "lastVerified": "NOT TESTED",
         "nextAction": "پس از تکمیل مدل، نگاشت به implementation و قراردادهای موجود",
-        "detail": [
-          "نتیجهٔ نهایی",
-          "وضعیت/محدودیت",
-          "شناسهٔ وظیفه و شواهد"
-        ]
+        "detail": "تحویل پاسخ باید با envelope هم‌بسته باشد و acknowledgement را با نتیجهٔ نهایی اشتباه نگیرد؛ پیاده‌سازی واقعی هنوز نگاشت نشده است."
       }
     },
     {
@@ -1332,18 +1341,24 @@
         "label": "Failure Handler / مدیریت خطا",
         "kind": "runtime",
         "status": "PLANNED",
-        "role": "runtime",
-        "capabilities": "مدیریت خطاهای قابل بازیابی و غیرقابل بازیابی",
+        "role": "طبقه‌بندی خطا و تعیین retry، توقف یا ارجاع انسانی",
+        "capabilities": [
+          "Validation / authentication / authorization failures",
+          "Rate limit / transient network / timeout",
+          "Permanent external-service failure",
+          "Retry only transient and explicitly retryable failures",
+          "Exponential backoff with bounded attempts (target policy)",
+          "Idempotency protection for side-effecting operations",
+          "DLQ or human escalation after terminal failure",
+          "Structured error code, retryable flag, correlation_id and evidence reference",
+          "Redact credentials and sensitive payloads from error records"
+        ],
         "accessMethod": "لایهٔ منطقی معماری؛ implementation واقعی هنوز نگاشت نشده",
         "permissions": "حداقل دسترسی؛ هر هزینه یا اقدام حساس نیازمند تأیید انسانی",
         "evidence": "جزء معماری هدف؛ این گره به‌تنهایی سرویس مستقل یا اتصال runtime را اثبات نمی‌کند",
         "lastVerified": "NOT TESTED",
         "nextAction": "پس از تکمیل مدل، نگاشت به implementation و قراردادهای موجود",
-        "detail": [
-          "طبقه‌بندی خطا",
-          "Retry کنترل‌شده",
-          "DLQ و ارجاع انسانی"
-        ]
+        "detail": "کد خطا باید قابل ماشین‌خواندن باشد و بین خطای قابل تکرار، غیرقابل تکرار، timeout و مجوز تفکیک کند. این سیاست هدف است، نه رفتار runtime تأییدشده."
       }
     },
     {
@@ -2509,6 +2524,86 @@
       "data": {
         "status": "PLANNED",
         "evidence": "معماری هدف؛ schema و اجرای واقعی هنوز آزمون نشده"
+      }
+    },
+    {
+      "id": "e-api-ingress-contract",
+      "source": "api-contracts",
+      "target": "request-ingress",
+      "label": "VALIDATES_REQUEST",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "قرارداد هدف معماری؛ تطبیق و آزمون runtime به مرحلهٔ بعد موکول است"
+      }
+    },
+    {
+      "id": "e-api-response-contract",
+      "source": "api-contracts",
+      "target": "response-delivery",
+      "label": "SHAPES_RESPONSE",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "قرارداد هدف معماری؛ تطبیق و آزمون runtime به مرحلهٔ بعد موکول است"
+      }
+    },
+    {
+      "id": "e-api-error-contract",
+      "source": "api-contracts",
+      "target": "failure-handler",
+      "label": "STRUCTURES_ERROR",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "قرارداد هدف معماری؛ تطبیق و آزمون runtime به مرحلهٔ بعد موکول است"
+      }
+    },
+    {
+      "id": "e-envelope-response",
+      "source": "simot-message-envelope",
+      "target": "response-delivery",
+      "label": "CORRELATES_REPLY",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "قرارداد هدف معماری؛ تطبیق و آزمون runtime به مرحلهٔ بعد موکول است"
+      }
+    },
+    {
+      "id": "e-executor-permission-check",
+      "source": "executor",
+      "target": "connector-permissions",
+      "label": "CHECKS_GRANTED_SCOPE",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "قرارداد هدف معماری؛ تطبیق و آزمون runtime به مرحلهٔ بعد موکول است"
+      }
+    },
+    {
+      "id": "e-permission-approval-gate",
+      "source": "connector-permissions",
+      "target": "approval-gate",
+      "label": "REQUIRES_APPROVAL_FOR_SENSITIVE_SCOPE",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "قرارداد هدف معماری؛ تطبیق و آزمون runtime به مرحلهٔ بعد موکول است"
+      }
+    },
+    {
+      "id": "e-failure-evidence-contract",
+      "source": "failure-handler",
+      "target": "evidence-contract",
+      "label": "RECORDS_ERROR_OUTCOME",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "قرارداد هدف معماری؛ تطبیق و آزمون runtime به مرحلهٔ بعد موکول است"
+      }
+    },
+    {
+      "id": "e-ingress-identity-check",
+      "source": "request-ingress",
+      "target": "identity-access-boundary",
+      "label": "AUTHENTICATES_REQUEST",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "قرارداد هدف معماری؛ تطبیق و آزمون runtime به مرحلهٔ بعد موکول است"
       }
     }
   ]
