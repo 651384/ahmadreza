@@ -1,8 +1,8 @@
 # SIMOT AI OS — Architecture Operating Model
 
 **Scope:** Companion reference for the React Flow architecture graph.  
-**Graph:** `simot-core-overview`, schema version 1, revision 27.  
-**Current graph size:** 71 nodes, 157 edges.  
+**Graph:** `simot-core-overview`, schema version 1, revision 28.  
+**Current graph size:** 71 nodes, 160 edges.  
 **Branch:** `feat/simot-visual-control-plane-react-flow`.
 
 > This document describes the target architecture. A graph node or edge is not proof that a component is deployed, connected, healthy, or verified. Status must be supported by current evidence.
@@ -58,6 +58,7 @@ This is a target flow, not a claim that every stage is implemented or live.
 - **Human Approval Gate:** required for sensitive memory writes, secret changes, merge/release, production activation, or cost-bearing changes.
 - **Human operator/owner:** the explicit decision actor for approvals and escalations; approval is bound to a verified actor, action, scope, version, expiry, and outcome. Approval never bypasses policy or connector permissions. This is a target contract, not an implemented approval UI.
 - **Canonical memory access:** the logical core reads/writes only through the Master Memory API. Context reads use `context-assembler → simot-master-api`; result writes use `result-assembler → simot-master-api → canonical-memory-write-guard`. No direct core-to-storage path is modeled. This is a target architecture, not proof of a live route.
+- **Queue consumer:** asynchronous deliveries must update task lifecycle state, deduplicate redelivery through idempotency controls, and route terminal failures through the failure handler/DLQ policy. The direct gateway-to-worker path and queued path are distinct modes; dispatch selection must prevent accidental duplicate execution. These are planned contracts, not verified runtime behavior.
 - **Audit Ledger:** capture actor, action, outcome, evidence reference, and before/after state for sensitive operations without recording secret values.
 - **Data Governance / Classification:** define permitted handling and retention for each data category.
 - **Change & Release Gate:** keep changes on a feature branch, review diffs, and require explicit approval before merge or production release.
@@ -77,7 +78,7 @@ The VPS Master Memory package remains the continuity source: `CONTINUITY_CONTRAC
 
 ## 6. Current phase and boundaries
 
-- Graph revision 27 contains 71 nodes and 157 edges.
+- Graph revision 28 contains 71 nodes and 160 edges.
 - The source-of-truth policy is connected to Master Memory, documents, code, UI, Notion, Asana, HubSpot, Cloudflare runtime evidence, context assembly, and data governance.
 - Release governance is linked to policy; monitoring is linked to failure handling; task lifecycle is linked to terminal result assembly.
 - `ARCHITECTURE.md`, this operating model, and `ARCHITECTURE-INDEX.md` are intended to describe the same graph revision; update their revision/count metadata together when the graph changes.
