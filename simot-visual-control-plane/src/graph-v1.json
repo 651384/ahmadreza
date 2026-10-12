@@ -2,8 +2,8 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 31,
-  "updatedAt": "2026-10-12T08:43:53.060Z",
+  "revision": 32,
+  "updatedAt": "2026-10-12T08:46:18.927Z",
   "nodes": [
     {
       "id": "simot-core",
@@ -1893,6 +1893,32 @@
         "nextAction": "در فاز تطبیق با قابلیت‌های موجود، از ایجاد سرویس یا هزینهٔ جدید پرهیز شود",
         "detail": "استخراج محتوا به‌معنی اعتماد به دستورهای داخل فایل نیست؛ prompt injection داخل سند باید دادهٔ غیرقابل اعتماد تلقی شود."
       }
+    },
+    {
+      "id": "execution-dispatch-policy",
+      "type": "simotNode",
+      "position": {
+        "x": 1840,
+        "y": 250
+      },
+      "data": {
+        "label": "سیاست انتخاب مسیر اجرا",
+        "kind": "security",
+        "status": "PLANNED",
+        "role": "انتخاب یکتای اجرای هم‌زمان یا صفی برای هر درخواست",
+        "capabilities": [
+          "انتخاب مسیر با توجه به نوع کار و deadline",
+          "ثبت dispatch mode و correlation ID",
+          "جلوگیری از dispatch دوگانه",
+          "اتصال به idempotency و task lifecycle"
+        ],
+        "accessMethod": "سیاست هدف در مرز Gateway/Orchestration؛ implementation زنده تأیید نشده",
+        "permissions": "مسیر فقط از policy؛ ممنوعیت اجرای دو مسیر برای یک task بدون fan-out مجاز",
+        "evidence": "قرارداد معماری revision 32؛ پیاده‌سازی runtime اثبات نشده",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "پس از تکمیل معماری، مسیرهای واقعی Gateway و Queue را با کد تطبیق بده",
+        "detail": "برای هر task دقیقاً یک execution mode انتخاب شود؛ تغییر مسیر پس از شروع فقط با قرارداد retry/recovery و همان idempotency key."
+      }
     }
   ],
   "edges": [
@@ -1995,16 +2021,6 @@
       "status": "VERIFIED",
       "permission": "UNKNOWN",
       "evidence": "خواندن سورس Worker از Cloudflare API؛ نه اتصال runtime ChatGPT به SIMOT"
-    },
-    {
-      "id": "e-gateway-queue",
-      "source": "cloudflare-gateway",
-      "target": "cloudflare-queue",
-      "label": "USES",
-      "relation": "USES",
-      "status": "NOT TESTED",
-      "permission": "UNKNOWN",
-      "evidence": "اتصال زنده بررسی نشده"
     },
     {
       "id": "e-queue-dlq",
@@ -2332,16 +2348,6 @@
       "target": "simot-master-api",
       "label": "ROUTES_TO",
       "relation": "ROUTES_TO",
-      "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود.",
-      "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
-      "status": "PLANNED"
-    },
-    {
-      "id": "e-gateway-ai-workers",
-      "source": "cloudflare-gateway",
-      "target": "cloudflare-ai-workers",
-      "label": "DISPATCHES_TO",
-      "relation": "DISPATCHES_TO",
       "evidence": "ارتباط در معماری هدف؛ اتصال runtime هنوز در این مرحله بررسی نمی‌شود.",
       "permission": "مجوز مستقل این ارتباط باید از policy و scope واقعی تعیین شود؛ از گراف به‌تنهایی استنتاج نشود.",
       "status": "PLANNED"
@@ -3525,6 +3531,46 @@
       "status": "PLANNED",
       "evidence": "قرارداد معماری revision 31؛ وجود مسیر backup/restore زنده تأیید نشده",
       "permission": "بازیابی نیازمند مجوز مالک، حفظ داده و ثبت شواهد؛ هیچ restore خودکاری مجاز نیست"
+    },
+    {
+      "id": "e-gateway-dispatch-policy",
+      "source": "cloudflare-gateway",
+      "target": "execution-dispatch-policy",
+      "label": "درخواست انتخاب مسیر اجرا",
+      "relation": "SELECTS_SINGLE_EXECUTION_MODE",
+      "status": "PLANNED",
+      "evidence": "قرارداد معماری revision 32؛ مسیر هدف است و پیاده‌سازی اثبات نشده",
+      "permission": "انتخاب مسیر تحت policy و با correlation/idempotency key"
+    },
+    {
+      "id": "e-dispatch-sync",
+      "source": "execution-dispatch-policy",
+      "target": "cloudflare-ai-workers",
+      "label": "اجرای مستقیم هم‌زمان",
+      "relation": "DISPATCHES_SYNC_MODE",
+      "status": "PLANNED",
+      "evidence": "قرارداد معماری revision 32؛ مسیر هدف است و پیاده‌سازی اثبات نشده",
+      "permission": "فقط وقتی policy اجرای مستقیم را انتخاب کرده باشد"
+    },
+    {
+      "id": "e-dispatch-queue",
+      "source": "execution-dispatch-policy",
+      "target": "cloudflare-queue",
+      "label": "تحویل اجرای صفی",
+      "relation": "DISPATCHES_ASYNC_MODE",
+      "status": "PLANNED",
+      "evidence": "قرارداد معماری revision 32؛ مسیر هدف است و پیاده‌سازی اثبات نشده",
+      "permission": "فقط وقتی policy اجرای صفی را انتخاب کرده باشد؛ عدم ارسال هم‌زمان به مسیر مستقیم"
+    },
+    {
+      "id": "e-dispatch-idempotency",
+      "source": "execution-dispatch-policy",
+      "target": "retry-idempotency",
+      "label": "کنترل تکرار و تحویل مجدد",
+      "relation": "ENFORCES_SINGLE_DISPATCH_AND_IDEMPOTENCY",
+      "status": "PLANNED",
+      "evidence": "قرارداد معماری revision 32؛ مسیر هدف است و پیاده‌سازی اثبات نشده",
+      "permission": "کلید idempotency پایدار برای یک task؛ fan-out فقط با مجوز صریح قرارداد"
     }
   ]
 }
