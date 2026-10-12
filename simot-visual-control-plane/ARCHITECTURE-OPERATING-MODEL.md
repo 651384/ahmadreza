@@ -1,8 +1,8 @@
 # SIMOT AI OS — Architecture Operating Model
 
 **Scope:** Companion reference for the React Flow architecture graph.  
-**Graph:** `simot-core-overview`, schema version 1, revision 25.  
-**Current graph size:** 70 nodes, 155 edges.  
+**Graph:** `simot-core-overview`, schema version 1, revision 26.  
+**Current graph size:** 71 nodes, 158 edges.  
 **Branch:** `feat/simot-visual-control-plane-react-flow`.
 
 > This document describes the target architecture. A graph node or edge is not proof that a component is deployed, connected, healthy, or verified. Status must be supported by current evidence.
@@ -56,6 +56,7 @@ This is a target flow, not a claim that every stage is implemented or live.
 - **Identity & Access Boundary:** distinguish user and service identities; use least privilege.
 - **Secrets Boundary:** secret values must not appear in graph data, logs, or ordinary reports. Document binding names and trust boundaries only.
 - **Human Approval Gate:** required for sensitive memory writes, secret changes, merge/release, production activation, or cost-bearing changes.
+- **Human operator/owner:** the explicit decision actor for approvals and escalations; approval is bound to a verified actor, action, scope, version, expiry, and outcome. Approval never bypasses policy or connector permissions. This is a target contract, not an implemented approval UI.
 - **Audit Ledger:** capture actor, action, outcome, evidence reference, and before/after state for sensitive operations without recording secret values.
 - **Data Governance / Classification:** define permitted handling and retention for each data category.
 - **Change & Release Gate:** keep changes on a feature branch, review diffs, and require explicit approval before merge or production release.
@@ -75,7 +76,7 @@ The VPS Master Memory package remains the continuity source: `CONTINUITY_CONTRAC
 
 ## 6. Current phase and boundaries
 
-- Graph revision 25 contains 70 nodes and 155 edges.
+- Graph revision 26 contains 71 nodes and 158 edges.
 - The source-of-truth policy is connected to Master Memory, documents, code, UI, Notion, Asana, HubSpot, Cloudflare runtime evidence, context assembly, and data governance.
 - Release governance is linked to policy; monitoring is linked to failure handling; task lifecycle is linked to terminal result assembly.
 - `ARCHITECTURE.md`, this operating model, and `ARCHITECTURE-INDEX.md` are intended to describe the same graph revision; update their revision/count metadata together when the graph changes.
