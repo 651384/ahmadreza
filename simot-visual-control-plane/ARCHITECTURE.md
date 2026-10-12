@@ -155,3 +155,8 @@ OpenClaw درخواست‌ها را از مسیر `Client Channel Adapters` به
 ## Canonical memory boundary — revision 29
 
 All logical reads and writes of VPS Master Memory must pass through `simot-master-api`. Context reads originate in `context-assembler`; result/evidence and audit persistence originate from their respective assemblers/ledger and pass through the API and `canonical-memory-write-guard` before storage mutation. Do not model a direct core-to-API shortcut or direct audit/evidence-to-storage writes. The VPS-to-memory edge is only a hosting/topology relationship. These paths are planned contracts, not proof of live implementation.
+
+
+## Secure file, image, and document intake — revision 30
+
+File-bearing requests must use `client-channel-adapters → artifact-intake → content-extractor → request-ingress`. Text-only requests may use the direct request-ingress path. Treat files and extracted text as untrusted; validate actual type and size, prevent active-content execution, retain artifact provenance, classify data before model routing, and fail closed on unsupported or ambiguous inputs. OCR/parsing tools, quarantine storage, and malware scanning are not assumed to exist; no new dependency or cost is authorized.
