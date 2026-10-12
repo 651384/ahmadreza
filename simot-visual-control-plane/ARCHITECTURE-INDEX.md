@@ -1,10 +1,10 @@
 # SIMOT Visual Control Plane — Architecture Index & Handoff
 
 **Canonical graph artifact:** `simot-visual-control-plane/src/graph-v1.json`  
-**Graph:** `simot-core-overview`, schema version 1, revision 29  
-**Graph size:** 71 nodes, 159 edges  
+**Graph:** `simot-core-overview`, schema version 1, revision 30  
+**Graph size:** 73 nodes, 162 edges  
 **Working branch:** `feat/simot-visual-control-plane-react-flow`  
-**Latest graph commit:** `0cfb58f82067b0e98c09cae0f16466807188c5ce`
+**Latest graph commit:** `799fbac726b6b22ce0db26154c46188c492225eb`
 
 ## Architecture documents
 
@@ -24,6 +24,7 @@
 14. `MEMORY-ACCESS-BOUNDARY-REV27.md` — guarded API-only access to canonical VPS Master Memory.
 15. `QUEUE-CONSUMER-CONTRACT-REV28.md` — asynchronous queue lifecycle, idempotency, failure, and DLQ contract.
 16. `CANONICAL-MEMORY-ACCESS-REV29.md` — single API boundary for reads, guarded writes, audit, and evidence persistence.
+17. `SECURE-ARTIFACT-INTAKE-REV30.md` — untrusted file/image/document validation and extraction boundary.
 
 ## Architecture scope represented in the graph
 
@@ -45,9 +46,9 @@
 - **Documentation alignment:** `ARCHITECTURE.md`, `ARCHITECTURE-OPERATING-MODEL.md`, and this index reference graph revision 29 and 71 nodes / 159 edges; all edges carry relation, status, evidence, and permission metadata at top level, with no duplicate nested status/evidence fields.
 - **Runtime integration:** graph nodes are not proof of live connectivity or permissions. Keep PLANNED/NOT TESTED where evidence is absent.
 - **Deployment:** no public deployment and no merge to master.
-- **VPS source sync — VERIFIED through revision 28:** The user supplied PuTTY output confirming a successful fast-forward to commit `669c420ba2c880cf9ad61553a9387eea410de6cb`; the latest user-provided PuTTY output confirms VPS checkout commit `75caa38d4da737383fcd6fe7fe24be2557c58513`, graph revision 28, 71 nodes, 160 edges, and no ahead/behind marker. Graph revision 29 is the current architecture target; the new revision is **NOT YET SYNCED** to VPS. The local `vite.config.js` modification and untracked `dist/`, `node_modules/`, and `package-lock.json` were preserved by the confirmed sync. UI rendering, build, service health, and live SIMOT integrations remain NOT TESTED.
+- **VPS source sync — VERIFIED through revision 28:** The user supplied PuTTY output confirming a successful fast-forward to commit `669c420ba2c880cf9ad61553a9387eea410de6cb`; the latest user-provided PuTTY output confirms VPS checkout commit `75caa38d4da737383fcd6fe7fe24be2557c58513`, graph revision 28, 71 nodes, 160 edges, and no ahead/behind marker. Graph revision 30 is the current architecture target; the new revision is **NOT YET SYNCED** to VPS. The local `vite.config.js` modification and untracked `dist/`, `node_modules/`, and `package-lock.json` were preserved by the confirmed sync. UI rendering, build, service health, and live SIMOT integrations remain NOT TESTED.
 - **Safety:** no new costs, credentials, secrets, or infrastructure were created or changed.
 
 ## Next continuation
 
-Continue architecture-only work on the feature branch until the model is complete. Revision 29 clarifies that all canonical memory access is API-mediated and all mutations are write-guarded. After the user confirms the architecture gate, reconcile the graph and documents with actual code/runtime evidence, then perform tests and verification. Before claiming the phone/VPS UI reflects the newest graph, obtain fresh evidence that the VPS checkout was updated and the interface is serving that revision.
+Continue architecture-only work on the feature branch until the model is complete. Revision 29 clarifies API-mediated canonical memory access; revision 30 adds a guarded artifact intake and content-extraction path. After the user confirms the architecture gate, reconcile the graph and documents with actual code/runtime evidence, then perform tests and verification. Before claiming the phone/VPS UI reflects the newest graph, obtain fresh evidence that the VPS checkout was updated and the interface is serving that revision.
