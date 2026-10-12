@@ -2,8 +2,8 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 33,
-  "updatedAt": "2026-10-12T08:47:41.939Z",
+  "revision": 34,
+  "updatedAt": "2026-10-12T08:50:00.488Z",
   "nodes": [
     {
       "id": "simot-core",
@@ -3591,6 +3591,56 @@
       "status": "PLANNED",
       "evidence": "قرارداد معماری revision 33؛ schema و retention runtime هنوز تطبیق داده نشده",
       "permission": "حداقل داده، طبقه‌بندی قبل از ذخیره، retention مشخص؛ اسرار و محتوای خام حساس به‌صورت پیش‌فرض ممنوع"
+    },
+    {
+      "id": "e-ingress-deadline",
+      "source": "request-ingress",
+      "target": "task-cancellation-timeout",
+      "label": "ثبت deadline و شناسهٔ لغو",
+      "relation": "REGISTERS_TASK_DEADLINE_AND_CANCELLATION",
+      "status": "PLANNED",
+      "evidence": "قرارداد معماری revision 34؛ رفتار runtime بررسی نشده",
+      "permission": "مهلت و شناسهٔ task در envelope معتبر؛ حد بالای اجرا تابع policy"
+    },
+    {
+      "id": "e-executor-cancel-check",
+      "source": "executor",
+      "target": "task-cancellation-timeout",
+      "label": "بررسی لغو و مهلت اجرا",
+      "relation": "HONORS_CANCELLATION_AND_DEADLINE",
+      "status": "PLANNED",
+      "evidence": "قرارداد معماری revision 34؛ پیاده‌سازی cooperative cancellation اثبات نشده",
+      "permission": "توقف اجرای امن؛ عدم نادیده‌گرفتن وضعیت terminal"
+    },
+    {
+      "id": "e-consumer-cancel-check",
+      "source": "queue-consumer",
+      "target": "task-cancellation-timeout",
+      "label": "اعمال لغو برای اجرای صفی",
+      "relation": "APPLIES_CANCELLATION_TO_QUEUED_TASK",
+      "status": "PLANNED",
+      "evidence": "قرارداد معماری revision 34؛ رفتار queue consumer بررسی نشده",
+      "permission": "اعتبارسنجی task/correlation/idempotency پیش از تغییر state"
+    },
+    {
+      "id": "e-cancel-response",
+      "source": "task-cancellation-timeout",
+      "target": "response-delivery",
+      "label": "ارسال نتیجهٔ لغو یا timeout",
+      "relation": "REPORTS_CANCELLED_OR_TIMED_OUT_OUTCOME",
+      "status": "PLANNED",
+      "evidence": "قرارداد معماری revision 34؛ مسیر پاسخ runtime بررسی نشده",
+      "permission": "پاسخ ساختاریافته؛ عدم نمایش موفقیت برای task لغوشده یا timeout شده"
+    },
+    {
+      "id": "e-cancel-retry-fence",
+      "source": "task-cancellation-timeout",
+      "target": "retry-idempotency",
+      "label": "جلوگیری از retry پس از وضعیت terminal",
+      "relation": "FENCES_RETRY_AFTER_TERMINAL_STATE",
+      "status": "PLANNED",
+      "evidence": "قرارداد معماری revision 34؛ race handling runtime بررسی نشده",
+      "permission": "لغو/timeout terminal باید جلوی retry و نتیجهٔ دیررس ناسازگار را بگیرد"
     }
   ]
 }
