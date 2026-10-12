@@ -21,6 +21,7 @@
 11. `EDGE-CONTRACT-REV22.md` — canonical top-level edge fields and status/evidence normalization.
 12. `CLIENT-CHANNEL-ROUTING-REV24.md` — request/response path through channel adapters and OpenClaw.
 13. `HUMAN-OPERATOR-APPROVAL-REV26.md` — explicit human decision actor, scoped approval, and escalation contract.
+14. `MEMORY-ACCESS-BOUNDARY-REV27.md` — guarded API-only access to canonical VPS Master Memory.
 
 ## Architecture scope represented in the graph
 
