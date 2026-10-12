@@ -2,8 +2,8 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 16,
-  "updatedAt": "2026-10-12T07:51:20.012Z",
+  "revision": 17,
+  "updatedAt": "2026-10-12T07:51:47.437Z",
   "nodes": [
     {
       "id": "simot-core",
@@ -1643,6 +1643,116 @@
         "nextAction": "در مرحلهٔ وریفای، روش backup/restore موجود را شناسایی کن؛ سرویس جدید نساز",
         "detail": "این مدل سیاست است، نه فرمان backup یا rollback و نه اثبات وجود نسخهٔ پشتیبان سالم."
       }
+    },
+    {
+      "id": "graph-schema-registry",
+      "type": "simotNode",
+      "position": {
+        "x": 40,
+        "y": 1840
+      },
+      "data": {
+        "label": "Versioned Graph Model & Schema",
+        "kind": "core",
+        "status": "PLANNED",
+        "role": "تعریف مدل نسخه‌دار گراف و قرارداد سازگاری",
+        "capabilities": [
+          "schema and schemaVersion",
+          "stable node/edge IDs",
+          "required field definitions",
+          "graph revision and updatedAt",
+          "compatibility/migration rules"
+        ],
+        "accessMethod": "graph-v1.json موجود در شاخهٔ VCP؛ schema enforcement هنوز نگاشت نشده",
+        "permissions": "تغییر مدل فقط در branch؛ عدم جایگزینی بی‌اجازهٔ فایل موجود",
+        "evidence": "مدل فعلی simot.visual-control-plane.graph نسخهٔ 1",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "پس از تکمیل معماری، schema به validator واقعی نگاشت شود",
+        "detail": "این گره مدل مفهومی نسخه‌بندی را توصیف می‌کند؛ registry یا سرویس جدیدی ایجاد نمی‌کند."
+      }
+    },
+    {
+      "id": "graph-change-review",
+      "type": "simotNode",
+      "position": {
+        "x": 320,
+        "y": 1840
+      },
+      "data": {
+        "label": "Graph Change Proposal & Review",
+        "kind": "security",
+        "status": "PLANNED",
+        "role": "نمایش تغییرات گراف به‌صورت diff قابل بازبینی",
+        "capabilities": [
+          "proposed change",
+          "before/after diff",
+          "impact summary",
+          "human approval for sensitive changes",
+          "feature branch only"
+        ],
+        "accessMethod": "GitHub branch/commit history؛ UI review workflow هنوز پیاده‌سازی نشده",
+        "permissions": "عدم merge یا انتشار بدون تأیید صریح",
+        "evidence": "کنترل تغییر پروژه و شاخهٔ feature موجود",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "بعداً diff و approval را به جریان واقعی GitHub/VCP وصل کن",
+        "detail": "پیشنهاد تغییر نباید خودکار به production یا master اعمال شود."
+      }
+    },
+    {
+      "id": "graph-validation-policy",
+      "type": "simotNode",
+      "position": {
+        "x": 600,
+        "y": 1840
+      },
+      "data": {
+        "label": "Graph Integrity & Validation",
+        "kind": "core",
+        "status": "PLANNED",
+        "role": "تعریف قواعد سلامت مدل قبل از پذیرفتن revision",
+        "capabilities": [
+          "unique node IDs",
+          "unique edge IDs",
+          "valid edge references",
+          "required node fields",
+          "supported schemaVersion",
+          "layout/position policy",
+          "no unsupported status claims"
+        ],
+        "accessMethod": "validator script موجود در repository باید بعداً بررسی و به workflow وصل شود",
+        "permissions": "خطای validation مانع پذیرش revision؛ هیچ تغییر runtime خودکار انجام نمی‌شود",
+        "evidence": "قواعد ساختاری مدل؛ اجرای validation در این فاز عمداً به تعویق افتاده",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "پس از اعلام تکمیل معماری، validator را با قرارداد فعلی تطبیق بده",
+        "detail": "این گره سیاست validation است و به معنی اجرای تست در این مرحله نیست."
+      }
+    },
+    {
+      "id": "graph-history-rollback",
+      "type": "simotNode",
+      "position": {
+        "x": 880,
+        "y": 1840
+      },
+      "data": {
+        "label": "Graph Revision History & Rollback",
+        "kind": "security",
+        "status": "PLANNED",
+        "role": "قابلیت بازگشت کنترل‌شده به revision قبلی گراف",
+        "capabilities": [
+          "Git commit/revision reference",
+          "revert proposal",
+          "preserve evidence",
+          "review diff before rollback",
+          "protect newer canonical memory"
+        ],
+        "accessMethod": "GitHub commit history on feature branch; UI rollback control not implemented",
+        "permissions": "Rollback is a new reviewed change; no force-push or destructive rewrite by default",
+        "evidence": "تاریخچهٔ commitهای گراف روی شاخهٔ مستقل",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "بعداً عملیات rollback را به پیشنهاد و approval متصل کن",
+        "detail": "تاریخچهٔ Git موجود است؛ rollback از داخل UI هنوز قابلیتی تأییدشده نیست."
+      }
     }
   ],
   "edges": [
@@ -2918,6 +3028,96 @@
       "data": {
         "status": "PLANNED",
         "evidence": "سیاست هدف؛ عملیات backup/rollback یا enforcement در این مرحله اجرا نشده"
+      }
+    },
+    {
+      "id": "e-vcp-graph-schema",
+      "source": "vcp",
+      "target": "graph-schema-registry",
+      "label": "USES_VERSIONED_MODEL",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "معماری هدف برای کنترل گراف؛ اجرای validator یا rollback در این مرحله انجام نشده"
+      }
+    },
+    {
+      "id": "e-schema-validation",
+      "source": "graph-schema-registry",
+      "target": "graph-validation-policy",
+      "label": "VALIDATED_BY",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "معماری هدف برای کنترل گراف؛ اجرای validator یا rollback در این مرحله انجام نشده"
+      }
+    },
+    {
+      "id": "e-vcp-change-review",
+      "source": "vcp",
+      "target": "graph-change-review",
+      "label": "PROPOSES_CHANGES",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "معماری هدف برای کنترل گراف؛ اجرای validator یا rollback در این مرحله انجام نشده"
+      }
+    },
+    {
+      "id": "e-review-change-gate",
+      "source": "graph-change-review",
+      "target": "change-release-gate",
+      "label": "REQUIRES_REVIEW",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "معماری هدف برای کنترل گراف؛ اجرای validator یا rollback در این مرحله انجام نشده"
+      }
+    },
+    {
+      "id": "e-review-audit",
+      "source": "graph-change-review",
+      "target": "audit-ledger",
+      "label": "RECORDS_PROPOSAL",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "معماری هدف برای کنترل گراف؛ اجرای validator یا rollback در این مرحله انجام نشده"
+      }
+    },
+    {
+      "id": "e-validation-review",
+      "source": "graph-validation-policy",
+      "target": "graph-change-review",
+      "label": "GATES_ACCEPTANCE",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "معماری هدف برای کنترل گراف؛ اجرای validator یا rollback در این مرحله انجام نشده"
+      }
+    },
+    {
+      "id": "e-history-github",
+      "source": "graph-history-rollback",
+      "target": "github",
+      "label": "REFERENCES_COMMITS",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "معماری هدف برای کنترل گراف؛ اجرای validator یا rollback در این مرحله انجام نشده"
+      }
+    },
+    {
+      "id": "e-history-review",
+      "source": "graph-history-rollback",
+      "target": "graph-change-review",
+      "label": "PROPOSES_REVERT",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "معماری هدف برای کنترل گراف؛ اجرای validator یا rollback در این مرحله انجام نشده"
+      }
+    },
+    {
+      "id": "e-history-audit",
+      "source": "graph-history-rollback",
+      "target": "audit-ledger",
+      "label": "RECORDS_REVERSION",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "معماری هدف برای کنترل گراف؛ اجرای validator یا rollback در این مرحله انجام نشده"
       }
     }
   ]
