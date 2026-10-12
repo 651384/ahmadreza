@@ -39,16 +39,21 @@ function Workspace() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialGraph.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialGraph.edges.map(e => ({ ...e, markerEnd: { type: MarkerType.ArrowClosed } })));
   const [selected, setSelected] = useState(null);
+  const [selectedEdgeId, setSelectedEdgeId] = useState(null);
   const [revision, setRevision] = useState(initialGraph.revision || 1);
   const [notice, setNotice] = useState('');
   const onConnect = useCallback(params => setEdges(es => addEdge({
     ...params,
     id: 'manual-' + Date.now(),
     label: 'ارتباط پیشنهادی',
-    data: { status: 'NOT TESTED', evidence: 'اتصال محلی آزمایشی؛ هنوز در فایل canonical ثبت یا بررسی نشده' },
+    relation: 'ارتباط پیشنهادی',
+    status: 'NOT TESTED',
+    evidence: 'ارتباط محلی پیشنهادی؛ هنوز در فایل canonical ثبت یا بررسی نشده',
+    permission: 'UNKNOWN؛ هیچ مجوز اجرایی از این ارتباط محلی استنتاج نشود',
     markerEnd: { type: MarkerType.ArrowClosed }
   }, es)), [setEdges]);
   const chosen = nodes.find(n => n.id === selected);
+  const chosenEdge = edges.find(e => e.id === selectedEdgeId);
   const graph = useMemo(() => ({
     schema: initialGraph.schema,
     schemaVersion: initialGraph.schemaVersion,
@@ -89,6 +94,7 @@ function Workspace() {
     setNodes(initialGraph.nodes);
     setEdges(initialGraph.edges.map(e => ({ ...e, markerEnd: { type: MarkerType.ArrowClosed } })));
     setSelected(null);
+    setSelectedEdgeId(null);
     setRevision(initialGraph.revision || 1);
     setNotice('نمای گراف به نسخهٔ اولیهٔ ثبت‌شده بازگشت.');
   }
@@ -138,8 +144,9 @@ function Workspace() {
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
-            onNodeClick={(_, n) => setSelected(n.id)}
-            onPaneClick={() => setSelected(null)}
+            onNodeClick={(_, n) => { setSelected(n.id); setSelectedEdgeId(null); }}
+            onEdgeClick={(_, e) => { setSelectedEdgeId(e.id); setSelected(null); }}
+            onPaneClick={() => { setSelected(null); setSelectedEdgeId(null); }}
             fitView
             fitViewOptions={{ padding: 0.18 }}
             defaultEdgeOptions={{ type: 'smoothstep', style: { stroke: '#687a98', strokeWidth: 1.6 }, labelStyle: { fill: '#aebbd0', fontSize: 10 }, labelBgStyle: { fill: '#111b2c' } }}
@@ -156,7 +163,7 @@ function Workspace() {
       </div>
 
       <aside className="details-panel">
-        <div className="panel-heading"><div><span className="eyebrow">INSPECTOR</span><h3>جزئیات گره</h3></div></div>
+        <div className="panel-heading"><div><span className="eyebrow">INSPECTOR</span><h3>{chosenEdge ? 'جزئیات ارتباط' : 'جزئیات گره'}</h3></div></div>
         {chosen ? <div className="detail-content">
           <div className="detail-symbol"><Workflow size={24} /></div>
           <h4>{chosen.data.label}</h4>
@@ -165,6 +172,21 @@ function Workspace() {
           {chosen.data.capabilities?.length > 0 && <div className="detail-section"><strong>قابلیت‌های ثبت‌شده</strong><ul>{(Array.isArray(chosen.data.capabilities) ? chosen.data.capabilities : [chosen.data.capabilities]).map((item, index) => <li key={index}>{item}</li>)}</ul></div>}
           {detailRows.map(([label, value]) => <div className="detail-row detail-row-stacked" key={label}><span>{label}</span><p>{value}</p></div>)}
           <div className="notice"><ShieldAlert size={16} /><span>وضعیت فقط همان ادعای ثبت‌شده را پوشش می‌دهد؛ شواهد تاریخی، آزمون جاری محسوب نمی‌شود.</span></div>
+        </div> : chosenEdge ? <div className="detail-content">
+          <div className="detail-symbol"><GitBranch size={24} /></div>
+          <h4>{chosenEdge.label || chosenEdge.relation || 'ارتباط بدون عنوان'}</h4>
+          <span className={'status-pill ' + (statusClass[chosenEdge.status] || 'unknown')}>{statusText[chosenEdge.status] || chosenEdge.status || 'وضعیت نامعلوم'}</span>
+          <p>جزئیات همین ارتباط؛ وجود یال به‌تنهایی اجرای زنده یا مجوز دسترسی را اثبات نمی‌کند.</p>
+          {[
+            ['شناسه پایدار', chosenEdge.id],
+            ['مبدأ', chosenEdge.source],
+            ['مقصد', chosenEdge.target],
+            ['رابطه', chosenEdge.relation || chosenEdge.label],
+            ['وضعیت', chosenEdge.status || 'MISSING'],
+            ['مجوز', chosenEdge.permission || 'ثبت نشده'],
+            ['شواهد', chosenEdge.evidence || 'ثبت نشده']
+          ].map(([label, value]) => <div className="detail-row detail-row-stacked" key={label}><span>{label}</span><p>{value}</p></div>)}
+          <div className="notice"><ShieldAlert size={16} /><span>وضعیت ارتباط مستقل است؛ «آزمایش‌نشده» به معنی سالم یا خراب بودن نیست.</span></div>
         </div> : <div className="empty-detail">
           <div className="detail-symbol"><Workflow size={24} /></div>
           <strong>یک گره را انتخاب کن</strong>
