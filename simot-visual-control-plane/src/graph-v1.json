@@ -2,8 +2,8 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 11,
-  "updatedAt": "2026-10-12T07:46:28.277Z",
+  "revision": 12,
+  "updatedAt": "2026-10-12T07:46:47.225Z",
   "nodes": [
     {
       "id": "simot-core",
@@ -2377,6 +2377,36 @@
       "data": {
         "status": "PLANNED",
         "evidence": "معماری هدف؛ پیاده‌سازی و enforcement هنوز آزمون نشده"
+      }
+    },
+    {
+      "id": "e-policy-release-gate",
+      "source": "policy-engine",
+      "target": "change-release-gate",
+      "label": "GOVERNS_CHANGES",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط معماری هدف؛ پیاده‌سازی runtime هنوز نگاشت یا آزمون نشده"
+      }
+    },
+    {
+      "id": "e-monitoring-failure-handler",
+      "source": "monitoring",
+      "target": "failure-handler",
+      "label": "ROUTES_DETECTED_FAILURES",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط معماری هدف؛ پیاده‌سازی runtime هنوز نگاشت یا آزمون نشده"
+      }
+    },
+    {
+      "id": "e-lifecycle-result-state",
+      "source": "task-lifecycle",
+      "target": "result-assembler",
+      "label": "EMITS_TERMINAL_TASK_STATE",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "ارتباط معماری هدف؛ پیاده‌سازی runtime هنوز نگاشت یا آزمون نشده"
       }
     }
   ]
