@@ -118,3 +118,8 @@ D1 may hold limited runtime metadata for Gateway/event/queue operation, but it i
 ## Cancellation and timeout propagation (revision 34)
 
 Register a bounded deadline at ingress; have executor and queue consumer honor cancellation and terminal state; fence retries after cancellation/timeout; and reject late results that conflict with the canonical task state/version. A timeout does not prove an external computation stopped. These are planned requirements, not verified runtime behavior.
+
+
+## Operational authority and rollback gates (revision 35)
+
+The human operator authorizes scoped operational-mode transitions. The policy engine governs deployment trust boundaries. Graph restore/revert requires a reviewed diff, preserved current state/evidence, explicit scoped approval, and the change/release gate. Ambiguous or missing approval means no action. These are planned controls, not verified runtime enforcement.
