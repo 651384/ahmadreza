@@ -2,8 +2,8 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 15,
-  "updatedAt": "2026-10-12T07:50:49.973Z",
+  "revision": 16,
+  "updatedAt": "2026-10-12T07:51:20.012Z",
   "nodes": [
     {
       "id": "simot-core",
@@ -569,16 +569,20 @@
         "status": "PLANNED",
         "role": "کنترل انسانی عملیات حساس",
         "capabilities": [
-          "تأیید نوشتن حافظه",
-          "تأیید تغییر Secret",
-          "تأیید Deploy/Merge"
+          "Sensitive Master Memory writes",
+          "Secret creation, rotation, or disclosure boundary changes",
+          "DELETE and irreversible external side effects",
+          "Production deployment and merge to master",
+          "Cost-bearing actions or new paid dependencies",
+          "Explicit decision, actor, timestamp, scope, expiry and outcome",
+          "Approval does not bypass policy or permission checks"
         ],
         "accessMethod": "طراحی مرحلهٔ بعد؛ هنوز در رابط پیاده‌سازی نشده",
         "permissions": "هیچ عملیات حساس از این گراف اجرا نمی‌شود",
         "evidence": "الزام صریح brief معماری",
         "lastVerified": "PLANNED",
         "nextAction": "پیش از فعال‌کردن عملیات نوشتن، Approval و Audit واقعی طراحی شود",
-        "detail": "این گره فعلاً نمای معماری است، نه کنترل امنیتی اجرایی."
+        "detail": "تأیید باید به اقدام، محدوده و نسخهٔ مشخص محدود باشد؛ تأیید عمومی یا ضمنی مجوز همهٔ عملیات نیست. این گره هنوز کنترل اجرایی در UI نیست."
       }
     },
     {
@@ -1262,16 +1266,20 @@
         "status": "PLANNED",
         "role": "طبقه‌بندی داده و تعیین قواعد نگهداری/انتقال",
         "capabilities": [
-          "حداقل‌سازی داده",
-          "طبقه‌بندی حساسیت",
-          "قواعد نگهداری"
+          "Classification labels: PUBLIC / INTERNAL / CONFIDENTIAL / RESTRICTED (target taxonomy)",
+          "Purpose limitation and minimum necessary context",
+          "Retention period and deletion authority per data domain",
+          "Redaction of secrets and unnecessary personal data",
+          "Provider/connector transfer restrictions",
+          "Evidence retention linked to task lifecycle",
+          "Unknown classification fails closed for external transfer"
         ],
         "accessMethod": "لایهٔ منطقی معماری؛ نگاشت به implementation واقعی در مرحلهٔ بعد",
         "permissions": "حداقل دسترسی؛ عملیات حساس پشت human approval gate",
         "evidence": "جزء معماری هدف؛ وجود سرویس مستقل یا اتصال runtime از این گراف نتیجه نمی‌شود",
         "lastVerified": "NOT TESTED",
-        "nextAction": "تکمیل مدل معماری؛ سپس نگاشت به کد و سرویس واقعی",
-        "detail": "قواعد داده باید از policy و data governance تبعیت کنند؛ secretها در payload و گراف قرار نمی‌گیرند."
+        "nextAction": "پس از تکمیل معماری، taxonomy را با Data Governance و قوانین واقعی هر منبع reconcile کن",
+        "detail": "Taxonomy پیشنهادی برای تکمیل معماری است و باید با سیاست‌های واقعی موجود تطبیق داده شود؛ این گره اجرای خودکار طبقه‌بندی را اثبات نمی‌کند."
       }
     },
     {
@@ -1398,17 +1406,21 @@
         "kind": "security",
         "status": "PLANNED",
         "role": "security",
-        "capabilities": "کنترل تغییرات، merge و انتشار عملیاتی",
+        "capabilities": [
+          "Feature branch and reviewable diff",
+          "No merge-to-master without explicit approval",
+          "No production deployment without explicit approval",
+          "Pre-change backup or recovery point for risky changes",
+          "Rollback trigger, owner, and recovery procedure",
+          "Post-change evidence and state reconciliation",
+          "No rollback that destroys newer canonical data"
+        ],
         "accessMethod": "لایهٔ منطقی معماری؛ implementation واقعی هنوز نگاشت نشده",
         "permissions": "حداقل دسترسی؛ هر هزینه یا اقدام حساس نیازمند تأیید انسانی",
         "evidence": "جزء معماری هدف؛ این گره به‌تنهایی سرویس مستقل یا اتصال runtime را اثبات نمی‌کند",
         "lastVerified": "NOT TESTED",
         "nextAction": "پس از تکمیل مدل، نگاشت به implementation و قراردادهای موجود",
-        "detail": [
-          "شاخهٔ جداگانه",
-          "بازبینی diff",
-          "تأیید پیش از production"
-        ]
+        "detail": "Release gate باید قبل از تغییر حساس برنامهٔ بازیابی داشته باشد؛ این گره صرفاً مدل هدف است و هنوز deploy/rollback اجرا نمی‌کند."
       }
     },
     {
@@ -1574,6 +1586,62 @@
         "lastVerified": "NOT TESTED",
         "nextAction": "در مرحلهٔ وریفای، مسیرهای موجود و trust boundaries با شواهد تازه تطبیق داده شوند",
         "detail": "این گره مرزهای اعتماد را توصیف می‌کند؛ افزودن آن به گراف هیچ مسیر شبکه‌ای را تغییر نمی‌دهد."
+      }
+    },
+    {
+      "id": "operational-mode-policy",
+      "type": "simotNode",
+      "position": {
+        "x": 1160,
+        "y": 1680
+      },
+      "data": {
+        "label": "Operational Mode & Safety Policy",
+        "kind": "security",
+        "status": "PLANNED",
+        "role": "تعریف حالت اجرای SIMOT و محدودیت اقدام در هر حالت",
+        "capabilities": [
+          "READ_ONLY",
+          "DESIGN_ONLY",
+          "AWAITING_APPROVAL",
+          "EXECUTION_ENABLED",
+          "DEGRADED",
+          "MAINTENANCE",
+          "Fail closed on unknown state"
+        ],
+        "accessMethod": "سیاست orchestration و approval gate؛ پیاده‌سازی runtime هنوز نگاشت نشده",
+        "permissions": "READ_ONLY پیش‌فرض؛ execution فقط با policy و مجوز معتبر؛ sensitive writes نیازمند تأیید انسانی",
+        "evidence": "محدودیت‌های اجرایی پروژه و معماری کنترل‌شده",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "پس از تکمیل معماری، حالت‌ها را با تنظیمات و کنترل‌های واقعی تطبیق بده",
+        "detail": "حالت UI یا وجود گره به‌تنهایی execution را فعال نمی‌کند. وضعیت نامعلوم باید محدودکننده باشد، نه مجوز ضمنی."
+      }
+    },
+    {
+      "id": "backup-rollback-policy",
+      "type": "simotNode",
+      "position": {
+        "x": 1440,
+        "y": 1680
+      },
+      "data": {
+        "label": "Backup, Recovery & Rollback Policy",
+        "kind": "security",
+        "status": "PLANNED",
+        "role": "حفظ داده و مسیر بازیابی قبل از تغییرات پرریسک",
+        "capabilities": [
+          "Risk-based backup/recovery point",
+          "Rollback owner and trigger",
+          "Restore verification after architecture gate",
+          "Preserve newer canonical records",
+          "Recovery evidence and incident linkage"
+        ],
+        "accessMethod": "سیاست تغییرات در کنار Master Memory و Change & Release Gate؛ ابزار backup موجود باید بعداً inventory شود",
+        "permissions": "بدون حذف یا restore مخرب بدون تأیید صریح؛ ابتدا حفظ وضعیت موجود",
+        "evidence": "الزامات حفاظت از داده و کنترل تغییر پروژه؛ روش عملیاتی جاری اینجا بررسی نشده",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "در مرحلهٔ وریفای، روش backup/restore موجود را شناسایی کن؛ سرویس جدید نساز",
+        "detail": "این مدل سیاست است، نه فرمان backup یا rollback و نه اثبات وجود نسخهٔ پشتیبان سالم."
       }
     }
   ],
@@ -2770,6 +2838,86 @@
       "data": {
         "status": "PLANNED",
         "evidence": "مرزبندی هدف معماری؛ هیچ تنظیم runtime یا مجوزی در این تغییر دست‌کاری نشده"
+      }
+    },
+    {
+      "id": "e-mode-policy-engine",
+      "source": "operational-mode-policy",
+      "target": "policy-engine",
+      "label": "CONSTRAINS_EXECUTION",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "سیاست هدف؛ عملیات backup/rollback یا enforcement در این مرحله اجرا نشده"
+      }
+    },
+    {
+      "id": "e-mode-approval",
+      "source": "operational-mode-policy",
+      "target": "approval-gate",
+      "label": "GATES_MODE_TRANSITION",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "سیاست هدف؛ عملیات backup/rollback یا enforcement در این مرحله اجرا نشده"
+      }
+    },
+    {
+      "id": "e-mode-monitoring",
+      "source": "operational-mode-policy",
+      "target": "monitoring",
+      "label": "EXPOSES_MODE_STATUS",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "سیاست هدف؛ عملیات backup/rollback یا enforcement در این مرحله اجرا نشده"
+      }
+    },
+    {
+      "id": "e-classification-context",
+      "source": "data-classification",
+      "target": "context-assembler",
+      "label": "FILTERS_CONTEXT",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "سیاست هدف؛ عملیات backup/rollback یا enforcement در این مرحله اجرا نشده"
+      }
+    },
+    {
+      "id": "e-classification-connectors",
+      "source": "data-classification",
+      "target": "connector-trust-matrix",
+      "label": "RESTRICTS_DATA_TRANSFER",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "سیاست هدف؛ عملیات backup/rollback یا enforcement در این مرحله اجرا نشده"
+      }
+    },
+    {
+      "id": "e-rollback-release",
+      "source": "backup-rollback-policy",
+      "target": "change-release-gate",
+      "label": "REQUIRES_RECOVERY_PLAN",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "سیاست هدف؛ عملیات backup/rollback یا enforcement در این مرحله اجرا نشده"
+      }
+    },
+    {
+      "id": "e-rollback-audit",
+      "source": "backup-rollback-policy",
+      "target": "audit-ledger",
+      "label": "RECORDS_RECOVERY_EVIDENCE",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "سیاست هدف؛ عملیات backup/rollback یا enforcement در این مرحله اجرا نشده"
+      }
+    },
+    {
+      "id": "e-release-backup",
+      "source": "change-release-gate",
+      "target": "backup-rollback-policy",
+      "label": "CHECKS_RECOVERY_READINESS",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "سیاست هدف؛ عملیات backup/rollback یا enforcement در این مرحله اجرا نشده"
       }
     }
   ]
