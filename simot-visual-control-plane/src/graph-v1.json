@@ -2,8 +2,8 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 27,
-  "updatedAt": "2026-10-12T08:26:40.711Z",
+  "revision": 28,
+  "updatedAt": "2026-10-12T08:27:30.792Z",
   "nodes": [
     {
       "id": "simot-core",
@@ -3413,6 +3413,36 @@
       "status": "PLANNED",
       "evidence": "مالک رابط را استفاده می‌کند؛ این رابطه مجوز اجرای عملیات یا write ایجاد نمی‌کند.",
       "permission": "رابط نمایشی؛ هیچ دسترسی canonical از این ارتباط استنتاج نشود."
+    },
+    {
+      "id": "e-consumer-lifecycle",
+      "source": "queue-consumer",
+      "target": "task-lifecycle",
+      "label": "UPDATES_TASK_STATE",
+      "relation": "UPDATES_TASK_STATE",
+      "status": "PLANNED",
+      "evidence": "مسیر پردازش صف در معماری هدف باید وضعیت task را برای دریافت، شروع، موفقیت یا شکست نهایی به‌روزرسانی کند؛ اجرا هنوز آزمون نشده است.",
+      "permission": "فقط با task ID و correlation ID معتبر؛ انتقال وضعیت باید با state machine و کنترل نسخه سازگار باشد."
+    },
+    {
+      "id": "e-consumer-idempotency",
+      "source": "queue-consumer",
+      "target": "retry-idempotency",
+      "label": "DEDUPLICATES_REDELIVERY",
+      "relation": "DEDUPLICATES_REDELIVERY",
+      "status": "PLANNED",
+      "evidence": "تحویل مجدد صف در معماری هدف باید از اجرای دوبارهٔ اثر جانبی جلوگیری کند؛ پیاده‌سازی اجرایی تأیید نشده است.",
+      "permission": "کلید idempotency و دامنهٔ آن باید از envelope معتبر استخراج شود؛ تکرار امن فقط پس از ثبت نتیجهٔ قبلی."
+    },
+    {
+      "id": "e-consumer-failure",
+      "source": "queue-consumer",
+      "target": "failure-handler",
+      "label": "REPORTS_TERMINAL_FAILURE",
+      "relation": "REPORTS_TERMINAL_FAILURE",
+      "status": "PLANNED",
+      "evidence": "شکست نهایی مصرف پیام باید از مسیر مدیریت خطا و سیاست DLQ عبور کند؛ runtime آزمون نشده است.",
+      "permission": "حد retry و علت شکست باید مشخص باشد؛ پیام به‌طور خام یا بی‌ردپا حذف نشود."
     }
   ]
 }
