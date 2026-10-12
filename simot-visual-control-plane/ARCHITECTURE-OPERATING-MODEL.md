@@ -1,8 +1,8 @@
 # SIMOT AI OS — Architecture Operating Model
 
 **Scope:** Companion reference for the React Flow architecture graph.  
-**Graph:** `simot-core-overview`, schema version 1, revision 35.  
-**Current graph size:** 74 nodes, 177 edges.  
+**Graph:** `simot-core-overview`, schema version 1, revision 36.  
+**Current graph size:** 75 nodes, 182 edges.  
 **Branch:** `feat/simot-visual-control-plane-react-flow`.
 
 > This document describes the target architecture. A graph node or edge is not proof that a component is deployed, connected, healthy, or verified. Status must be supported by current evidence.
@@ -78,12 +78,13 @@ The VPS Master Memory package remains the continuity source: `CONTINUITY_CONTRAC
 
 ## 6. Current phase and boundaries
 
-- Graph revision 34 contains 74 nodes and 172 edges.
+- Current graph revision 36 contains 75 nodes and 182 edges.
 - The source-of-truth policy is connected to Master Memory, documents, code, UI, Notion, Asana, HubSpot, Cloudflare runtime evidence, context assembly, and data governance.
 - Release governance is linked to policy; monitoring is linked to failure handling; task lifecycle is linked to terminal result assembly.
-- `ARCHITECTURE.md`, this operating model, and `ARCHITECTURE-INDEX.md` are intended to describe the same graph revision; update their revision/count metadata together when the graph changes.
+- `ARCHITECTURE.md`, this operating model, `ARCHITECTURE-INDEX.md`, and revision contract documents must describe the same current graph revision; update current revision/count metadata together when the graph changes.
 - No tests, build checks, runtime calls, production deploy, or merge are part of this phase.
 - Do not mark conceptual components VERIFIED without fresh evidence from their actual source.
+- Revision 36 adds an evidence-freshness policy: distinguish observed-at from recorded-at, preserve claim scope and source, avoid a universal TTL, and treat stale or insufficient evidence as historical/unknown rather than current health. Enforcement remains PLANNED.
 
 
 ## Canonical memory access refinement (revision 29)
@@ -123,3 +124,13 @@ Register a bounded deadline at ingress; have executor and queue consumer honor c
 ## Operational authority and rollback gates (revision 35)
 
 The human operator authorizes scoped operational-mode transitions. The policy engine governs deployment trust boundaries. Graph restore/revert requires a reviewed diff, preserved current state/evidence, explicit scoped approval, and the change/release gate. Ambiguous or missing approval means no action. These are planned controls, not verified runtime enforcement.
+
+
+## Evidence freshness and reconciliation (revision 36)
+
+- Evidence is scoped to a specific component/claim and must retain source provenance and observation time separately from record time.
+- A past successful test is historical evidence, not proof of current health. Configuration presence, a binding name, or a successful build does not prove live connectivity.
+- Freshness rules are source- and claim-specific; do not invent a single global expiration window.
+- Missing/insufficient provenance or stale evidence means current status remains unknown / `NOT TESTED`; historical evidence may still be displayed as historical.
+- Reconciliation is read-only during architecture work. It must not automatically mutate canonical status; operational write-back remains behind the existing API and write guard.
+- The revision 36 policy and its five edges are `PLANNED`; no runtime enforcement has been claimed.
