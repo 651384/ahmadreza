@@ -1,10 +1,10 @@
 # SIMOT Visual Control Plane — Architecture Index & Handoff
 
 **Canonical graph artifact:** `simot-visual-control-plane/src/graph-v1.json`  
-**Graph:** `simot-core-overview`, schema version 1, revision 18  
-**Graph size:** 68 nodes, 147 edges  
+**Graph:** `simot-core-overview`, schema version 1, revision 19  
+**Graph size:** 69 nodes, 153 edges  
 **Working branch:** `feat/simot-visual-control-plane-react-flow`  
-**Latest graph commit:** `bff875bdbea618787b3bb5c696012f47b018e818`
+**Latest graph commit:** `85c214c4c8260587bd3f06c7ef196b4221c0a547`
 
 ## Architecture documents
 
@@ -15,6 +15,7 @@
 5. `OPERATIONAL-SAFETY-POLICY-REV16.md` — operational modes, classification, approval scope, backup/recovery policy.
 6. `GRAPH-GOVERNANCE-REV17.md` — graph schema, proposed change review, validation requirements, history and rollback.
 7. `MODEL-ROUTING-PRIVACY-COST-REV18.md` — free-first/local-first routing, data privacy, provider eligibility and cost gates.
+8. `MASTER-MEMORY-WRITE-GUARD-REV19.md` — guarded writes to the existing canonical VPS Master Memory.
 
 ## Architecture scope represented in the graph
 
