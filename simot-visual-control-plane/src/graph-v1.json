@@ -2,8 +2,8 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 12,
-  "updatedAt": "2026-10-12T07:46:47.225Z",
+  "revision": 13,
+  "updatedAt": "2026-10-12T07:48:14.819Z",
   "nodes": [
     {
       "id": "simot-core",
@@ -1003,21 +1003,19 @@
         "status": "PLANNED",
         "role": "مدیریت چرخهٔ عمر وظیفه از دریافت تا ثبت نتیجه",
         "capabilities": [
-          "UNDERSTAND",
-          "RECONCILE",
-          "PLAN",
-          "EXECUTE",
-          "TEST",
-          "VERIFY",
-          "RECORD",
-          "CONTINUE"
+          "States: RECEIVED → RECONCILING → PLANNED → AWAITING_APPROVAL (when required) → EXECUTING",
+          "Optional TEST → VERIFY after execution when the task's gate permits",
+          "RECORD → CONTINUE only after outcome/evidence handling",
+          "Terminal outcomes: SUCCEEDED, FAILED, BLOCKED, CANCELLED, TIMED_OUT",
+          "Retry only for retryable errors with idempotency/correlation controls",
+          "Reject illegal transitions; never infer success from missing response"
         ],
         "accessMethod": "منطق orchestration و وضعیت canonical در Master Memory",
         "permissions": "انتقال وضعیت با شواهد؛ human gate برای عملیات حساس",
         "evidence": "چرخهٔ اجرایی در قرارداد پروژه تعریف شده؛ state machine مستقل هنوز نگاشت نشده",
         "lastVerified": "NOT TESTED",
-        "nextAction": "تعریف حالت‌ها، انتقال‌های مجاز و شرایط توقف",
-        "detail": "این مدل چرخهٔ وظیفه را تعریف می‌کند؛ ثبت canonical همچنان در VPS Master Memory می‌ماند."
+        "nextAction": "پس از تکمیل مدل، state transitions را با Master Memory schema و runtime تطبیق بده",
+        "detail": "مدل هدف چرخهٔ وظیفه؛ وضعیت canonical در VPS Master Memory می‌ماند. AWAITING_APPROVAL، CANCELLED و TIMED_OUT نتیجهٔ مستقل‌اند و نباید با SUCCEEDED یکی شوند."
       }
     },
     {
@@ -1102,8 +1100,8 @@
       "id": "request-ingress",
       "type": "simotNode",
       "position": {
-        "x": 600,
-        "y": 2220
+        "x": 40,
+        "y": 1200
       },
       "data": {
         "label": "Request Ingress / ورودی درخواست",
@@ -1127,8 +1125,8 @@
       "id": "context-assembler",
       "type": "simotNode",
       "position": {
-        "x": 600,
-        "y": 2220
+        "x": 320,
+        "y": 1200
       },
       "data": {
         "label": "Context & Memory Assembler",
@@ -1153,7 +1151,7 @@
       "type": "simotNode",
       "position": {
         "x": 600,
-        "y": 2220
+        "y": 1200
       },
       "data": {
         "label": "Task Planner / برنامه‌ریز",
@@ -1177,8 +1175,8 @@
       "id": "executor",
       "type": "simotNode",
       "position": {
-        "x": 600,
-        "y": 2220
+        "x": 880,
+        "y": 1200
       },
       "data": {
         "label": "Task Executor / اجراکننده",
@@ -1202,8 +1200,8 @@
       "id": "result-assembler",
       "type": "simotNode",
       "position": {
-        "x": 600,
-        "y": 2220
+        "x": 1160,
+        "y": 1200
       },
       "data": {
         "label": "Result & Evidence Assembler",
@@ -1227,8 +1225,8 @@
       "id": "retry-idempotency",
       "type": "simotNode",
       "position": {
-        "x": 600,
-        "y": 2220
+        "x": 1440,
+        "y": 1200
       },
       "data": {
         "label": "Retry / Idempotency Control",
@@ -1252,8 +1250,8 @@
       "id": "data-classification",
       "type": "simotNode",
       "position": {
-        "x": 600,
-        "y": 2220
+        "x": 40,
+        "y": 1360
       },
       "data": {
         "label": "Data Classification & Retention",
@@ -1277,8 +1275,8 @@
       "id": "connector-permissions",
       "type": "simotNode",
       "position": {
-        "x": 600,
-        "y": 2220
+        "x": 320,
+        "y": 1360
       },
       "data": {
         "label": "Connector Capability & Permission Map",
@@ -1302,8 +1300,8 @@
       "id": "response-delivery",
       "type": "simotNode",
       "position": {
-        "x": 1160,
-        "y": 2670
+        "x": 600,
+        "y": 1360
       },
       "data": {
         "label": "Response Delivery / پاسخ به درخواست‌کننده",
@@ -1327,8 +1325,8 @@
       "id": "failure-handler",
       "type": "simotNode",
       "position": {
-        "x": 1440,
-        "y": 2670
+        "x": 880,
+        "y": 1360
       },
       "data": {
         "label": "Failure Handler / مدیریت خطا",
@@ -1352,8 +1350,8 @@
       "id": "model-cost-policy",
       "type": "simotNode",
       "position": {
-        "x": 40,
-        "y": 2820
+        "x": 1160,
+        "y": 1360
       },
       "data": {
         "label": "Model & Cost Policy",
@@ -1377,8 +1375,8 @@
       "id": "change-release-gate",
       "type": "simotNode",
       "position": {
-        "x": 320,
-        "y": 2820
+        "x": 1440,
+        "y": 1360
       },
       "data": {
         "label": "Change & Release Gate",
@@ -1402,8 +1400,8 @@
       "id": "human-escalation",
       "type": "simotNode",
       "position": {
-        "x": 600,
-        "y": 2820
+        "x": 40,
+        "y": 1520
       },
       "data": {
         "label": "Human Escalation / ارجاع به مالک",
@@ -1428,7 +1426,7 @@
       "type": "simotNode",
       "position": {
         "x": 320,
-        "y": 1770
+        "y": 1520
       },
       "data": {
         "label": "Source-of-Truth Policy",
@@ -1451,6 +1449,60 @@
         "lastVerified": "NOT TESTED",
         "nextAction": "اتصال policy به context و data governance",
         "detail": "هر منبع نقش مشخص دارد؛ VPS Master Memory مرجع وضعیت عملیاتی است و سایر سامانه‌ها نقش اختصاصی خود را حفظ می‌کنند."
+      }
+    },
+    {
+      "id": "task-cancellation-timeout",
+      "type": "simotNode",
+      "position": {
+        "x": 600,
+        "y": 1520
+      },
+      "data": {
+        "label": "Cancellation & Timeout Control",
+        "kind": "core",
+        "status": "PLANNED",
+        "role": "مدیریت لغو، deadline و توقف امن وظیفه",
+        "capabilities": [
+          "Cancellation request",
+          "Deadline / timeout",
+          "Cooperative stop",
+          "No duplicate side effects",
+          "Terminal-state recording"
+        ],
+        "accessMethod": "سیاست task lifecycle؛ implementation واقعی هنوز نگاشت نشده",
+        "permissions": "لغو عملیات برگشت‌ناپذیر فقط با بررسی وضعیت و مجوز؛ timeout نباید به معنی موفقیت تلقی شود",
+        "evidence": "الزام معماری؛ runtime behavior هنوز آزمون نشده",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "پس از تکمیل گراف، نگاشت به state machine و handler واقعی",
+        "detail": "لغو و timeout باید نتیجهٔ نهایی و علت توقف را ثبت کنند؛ عملیات اجراشده لزوماً با لغو قابل بازگردانی نیست."
+      }
+    },
+    {
+      "id": "evidence-contract",
+      "type": "simotNode",
+      "position": {
+        "x": 880,
+        "y": 1520
+      },
+      "data": {
+        "label": "Evidence & Task Record Contract",
+        "kind": "data",
+        "status": "PLANNED",
+        "role": "یکسان‌سازی قالب شواهد و ثبت نتیجهٔ وظیفه",
+        "capabilities": [
+          "TASK-ID / CORR-ID",
+          "State transition",
+          "Actor / action / outcome",
+          "Evidence ID and timestamp",
+          "Redacted before/after summary"
+        ],
+        "accessMethod": "نگاشت به EVIDENCE_INDEX.json و TASK_LOG.jsonl در VPS Master Memory",
+        "permissions": "عدم ثبت token، secret یا دادهٔ حساس غیرضروری؛ ثبت نتیجهٔ واقعی و قابل ردیابی",
+        "evidence": "ساختار canonical memory و قرارداد تداوم پروژه؛ schema اجرایی نیازمند طراحی بعدی",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "پس از تکمیل معماری، schema را با فایل‌های canonical تطبیق بده",
+        "detail": "این قرارداد یک مدل منطقی است و جایگزین فایل‌های موجود Master Memory یا منبع حافظهٔ جدید نیست."
       }
     }
   ],
@@ -2407,6 +2459,56 @@
       "data": {
         "status": "PLANNED",
         "evidence": "ارتباط معماری هدف؛ پیاده‌سازی runtime هنوز نگاشت یا آزمون نشده"
+      }
+    },
+    {
+      "id": "e-lifecycle-cancellation-timeout",
+      "source": "task-lifecycle",
+      "target": "task-cancellation-timeout",
+      "label": "GOVERNS_CANCEL_TIMEOUT",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "معماری هدف؛ schema و اجرای واقعی هنوز آزمون نشده"
+      }
+    },
+    {
+      "id": "e-cancel-audit",
+      "source": "task-cancellation-timeout",
+      "target": "audit-ledger",
+      "label": "RECORDS_TERMINAL_REASON",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "معماری هدف؛ schema و اجرای واقعی هنوز آزمون نشده"
+      }
+    },
+    {
+      "id": "e-lifecycle-evidence-contract",
+      "source": "task-lifecycle",
+      "target": "evidence-contract",
+      "label": "USES_RECORD_SCHEMA",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "معماری هدف؛ schema و اجرای واقعی هنوز آزمون نشده"
+      }
+    },
+    {
+      "id": "e-evidence-master-memory",
+      "source": "evidence-contract",
+      "target": "master-memory",
+      "label": "PERSISTS_CANONICAL_RECORD",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "معماری هدف؛ schema و اجرای واقعی هنوز آزمون نشده"
+      }
+    },
+    {
+      "id": "e-evidence-audit",
+      "source": "evidence-contract",
+      "target": "audit-ledger",
+      "label": "DEFINES_AUDIT_EVIDENCE",
+      "data": {
+        "status": "PLANNED",
+        "evidence": "معماری هدف؛ schema و اجرای واقعی هنوز آزمون نشده"
       }
     }
   ]
