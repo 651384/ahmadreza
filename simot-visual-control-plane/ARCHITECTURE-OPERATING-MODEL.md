@@ -108,3 +108,8 @@ Backup/recovery policy applies to the existing VPS Master Memory package only; i
 ## Single-mode execution dispatch (revision 32)
 
 Each task must select one execution mode: synchronous direct worker dispatch or asynchronous queue dispatch. The gateway does not independently send the same task to both. The dispatch decision is tied to task ID, correlation ID, idempotency key, policy version, and outcome. Unknown/ambiguous mode fails closed; retry and mode switching must reconcile prior dispatch before another dispatch. All paths are planned only.
+
+
+## Runtime metadata versus canonical memory (revision 33)
+
+D1 may hold limited runtime metadata for Gateway/event/queue operation, but it is not a second Master Memory. Canonical state remains in VPS Master Memory and is read through the approved API. Metadata persistence must be minimal, classified, redacted, and governed by retention rules; actual D1 schema and deployed behavior remain unverified until the architecture-completion gate.
