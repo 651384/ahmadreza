@@ -2,8 +2,8 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 34,
-  "updatedAt": "2026-10-12T08:50:00.488Z",
+  "revision": 35,
+  "updatedAt": "2026-10-12T08:52:29.725Z",
   "nodes": [
     {
       "id": "simot-core",
@@ -3641,6 +3641,56 @@
       "status": "PLANNED",
       "evidence": "قرارداد معماری revision 34؛ race handling runtime بررسی نشده",
       "permission": "لغو/timeout terminal باید جلوی retry و نتیجهٔ دیررس ناسازگار را بگیرد"
+    },
+    {
+      "id": "e-operator-mode-control",
+      "source": "human-operator",
+      "target": "operational-mode-policy",
+      "label": "انتخاب و تأیید حالت عملیاتی",
+      "relation": "AUTHORIZES_SCOPED_OPERATIONAL_MODE",
+      "status": "PLANNED",
+      "evidence": "قرارداد معماری revision 35؛ هیچ runtime mode switch بررسی نشده",
+      "permission": "تغییر به حالت حساس/اجرایی فقط با تأیید صریح انسانی و ثبت دامنه"
+    },
+    {
+      "id": "e-policy-deployment-boundaries",
+      "source": "policy-engine",
+      "target": "deployment-trust-boundaries",
+      "label": "اعمال سیاست مرزهای استقرار",
+      "relation": "GOVERNS_DEPLOYMENT_TRUST_BOUNDARIES",
+      "status": "PLANNED",
+      "evidence": "قرارداد معماری revision 35؛ پیکربندی runtime بررسی نشده",
+      "permission": "حفظ دسترسی خصوصی؛ تغییر مسیر شبکه یا انتشار عمومی نیازمند تأیید"
+    },
+    {
+      "id": "e-approval-history-rollback",
+      "source": "approval-gate",
+      "target": "graph-history-rollback",
+      "label": "مجوز بازگردانی نسخه",
+      "relation": "AUTHORIZES_SCOPED_GRAPH_ROLLBACK",
+      "status": "PLANNED",
+      "evidence": "قرارداد معماری revision 35؛ rollback اجرا نشده",
+      "permission": "بازگردانی فقط پس از تأیید انسانی، بررسی diff و حفظ شواهد نسخهٔ جاری"
+    },
+    {
+      "id": "e-release-history-rollback",
+      "source": "change-release-gate",
+      "target": "graph-history-rollback",
+      "label": "کنترل تغییر و بازگردانی",
+      "relation": "GATES_GRAPH_RESTORE_OR_REVERT",
+      "status": "PLANNED",
+      "evidence": "قرارداد معماری revision 35؛ release gate پیاده‌سازی نشده",
+      "permission": "بدون merge به master یا تغییر production مگر با تأیید صریح"
+    },
+    {
+      "id": "e-approval-human-request",
+      "source": "approval-gate",
+      "target": "human-operator",
+      "label": "درخواست تصمیم انسانی",
+      "relation": "REQUESTS_SCOPED_HUMAN_DECISION",
+      "status": "PLANNED",
+      "evidence": "قرارداد معماری revision 35؛ مسیر approval واقعی بررسی نشده",
+      "permission": "عدم پیش‌فرض‌گرفتن تأیید؛ رد/نامشخص به معنی عدم اجرا"
     }
   ]
 }
