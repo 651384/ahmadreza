@@ -29,15 +29,15 @@ The source-of-truth policy must be applied when assembling context and coordinat
 2. **Request ingress** validates the request and builds the standard envelope.
 3. **SIMOT message envelope** carries correlation/reply identifiers and part sequencing where required.
 4. **Orchestration** coordinates the task lifecycle.
-4. **Context & Memory Assembler** retrieves relevant canonical state and scoped records through the appropriate adapters, applying source-of-truth, classification, retention, and permission policies.
-5. **Planner** produces steps and expected outcomes.
-6. **Task Lifecycle** governs allowed state transitions.
-7. **Executor** invokes registered tools/adapters under least privilege.
-8. **Policy Engine** checks permissions, classification, model/cost policy, and whether human approval is required.
-9. **Retry / Idempotency** controls safe retries and duplicate effects.
-10. **Result Assembler** prepares output and evidence; audit records are routed to the canonical record where appropriate.
-11. **Response Delivery** returns the result through Client Channel Adapters to the requesting interface, preserving request correlation.
-12. **Failure Handler** classifies terminal failures, routes them to DLQ when configured, and escalates decisions to a human.
+5. **Context & Memory Assembler** retrieves relevant canonical state and scoped records through the appropriate adapters, applying source-of-truth, classification, retention, and permission policies.
+6. **Planner** produces steps and expected outcomes.
+7. **Task Lifecycle** governs allowed state transitions.
+8. **Executor** invokes registered tools/adapters under least privilege.
+9. **Policy Engine** checks permissions, classification, model/cost policy, and whether human approval is required.
+10. **Retry / Idempotency** controls safe retries and duplicate effects.
+11. **Result Assembler** prepares output and evidence; audit records are routed to the canonical record where appropriate.
+12. **Response Delivery** returns the result through Client Channel Adapters to the requesting interface, preserving request correlation.
+13. **Failure Handler** classifies terminal failures, routes them to DLQ when configured, and escalates decisions to a human.
 
 This is a target flow, not a claim that every stage is implemented or live.
 
