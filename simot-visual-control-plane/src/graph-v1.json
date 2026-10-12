@@ -2,8 +2,8 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 35,
-  "updatedAt": "2026-10-12T08:52:29.725Z",
+  "revision": 36,
+  "updatedAt": "2026-10-12T09:00:00.000Z",
   "nodes": [
     {
       "id": "simot-core",
@@ -1919,6 +1919,33 @@
         "nextAction": "پس از تکمیل معماری، مسیرهای واقعی Gateway و Queue را با کد تطبیق بده",
         "detail": "برای هر task دقیقاً یک execution mode انتخاب شود؛ تغییر مسیر پس از شروع فقط با قرارداد retry/recovery و همان idempotency key."
       }
+    },
+    {
+      "id": "evidence-freshness-policy",
+      "type": "simotNode",
+      "position": {
+        "x": 1720,
+        "y": 1520
+      },
+      "data": {
+        "label": "Evidence Freshness & Reconciliation Policy",
+        "kind": "security",
+        "status": "PLANNED",
+        "role": "تعیین اینکه هر شاهد برای کدام ادعا و بازهٔ زمانی معتبر است و چه زمانی وضعیت باید نامعلوم شود",
+        "capabilities": [
+          "Evidence source and scope",
+          "Observed-at / recorded-at provenance",
+          "Per-source freshness rules",
+          "Stale-evidence detection",
+          "Reconciliation outcome"
+        ],
+        "accessMethod": "قواعد معماری؛ تعیین بازه‌های اعتبار فقط پس از inventory منبع واقعی",
+        "permissions": "Read-only در فاز معماری؛ هیچ status یا حافظهٔ canonical خودکار تغییر نمی‌کند",
+        "evidence": "قرارداد معماری revision 36؛ enforcement و سیاست‌های زمانی runtime پیاده‌سازی یا آزمون نشده‌اند",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "پس از تکمیل معماری، منابع شواهد و freshness rule هر منبع را با مالک منبع تطبیق بده",
+        "detail": "شاهد تاریخی نباید به‌عنوان سلامت جاری نمایش داده شود. نبود timestamp، منبع یا scope کافی یعنی وضعیت جاری نامعلوم است؛ TTL عمومی و یکسان برای همهٔ منابع فرض نمی‌شود."
+      }
     }
   ],
   "edges": [
@@ -3691,6 +3718,56 @@
       "status": "PLANNED",
       "evidence": "قرارداد معماری revision 35؛ مسیر approval واقعی بررسی نشده",
       "permission": "عدم پیش‌فرض‌گرفتن تأیید؛ رد/نامشخص به معنی عدم اجرا"
+    },
+    {
+      "id": "e-monitoring-evidence-freshness",
+      "source": "monitoring",
+      "target": "evidence-freshness-policy",
+      "label": "کنترل تازگی شواهد وضعیت",
+      "relation": "ENFORCES_EVIDENCE_FRESHNESS",
+      "status": "PLANNED",
+      "evidence": "قرارداد معماری revision 36؛ freshness enforcement در runtime پیاده‌سازی یا آزمون نشده",
+      "permission": "شواهد بدون منبع، scope و زمان معتبر نباید سلامت جاری را اثبات کنند؛ عدم قطعیت باید حفظ شود."
+    },
+    {
+      "id": "e-evidence-freshness-contract",
+      "source": "evidence-contract",
+      "target": "evidence-freshness-policy",
+      "label": "تأمین منشأ و زمان شاهد",
+      "relation": "SUPPLIES_EVIDENCE_PROVENANCE_AND_TIME",
+      "status": "PLANNED",
+      "evidence": "قرارداد معماری revision 36؛ schema اجرایی با فایل‌های canonical تطبیق داده نشده",
+      "permission": "شناسهٔ شاهد، منبع، scope، زمان مشاهده و زمان ثبت باید بدون افشای secret حفظ شوند."
+    },
+    {
+      "id": "e-freshness-status-display",
+      "source": "evidence-freshness-policy",
+      "target": "vcp",
+      "label": "نمایش وضعیت با اعتبار شواهد",
+      "relation": "GATES_STATUS_DISPLAY_ON_VALID_EVIDENCE",
+      "status": "PLANNED",
+      "evidence": "قرارداد معماری revision 36؛ UI هنوز freshness policy را اجرا نمی‌کند",
+      "permission": "شاهد قدیمی فقط به‌عنوان تاریخی نمایش داده شود؛ در نبود شواهد جاری وضعیت NOT TESTED/UNKNOWN باقی بماند."
+    },
+    {
+      "id": "e-freshness-audit",
+      "source": "evidence-freshness-policy",
+      "target": "audit-ledger",
+      "label": "ثبت نتیجهٔ تطبیق شواهد",
+      "relation": "RECORDS_EVIDENCE_RECONCILIATION",
+      "status": "PLANNED",
+      "evidence": "قرارداد معماری revision 36؛ ثبت خودکار تطبیق هنوز پیاده‌سازی نشده",
+      "permission": "ثبت مرجع و نتیجه بدون تغییر خودکار وضعیت canonical و بدون ذخیرهٔ secret."
+    },
+    {
+      "id": "e-freshness-result-assembler",
+      "source": "evidence-freshness-policy",
+      "target": "result-assembler",
+      "label": "جلوگیری از ادعای پشتیبانی‌نشده",
+      "relation": "BLOCKS_UNSUPPORTED_CURRENT_STATUS_CLAIMS",
+      "status": "PLANNED",
+      "evidence": "قرارداد معماری revision 36؛ enforcement خروجی هنوز پیاده‌سازی نشده",
+      "permission": "ادعای VERIFIED فقط برای همان component/claim و scope دارای شاهد معتبر مجاز است."
     }
   ]
 }
