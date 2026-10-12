@@ -2,15 +2,15 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 3,
-  "updatedAt": "2026-10-12T06:30:00.000Z",
+  "revision": 4,
+  "updatedAt": "2026-10-12T06:40:00.000Z",
   "nodes": [
     {
       "id": "simot-core",
       "type": "simotNode",
       "position": {
-        "x": 560,
-        "y": 300
+        "x": 40,
+        "y": 330
       },
       "data": {
         "label": "هستهٔ SIMOT AI OS",
@@ -34,8 +34,8 @@
       "id": "master-memory",
       "type": "simotNode",
       "position": {
-        "x": 150,
-        "y": 300
+        "x": 40,
+        "y": 470
       },
       "data": {
         "label": "VPS Master Memory",
@@ -60,8 +60,8 @@
       "id": "cloudflare-gateway",
       "type": "simotNode",
       "position": {
-        "x": 560,
-        "y": 80
+        "x": 880,
+        "y": 190
       },
       "data": {
         "label": "Cloudflare Worker Gateway",
@@ -85,8 +85,8 @@
       "id": "cloudflare-vpc",
       "type": "simotNode",
       "position": {
-        "x": 310,
-        "y": 80
+        "x": 600,
+        "y": 190
       },
       "data": {
         "label": "VPC Service / Binding",
@@ -109,8 +109,8 @@
       "id": "vps",
       "type": "simotNode",
       "position": {
-        "x": 50,
-        "y": 80
+        "x": 40,
+        "y": 190
       },
       "data": {
         "label": "VPS Runtime",
@@ -134,7 +134,7 @@
       "id": "tunnel",
       "type": "simotNode",
       "position": {
-        "x": 50,
+        "x": 320,
         "y": 190
       },
       "data": {
@@ -157,8 +157,8 @@
       "id": "vcp",
       "type": "simotNode",
       "position": {
-        "x": 850,
-        "y": 80
+        "x": 40,
+        "y": 50
       },
       "data": {
         "label": "React Flow VCP",
@@ -182,8 +182,8 @@
       "id": "tailscale",
       "type": "simotNode",
       "position": {
-        "x": 850,
-        "y": 200
+        "x": 880,
+        "y": 50
       },
       "data": {
         "label": "Tailscale Private Network",
@@ -206,8 +206,8 @@
       "id": "cloudflare-d1",
       "type": "simotNode",
       "position": {
-        "x": 560,
-        "y": 510
+        "x": 1160,
+        "y": 190
       },
       "data": {
         "label": "Cloudflare D1",
@@ -229,8 +229,8 @@
       "id": "cloudflare-queue",
       "type": "simotNode",
       "position": {
-        "x": 800,
-        "y": 510
+        "x": 1440,
+        "y": 190
       },
       "data": {
         "label": "Queue: simot-events",
@@ -252,8 +252,8 @@
       "id": "cloudflare-dlq",
       "type": "simotNode",
       "position": {
-        "x": 1030,
-        "y": 510
+        "x": 320,
+        "y": 750
       },
       "data": {
         "label": "Dead Letter Queue",
@@ -275,8 +275,8 @@
       "id": "github",
       "type": "simotNode",
       "position": {
-        "x": 1100,
-        "y": 80
+        "x": 1440,
+        "y": 50
       },
       "data": {
         "label": "GitHub / Source",
@@ -300,8 +300,8 @@
       "id": "chatgpt",
       "type": "simotNode",
       "position": {
-        "x": 1390,
-        "y": 80
+        "x": 1160,
+        "y": 50
       },
       "data": {
         "label": "ChatGPT & Connectors",
@@ -325,8 +325,8 @@
       "id": "claude",
       "type": "simotNode",
       "position": {
-        "x": 1390,
-        "y": 230
+        "x": 880,
+        "y": 750
       },
       "data": {
         "label": "Claude AI",
@@ -348,8 +348,8 @@
       "id": "grok",
       "type": "simotNode",
       "position": {
-        "x": 1390,
-        "y": 360
+        "x": 1160,
+        "y": 750
       },
       "data": {
         "label": "Grok",
@@ -371,8 +371,8 @@
       "id": "arena",
       "type": "simotNode",
       "position": {
-        "x": 1390,
-        "y": 490
+        "x": 1440,
+        "y": 750
       },
       "data": {
         "label": "Arena AI",
@@ -394,8 +394,8 @@
       "id": "openclaw",
       "type": "simotNode",
       "position": {
-        "x": 850,
-        "y": 330
+        "x": 600,
+        "y": 50
       },
       "data": {
         "label": "OpenClaw Gateway",
@@ -418,8 +418,8 @@
       "id": "phone-client",
       "type": "simotNode",
       "position": {
-        "x": 1080,
-        "y": 330
+        "x": 320,
+        "y": 50
       },
       "data": {
         "label": "موبایل / OpenClaw Client",
@@ -441,8 +441,8 @@
       "id": "ollama",
       "type": "simotNode",
       "position": {
-        "x": 1080,
-        "y": 440
+        "x": 1440,
+        "y": 610
       },
       "data": {
         "label": "Ollama / Local Models",
@@ -465,8 +465,8 @@
       "id": "notion",
       "type": "simotNode",
       "position": {
-        "x": 50,
-        "y": 510
+        "x": 320,
+        "y": 610
       },
       "data": {
         "label": "Notion",
@@ -488,8 +488,8 @@
       "id": "sharepoint",
       "type": "simotNode",
       "position": {
-        "x": 270,
-        "y": 510
+        "x": 600,
+        "y": 610
       },
       "data": {
         "label": "SharePoint / OneDrive",
@@ -511,8 +511,8 @@
       "id": "asana",
       "type": "simotNode",
       "position": {
-        "x": 50,
-        "y": 630
+        "x": 880,
+        "y": 610
       },
       "data": {
         "label": "Asana",
@@ -534,8 +534,8 @@
       "id": "hubspot",
       "type": "simotNode",
       "position": {
-        "x": 270,
-        "y": 630
+        "x": 1160,
+        "y": 610
       },
       "data": {
         "label": "HubSpot CRM",
@@ -559,8 +559,8 @@
       "id": "approval-gate",
       "type": "simotNode",
       "position": {
-        "x": 560,
-        "y": 690
+        "x": 1440,
+        "y": 330
       },
       "data": {
         "label": "Human Approval Gate",
@@ -584,8 +584,8 @@
       "id": "orchestration",
       "type": "simotNode",
       "position": {
-        "x": 380,
-        "y": 340
+        "x": 320,
+        "y": 330
       },
       "data": {
         "label": "موتور هماهنگی و گردش‌کار",
@@ -610,7 +610,7 @@
       "type": "simotNode",
       "position": {
         "x": 600,
-        "y": 340
+        "y": 330
       },
       "data": {
         "label": "رجیستری ابزارها و اتصال‌ها",
@@ -634,8 +634,8 @@
       "id": "policy-engine",
       "type": "simotNode",
       "position": {
-        "x": 380,
-        "y": 470
+        "x": 880,
+        "y": 330
       },
       "data": {
         "label": "سیاست امنیت و مجوزها",
@@ -659,8 +659,8 @@
       "id": "model-router",
       "type": "simotNode",
       "position": {
-        "x": 1080,
-        "y": 650
+        "x": 600,
+        "y": 750
       },
       "data": {
         "label": "مسیریاب مدل‌های هوش مصنوعی",
@@ -684,8 +684,8 @@
       "id": "event-bus",
       "type": "simotNode",
       "position": {
-        "x": 800,
-        "y": 650
+        "x": 40,
+        "y": 750
       },
       "data": {
         "label": "لایهٔ رویدادها و صف",
@@ -734,8 +734,8 @@
       "id": "data-governance",
       "type": "simotNode",
       "position": {
-        "x": 820,
-        "y": 340
+        "x": 880,
+        "y": 470
       },
       "data": {
         "label": "حاکمیت داده و قراردادها",
@@ -759,8 +759,8 @@
       "id": "integration-adapters",
       "type": "simotNode",
       "position": {
-        "x": 1080,
-        "y": 340
+        "x": 40,
+        "y": 610
       },
       "data": {
         "label": "آداپتورهای یکپارچه‌سازی",
@@ -787,8 +787,8 @@
       "id": "secrets-boundary",
       "type": "simotNode",
       "position": {
-        "x": 150,
-        "y": 470
+        "x": 1160,
+        "y": 330
       },
       "data": {
         "label": "مرز اسرار و پیکربندی",
@@ -812,8 +812,8 @@
       "id": "continuity-contract",
       "type": "simotNode",
       "position": {
-        "x": 150,
-        "y": 650
+        "x": 320,
+        "y": 470
       },
       "data": {
         "label": "قرارداد تداوم و وضعیت",
@@ -839,7 +839,7 @@
       "id": "api-contracts",
       "type": "simotNode",
       "position": {
-        "x": 820,
+        "x": 1160,
         "y": 470
       },
       "data": {
@@ -866,7 +866,7 @@
       "id": "monitoring",
       "type": "simotNode",
       "position": {
-        "x": 1030,
+        "x": 1440,
         "y": 470
       },
       "data": {
