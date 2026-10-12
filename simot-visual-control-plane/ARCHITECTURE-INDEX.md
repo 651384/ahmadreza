@@ -1,14 +1,14 @@
 # SIMOT Visual Control Plane — Architecture Index & Handoff
 
 **Canonical graph artifact:** `simot-visual-control-plane/src/graph-v1.json`  
-**Graph:** `simot-core-overview`, schema version 1, revision 24  
+**Graph:** `simot-core-overview`, schema version 1, revision 25  
 **Graph size:** 70 nodes, 155 edges  
 **Working branch:** `feat/simot-visual-control-plane-react-flow`  
-**Latest graph commit:** `56e19f5953254d7c2c22d9bc2c37b0d44e0f3d73`
+**Latest graph commit:** `60372d326cc608afa21f9e435cd6a648d0e2dbf6`
 
 ## Architecture documents
 
-1. `ARCHITECTURE.md` — VCP implementation specification, reconciled to graph revision 24.
+1. `ARCHITECTURE.md` — VCP implementation specification, reconciled to graph revision 25.
 2. `ARCHITECTURE-OPERATING-MODEL.md` — core roles, source-of-truth hierarchy, request-to-result flow, continuity and safety.
 3. `ARCHITECTURE-CONTRACTS-REV14.md` — API/message envelope, response/acknowledgement, structured error, connector scope.
 4. `CONNECTOR-TRUST-BOUNDARIES-REV15.md` — connector trust matrix and intended deployment boundaries.
@@ -38,10 +38,10 @@
 - **Tests/build/runtime probes:** NOT RUN in this phase by design.
 - **Graph and documents:** committed to the existing feature branch only.
 - **Inspector scope:** `src/App.jsx` now supports selecting a relationship to inspect its relation, status, evidence, and permission; manually drawn links also receive explicit contract fields. This is source-level work only and has not been built or tested.
-- **Documentation alignment:** `ARCHITECTURE.md`, `ARCHITECTURE-OPERATING-MODEL.md`, and this index reference graph revision 24 and 70 nodes / 155 edges; all edges carry relation, status, evidence, and permission metadata at top level, with no duplicate nested status/evidence fields.
+- **Documentation alignment:** `ARCHITECTURE.md`, `ARCHITECTURE-OPERATING-MODEL.md`, and this index reference graph revision 25 and 70 nodes / 155 edges; all edges carry relation, status, evidence, and permission metadata at top level, with no duplicate nested status/evidence fields.
 - **Runtime integration:** graph nodes are not proof of live connectivity or permissions. Keep PLANNED/NOT TESTED where evidence is absent.
 - **Deployment:** no public deployment and no merge to master.
-- **VPS sync:** The user supplied PuTTY output confirming a successful fast-forward to commit `27c49c5afb466d3386612c658a233c6cb2dcb5f5`, graph revision 24 (70 nodes / 155 edges), with the feature branch aligned to `origin`. The local `vite.config.js` modification and untracked `dist/`, `node_modules/`, and `package-lock.json` were preserved. This confirms source sync only; it does not verify UI rendering, build, service health, or live SIMOT integrations.
+- **VPS sync:** The user supplied PuTTY output confirming a successful fast-forward to commit `27c49c5afb466d3386612c658a233c6cb2dcb5f5`, graph revision 24 (70 nodes / 155 edges), with the feature branch aligned to `origin`. GitHub now contains graph revision 25; this newer graph revision has not yet been synced to VPS. The local `vite.config.js` modification and untracked `dist/`, `node_modules/`, and `package-lock.json` were preserved. This confirms source sync only; it does not verify UI rendering, build, service health, or live SIMOT integrations.
 - **Safety:** no new costs, credentials, secrets, or infrastructure were created or changed.
 
 ## Next continuation
