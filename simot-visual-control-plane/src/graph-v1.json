@@ -2,23 +2,835 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 1,
-  "updatedAt": "2026-10-11",
+  "revision": 2,
+  "updatedAt": "2026-10-12T05:22:00.000Z",
   "nodes": [
-    { "id": "simot", "type": "simotNode", "position": { "x": 420, "y": 230 }, "data": { "label": "هستهٔ SIMOT AI OS", "kind": "core", "status": "VERIFIED", "detail": "هستهٔ هماهنگ‌سازی؛ وضعیت زندهٔ همهٔ اجزا هنوز متصل نیست." } },
-    { "id": "gateway", "type": "simotNode", "position": { "x": 420, "y": 60 }, "data": { "label": "Cloudflare Gateway", "kind": "runtime", "status": "VERIFIED", "detail": "کد و تنظیمات مخزن بررسی شده؛ سلامت زنده در این نمونه آزمایش نشده." } },
-    { "id": "memory", "type": "simotNode", "position": { "x": 70, "y": 230 }, "data": { "label": "VPS Master Memory", "kind": "memory", "status": "NOT_VERIFIED", "detail": "منبع عملیاتی اصلی؛ خواندن/بازیابی زنده باید با آزمون جداگانه تأیید شود." } },
-    { "id": "d1", "type": "simotNode", "position": { "x": 420, "y": 410 }, "data": { "label": "Cloudflare D1", "kind": "runtime", "status": "CONFIG_ONLY", "detail": "حافظهٔ runtime؛ جایگزین Master Memory نیست." } },
-    { "id": "github", "type": "simotNode", "position": { "x": 770, "y": 230 }, "data": { "label": "GitHub", "kind": "source", "status": "VERIFIED", "detail": "مخزن و شاخهٔ نمونه؛ منبع کد و نسخه‌بندی." } },
-    { "id": "notion", "type": "simotNode", "position": { "x": 70, "y": 410 }, "data": { "label": "Notion", "kind": "knowledge", "status": "NOT_CONNECTED", "detail": "معماری، سیاست‌ها و تصمیم‌ها؛ اتصال زنده از این رابط برقرار نیست." } },
-    { "id": "asana", "type": "simotNode", "position": { "x": 770, "y": 410 }, "data": { "label": "Asana", "kind": "execution", "status": "NOT_CONNECTED", "detail": "اجرای کارها؛ اتصال زنده از این رابط برقرار نیست." } }
+    {
+      "id": "simot-core",
+      "type": "simotNode",
+      "position": {
+        "x": 560,
+        "y": 300
+      },
+      "data": {
+        "label": "هستهٔ SIMOT AI OS",
+        "kind": "core",
+        "status": "NOT TESTED",
+        "role": "هستهٔ هماهنگی، گردش‌کار و یکپارچه‌سازی",
+        "capabilities": [
+          "هماهنگی اجزا",
+          "گردش‌کار",
+          "مدیریت اتصال‌ها"
+        ],
+        "accessMethod": "وضعیت عملیاتی از Master Memory/API موجود باید خوانده شود",
+        "permissions": "UNKNOWN؛ هیچ اقدام حساس از این گراف فعال نیست",
+        "evidence": "نقش معماری طبق قرارداد پروژه؛ سلامت زنده در این مرحله آزمایش نشده",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "اتصال خواندنی به وضعیت موجود، پس از بررسی API مجاز",
+        "detail": "هستهٔ اصلی SIMOT است؛ این نود به‌تنهایی سلامت زندهٔ هسته را اثبات نمی‌کند."
+      }
+    },
+    {
+      "id": "master-memory",
+      "type": "simotNode",
+      "position": {
+        "x": 150,
+        "y": 300
+      },
+      "data": {
+        "label": "VPS Master Memory",
+        "kind": "memory",
+        "status": "VERIFIED",
+        "role": "منبع اصلی تداوم و وضعیت عملیاتی",
+        "capabilities": [
+          "CURRENT_STATE",
+          "TASK_LOG",
+          "EVIDENCE_INDEX",
+          "DECISIONS"
+        ],
+        "accessMethod": "VPS API محلی از مسیر Worker موجود",
+        "permissions": "خواندن/نوشتن در API؛ نوشتن از رابط غیرفعال",
+        "evidence": "سابقهٔ تاریخی E2E با WRITE_READBACK_MATCH طبق brief مالک؛ آزمون تکرار نشد",
+        "lastVerified": "شاهد تاریخی؛ زمان دقیق در منبع فعلی در دسترس نیست",
+        "nextAction": "استفاده از مسیر read-only موجود؛ ثبت Audit قبل از هر نوشتن",
+        "detail": "منبع حقیقت عملیاتی؛ با D1، Notion یا حافظهٔ ChatGPT جایگزین نمی‌شود."
+      }
+    },
+    {
+      "id": "cloudflare-gateway",
+      "type": "simotNode",
+      "position": {
+        "x": 560,
+        "y": 80
+      },
+      "data": {
+        "label": "Cloudflare Worker Gateway",
+        "kind": "runtime",
+        "status": "VERIFIED",
+        "role": "درگاه درخواست‌ها و اتصال به سرویس‌های SIMOT",
+        "capabilities": [
+          "مسیرهای Master Memory",
+          "MCP",
+          "درگاه runtime"
+        ],
+        "accessMethod": "Worker موجود simot-ai-os-gateway",
+        "permissions": "وابسته به endpoint و احراز هویت",
+        "evidence": "سورس Worker از Cloudflare API خوانده شد؛ وجود routeها تأیید شد، سلامت endpoint زنده آزمایش نشده",
+        "lastVerified": "2026-10-12؛ بررسی سورس",
+        "nextAction": "استفاده از شواهد تاریخی؛ از آزمون تکراری بی‌دلیل خودداری شود",
+        "detail": "وجود کد و route تأیید شده است؛ سلامت زندهٔ هر endpoint جداگانه است."
+      }
+    },
+    {
+      "id": "cloudflare-vpc",
+      "type": "simotNode",
+      "position": {
+        "x": 310,
+        "y": 80
+      },
+      "data": {
+        "label": "VPC Service / Binding",
+        "kind": "network",
+        "status": "NOT TESTED",
+        "role": "مسیر خصوصی Worker به API حافظه",
+        "capabilities": [
+          "SIMOT_MASTER_MEMORY binding",
+          "simot-master-memory service"
+        ],
+        "accessMethod": "Cloudflare Worker → VPC Service",
+        "permissions": "مرز دسترسی خصوصی؛ جزئیات جاری کامل بررسی نشده",
+        "evidence": "نام‌ها در brief معماری ثبت شده‌اند؛ اتصال زنده اکنون تست نشده",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "ثبت شواهد تاریخی موجود بدون اجرای مجدد آزمون موفق",
+        "detail": "binding یا نام سرویس به‌تنهایی سلامت مسیر خصوصی را اثبات نمی‌کند."
+      }
+    },
+    {
+      "id": "vps",
+      "type": "simotNode",
+      "position": {
+        "x": 50,
+        "y": 80
+      },
+      "data": {
+        "label": "VPS Runtime",
+        "kind": "runtime",
+        "status": "NOT TESTED",
+        "role": "میزبان Master Memory و سرویس‌های موجود",
+        "capabilities": [
+          "simot-memory.service",
+          "API محلی :9100",
+          "OpenClaw Gateway"
+        ],
+        "accessMethod": "SSH/PuTTY توسط مالک؛ دسترسی مستقیم shell از ابزار فعلی در دسترس نیست",
+        "permissions": "NOT AVAILABLE در این نشست",
+        "evidence": "اطلاعات تاریخی VPS در brief؛ وضعیت لحظه‌ای بررسی نشده",
+        "lastVerified": "اطلاعات تاریخی",
+        "nextAction": "در این مرحله فقط از APIها و شواهد قابل‌دسترسی استفاده شود",
+        "detail": "هیچ دستور یا تغییر روی VPS در این مرحله اجرا نشده است."
+      }
+    },
+    {
+      "id": "tunnel",
+      "type": "simotNode",
+      "position": {
+        "x": 50,
+        "y": 190
+      },
+      "data": {
+        "label": "Cloudflare Tunnel",
+        "kind": "network",
+        "status": "NOT TESTED",
+        "role": "مسیر شبکهٔ خصوصی بین Cloudflare و VPS",
+        "capabilities": [
+          "انتقال درخواست Worker به VPS"
+        ],
+        "accessMethod": "مسیر ثبت‌شده در معماری",
+        "permissions": "UNKNOWN؛ تغییر زیرساخت انجام نشود",
+        "evidence": "جزئیات معماری ثبت‌شده؛ تست جاری انجام نشده",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "بدون نیاز واقعی، آزمون یا تغییر تکراری انجام نشود",
+        "detail": "وجود Tunnel در معماری معادل اتصال سالم در لحظه نیست."
+      }
+    },
+    {
+      "id": "vcp",
+      "type": "simotNode",
+      "position": {
+        "x": 850,
+        "y": 80
+      },
+      "data": {
+        "label": "React Flow VCP",
+        "kind": "client",
+        "status": "VERIFIED",
+        "role": "رابط بصری معماری SIMOT",
+        "capabilities": [
+          "گراف",
+          "انتخاب گره",
+          "خروجی JSON"
+        ],
+        "accessMethod": "VPS + Tailscale HTTPS :8443",
+        "permissions": "نمایشی؛ عملیات نوشتن غیرفعال",
+        "evidence": "کاربر قبلاً بازشدن رابط روی گوشی و رایانه و نمایش گراف را تأیید کرده",
+        "lastVerified": "شاهد تاریخی؛ آزمون مجدد انجام نشد",
+        "nextAction": "تکمیل گراف و جزئیات گره در همین پروژه",
+        "detail": "رابط موجود حفظ می‌شود؛ PC وابستگی دائمی معماری نیست."
+      }
+    },
+    {
+      "id": "tailscale",
+      "type": "simotNode",
+      "position": {
+        "x": 850,
+        "y": 200
+      },
+      "data": {
+        "label": "Tailscale Private Network",
+        "kind": "network",
+        "status": "VERIFIED",
+        "role": "دسترسی خصوصی به رابط روی VPS",
+        "capabilities": [
+          "MagicDNS",
+          "HTTPS خصوصی"
+        ],
+        "accessMethod": "srv7015981364.tail11b490.ts.net:8443",
+        "permissions": "دسترسی خصوصی؛ وضعیت جاری دوباره بررسی نشده",
+        "evidence": "HTTP 200 و بازشدن روی گوشی/رایانه در سوابق قبلی",
+        "lastVerified": "شاهد تاریخی",
+        "nextAction": "حفظ مسیر موجود؛ مسیر HTTPS پورت 443 تغییر نکند",
+        "detail": "وضعیت فعلی شبکه در این مرحله دوباره آزمایش نشده است."
+      }
+    },
+    {
+      "id": "cloudflare-d1",
+      "type": "simotNode",
+      "position": {
+        "x": 560,
+        "y": 510
+      },
+      "data": {
+        "label": "Cloudflare D1",
+        "kind": "database",
+        "status": "NOT TESTED",
+        "role": "داده‌های runtime",
+        "capabilities": [
+          "simot-ai-os database"
+        ],
+        "accessMethod": "binding در Worker؛ جزئیات جاری بررسی نشده",
+        "permissions": "UNKNOWN",
+        "evidence": "نام دیتابیس در brief ثبت شده؛ اتصال/سلامت فعلی آزمایش نشده",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "به‌عنوان حافظهٔ اصلی معرفی نشود",
+        "detail": "D1 جایگزین VPS Master Memory نیست."
+      }
+    },
+    {
+      "id": "cloudflare-queue",
+      "type": "simotNode",
+      "position": {
+        "x": 800,
+        "y": 510
+      },
+      "data": {
+        "label": "Queue: simot-events",
+        "kind": "queue",
+        "status": "NOT TESTED",
+        "role": "صف رویدادهای runtime",
+        "capabilities": [
+          "دریافت/پردازش رویداد"
+        ],
+        "accessMethod": "Cloudflare Queue؛ binding جاری بررسی نشده",
+        "permissions": "UNKNOWN",
+        "evidence": "نام در brief معماری ثبت شده؛ سلامت فعلی آزمایش نشده",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "در فاز کشف runtime بررسی شود",
+        "detail": "وجود نام در معماری به معنی مصرف‌کنندهٔ فعال نیست."
+      }
+    },
+    {
+      "id": "cloudflare-dlq",
+      "type": "simotNode",
+      "position": {
+        "x": 1030,
+        "y": 510
+      },
+      "data": {
+        "label": "Dead Letter Queue",
+        "kind": "queue",
+        "status": "NOT TESTED",
+        "role": "نگهداری رویدادهای ناموفق",
+        "capabilities": [
+          "simot-events-dlq"
+        ],
+        "accessMethod": "Cloudflare Queue؛ binding جاری بررسی نشده",
+        "permissions": "UNKNOWN",
+        "evidence": "نام در brief معماری ثبت شده؛ سلامت فعلی آزمایش نشده",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "در فاز کشف runtime بررسی شود",
+        "detail": "وضعیت و اتصال مصرف‌کننده در حال حاضر نامشخص است."
+      }
+    },
+    {
+      "id": "github",
+      "type": "simotNode",
+      "position": {
+        "x": 1100,
+        "y": 80
+      },
+      "data": {
+        "label": "GitHub / Source",
+        "kind": "source",
+        "status": "VERIFIED",
+        "role": "کد و تاریخچهٔ نسخه",
+        "capabilities": [
+          "شاخهٔ فعلی",
+          "فایل‌های React Flow",
+          "نسخه‌بندی"
+        ],
+        "accessMethod": "GitHub connector/API",
+        "permissions": "خواندن تأیید شد؛ تغییر فقط در شاخهٔ موجود",
+        "evidence": "مخزن و فایل‌های پروژه در شاخهٔ feat/simot-visual-control-plane-react-flow خوانده شدند",
+        "lastVerified": "2026-10-12؛ خواندن مخزن",
+        "nextAction": "تغییرات فقط در شاخه؛ بدون merge یا deploy",
+        "detail": "منبع کد و نسخه‌بندی؛ منبع حقیقت وضعیت عملیاتی نیست."
+      }
+    },
+    {
+      "id": "chatgpt",
+      "type": "simotNode",
+      "position": {
+        "x": 1390,
+        "y": 80
+      },
+      "data": {
+        "label": "ChatGPT & Connectors",
+        "kind": "tool",
+        "status": "VERIFIED",
+        "role": "رابط تحلیل و اجرای ابزارهای مجاز",
+        "capabilities": [
+          "GitHub connector",
+          "Cloudflare connector",
+          "ابزارهای متصل در این نشست"
+        ],
+        "accessMethod": "Connectorهای نشست فعلی",
+        "permissions": "وابسته به ابزار؛ هیچ اتصال خودکاری به SIMOT فرض نشده",
+        "evidence": "خواندن GitHub و Cloudflare از ابزارهای مجاز در این نشست موفق بود",
+        "lastVerified": "2026-10-12",
+        "nextAction": "فقط ابزارهای لازم و دارای شواهد در معماری نگه داشته شوند",
+        "detail": "ChatGPT رابط ابزار است، نه مغز اصلی یا منبع حقیقت عملیاتی SIMOT."
+      }
+    },
+    {
+      "id": "claude",
+      "type": "simotNode",
+      "position": {
+        "x": 1390,
+        "y": 230
+      },
+      "data": {
+        "label": "Claude AI",
+        "kind": "ai",
+        "status": "BLOCKED",
+        "role": "سامانهٔ هوش مصنوعی خارجی",
+        "capabilities": [
+          "تعامل اعلام‌شده توسط مالک"
+        ],
+        "accessMethod": "مسیر جایگزین بدون PC در این نشست پیدا نشد",
+        "permissions": "UNKNOWN",
+        "evidence": "اعلام مالک در brief؛ مسیر عملیاتی فعلی تأیید نشده و استفاده از PC ممنوع است",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "تا کشف مسیر مجاز غیر-PC، اتصال فعال نمایش داده نشود",
+        "detail": "قابلیت اعلام‌شده است؛ اتصال زنده اثبات نشده."
+      }
+    },
+    {
+      "id": "grok",
+      "type": "simotNode",
+      "position": {
+        "x": 1390,
+        "y": 360
+      },
+      "data": {
+        "label": "Grok",
+        "kind": "ai",
+        "status": "BLOCKED",
+        "role": "سامانهٔ هوش مصنوعی خارجی",
+        "capabilities": [
+          "تعامل اعلام‌شده توسط مالک"
+        ],
+        "accessMethod": "مسیر جایگزین بدون PC در این نشست پیدا نشد",
+        "permissions": "UNKNOWN",
+        "evidence": "اعلام مالک در brief؛ مسیر عملیاتی فعلی تأیید نشده و استفاده از PC ممنوع است",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "تا کشف مسیر مجاز غیر-PC، اتصال فعال نمایش داده نشود",
+        "detail": "قابلیت اعلام‌شده است؛ اتصال زنده اثبات نشده."
+      }
+    },
+    {
+      "id": "arena",
+      "type": "simotNode",
+      "position": {
+        "x": 1390,
+        "y": 490
+      },
+      "data": {
+        "label": "Arena AI",
+        "kind": "ai",
+        "status": "BLOCKED",
+        "role": "سامانهٔ هوش مصنوعی خارجی",
+        "capabilities": [
+          "تعامل اعلام‌شده توسط مالک"
+        ],
+        "accessMethod": "مسیر جایگزین بدون PC در این نشست پیدا نشد",
+        "permissions": "UNKNOWN",
+        "evidence": "اعلام مالک در brief؛ مسیر عملیاتی فعلی تأیید نشده و استفاده از PC ممنوع است",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "تا کشف مسیر مجاز غیر-PC، اتصال فعال نمایش داده نشود",
+        "detail": "قابلیت اعلام‌شده است؛ اتصال زنده اثبات نشده."
+      }
+    },
+    {
+      "id": "openclaw",
+      "type": "simotNode",
+      "position": {
+        "x": 850,
+        "y": 330
+      },
+      "data": {
+        "label": "OpenClaw Gateway",
+        "kind": "client",
+        "status": "NOT TESTED",
+        "role": "رابط/پل تعامل با ابزارها و مدل‌ها",
+        "capabilities": [
+          "Gateway محلی :18789",
+          "متن/صوت/فایل طبق هدف پروژه"
+        ],
+        "accessMethod": "VPS loopback و کلاینت‌های موجود",
+        "permissions": "UNKNOWN؛ وضعیت گوشی قبلاً نیازمند reapproval گزارش شده بود",
+        "evidence": "سوابق تاریخی؛ وضعیت جاری از این نشست بررسی نشده",
+        "lastVerified": "اطلاعات تاریخی",
+        "nextAction": "بعداً از مسیر غیر-PC وضعیت کلاینت بررسی شود",
+        "detail": "OpenClaw کلاینت است، نه مغز اصلی SIMOT."
+      }
+    },
+    {
+      "id": "phone-client",
+      "type": "simotNode",
+      "position": {
+        "x": 1080,
+        "y": 330
+      },
+      "data": {
+        "label": "موبایل / OpenClaw Client",
+        "kind": "client",
+        "status": "NOT TESTED",
+        "role": "رابط موبایل کاربر",
+        "capabilities": [
+          "متن و قابلیت‌های دستگاه طبق مجوز"
+        ],
+        "accessMethod": "اپ Android موجود",
+        "permissions": "Capability reapproval pending در سابقه",
+        "evidence": "گزارش تاریخی Galaxy A35 5G؛ بررسی جاری انجام نشده",
+        "lastVerified": "اطلاعات تاریخی",
+        "nextAction": "پس از دسترسی مجاز، مجوزها و اتصال بررسی شوند",
+        "detail": "Pairing تاریخی به معنی آماده‌بودن همه قابلیت‌ها نیست."
+      }
+    },
+    {
+      "id": "ollama",
+      "type": "simotNode",
+      "position": {
+        "x": 1080,
+        "y": 440
+      },
+      "data": {
+        "label": "Ollama / Local Models",
+        "kind": "ai",
+        "status": "NOT TESTED",
+        "role": "اجرای مدل‌های محلی ثبت‌شده",
+        "capabilities": [
+          "qwen3:0.6b",
+          "qwen3:1.7b طبق سابقه"
+        ],
+        "accessMethod": "محیط محلی موجود؛ محل جاری تأیید نشده",
+        "permissions": "UNKNOWN",
+        "evidence": "وضعیت Ready در سوابق تاریخی؛ وضعیت فعلی تست نشده",
+        "lastVerified": "اطلاعات تاریخی",
+        "nextAction": "از ادعای سلامت جاری خودداری شود",
+        "detail": "مدل محلی و وضعیت فعلی آن باید جداگانه تأیید شوند."
+      }
+    },
+    {
+      "id": "notion",
+      "type": "simotNode",
+      "position": {
+        "x": 50,
+        "y": 510
+      },
+      "data": {
+        "label": "Notion",
+        "kind": "knowledge",
+        "status": "NOT TESTED",
+        "role": "معماری، سیاست‌ها و تصمیم‌ها",
+        "capabilities": [
+          "مستندات معماری"
+        ],
+        "accessMethod": "Connector موجود در محیط؛ اتصال به SIMOT اثبات نشده",
+        "permissions": "UNKNOWN",
+        "evidence": "نقش معماری ثبت‌شده؛ اتصال زنده از رابط تست نشده",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "به‌عنوان منبع وضعیت عملیاتی معرفی نشود",
+        "detail": "Notion منبع اصلی وضعیت عملیاتی لحظه‌ای نیست."
+      }
+    },
+    {
+      "id": "sharepoint",
+      "type": "simotNode",
+      "position": {
+        "x": 270,
+        "y": 510
+      },
+      "data": {
+        "label": "SharePoint / OneDrive",
+        "kind": "knowledge",
+        "status": "NOT TESTED",
+        "role": "اسناد، ورودی‌ها، خروجی‌ها و شواهد",
+        "capabilities": [
+          "ذخیره و بازیابی اسناد"
+        ],
+        "accessMethod": "Connector موجود؛ اتصال به SIMOT اثبات نشده",
+        "permissions": "UNKNOWN",
+        "evidence": "نقش معماری ثبت‌شده؛ اتصال زنده از رابط تست نشده",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "اتصال واقعی و مجوزها در فاز یکپارچه‌سازی بررسی شوند",
+        "detail": "مخزن اسناد و شواهد؛ جایگزین Master Memory نیست."
+      }
+    },
+    {
+      "id": "asana",
+      "type": "simotNode",
+      "position": {
+        "x": 50,
+        "y": 630
+      },
+      "data": {
+        "label": "Asana",
+        "kind": "execution",
+        "status": "NOT TESTED",
+        "role": "مدیریت Taskها و اجرای پروژه",
+        "capabilities": [
+          "Taskها و مسئولیت‌ها"
+        ],
+        "accessMethod": "Connector موجود؛ اتصال عملیاتی به SIMOT اثبات نشده",
+        "permissions": "UNKNOWN",
+        "evidence": "نقش معماری ثبت‌شده؛ اتصال زنده از رابط تست نشده",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "مجوزهای واقعی پیش از هر write بررسی شوند",
+        "detail": "وجود Connector به معنی اتصال زنده به SIMOT نیست."
+      }
+    },
+    {
+      "id": "hubspot",
+      "type": "simotNode",
+      "position": {
+        "x": 270,
+        "y": 630
+      },
+      "data": {
+        "label": "HubSpot CRM",
+        "kind": "business",
+        "status": "NOT TESTED",
+        "role": "CRM و سوابق کسب‌وکار",
+        "capabilities": [
+          "شرکت‌ها",
+          "مخاطبان",
+          "Dealها"
+        ],
+        "accessMethod": "Connector موجود؛ اتصال به SIMOT اثبات نشده",
+        "permissions": "UNKNOWN",
+        "evidence": "نقش معماری ثبت‌شده؛ اتصال زنده از رابط تست نشده",
+        "lastVerified": "NOT TESTED",
+        "nextAction": "قبل از هر تغییر CRM، مجوز و تأیید انسانی لازم است",
+        "detail": "ابزار کسب‌وکار؛ به‌طور پیش‌فرض به هسته متصل فرض نمی‌شود."
+      }
+    },
+    {
+      "id": "approval-gate",
+      "type": "simotNode",
+      "position": {
+        "x": 560,
+        "y": 690
+      },
+      "data": {
+        "label": "Human Approval Gate",
+        "kind": "security",
+        "status": "PLANNED",
+        "role": "کنترل انسانی عملیات حساس",
+        "capabilities": [
+          "تأیید نوشتن حافظه",
+          "تأیید تغییر Secret",
+          "تأیید Deploy/Merge"
+        ],
+        "accessMethod": "طراحی مرحلهٔ بعد؛ هنوز در رابط پیاده‌سازی نشده",
+        "permissions": "هیچ عملیات حساس از این گراف اجرا نمی‌شود",
+        "evidence": "الزام صریح brief معماری",
+        "lastVerified": "PLANNED",
+        "nextAction": "پیش از فعال‌کردن عملیات نوشتن، Approval و Audit واقعی طراحی شود",
+        "detail": "این گره فعلاً نمای معماری است، نه کنترل امنیتی اجرایی."
+      }
+    }
   ],
   "edges": [
-    { "id": "e-gateway-core", "source": "gateway", "target": "simot", "label": "runtime" },
-    { "id": "e-memory-core", "source": "memory", "target": "simot", "label": "canonical memory" },
-    { "id": "e-core-d1", "source": "simot", "target": "d1", "label": "runtime state" },
-    { "id": "e-github-core", "source": "github", "target": "simot", "label": "versioned code" },
-    { "id": "e-memory-notion", "source": "memory", "target": "notion", "label": "evidence / policy" },
-    { "id": "e-github-asana", "source": "github", "target": "asana", "label": "controlled execution" }
+    {
+      "id": "e-gateway-core",
+      "source": "cloudflare-gateway",
+      "target": "simot-core",
+      "label": "CALLS",
+      "relation": "CALLS",
+      "status": "NOT TESTED",
+      "permission": "UNKNOWN",
+      "evidence": "مسیر اجرایی در معماری؛ سلامت جاری تأیید نشده"
+    },
+    {
+      "id": "e-memory-core",
+      "source": "master-memory",
+      "target": "simot-core",
+      "label": "READS",
+      "relation": "READS",
+      "status": "VERIFIED",
+      "permission": "UNKNOWN",
+      "evidence": "سابقهٔ تاریخی خواندن Continuity از Worker"
+    },
+    {
+      "id": "e-core-d1",
+      "source": "simot-core",
+      "target": "cloudflare-d1",
+      "label": "USES",
+      "relation": "USES",
+      "status": "NOT TESTED",
+      "permission": "UNKNOWN",
+      "evidence": "D1 فقط runtime؛ اتصال جاری تأیید نشده"
+    },
+    {
+      "id": "e-worker-vpc",
+      "source": "cloudflare-gateway",
+      "target": "cloudflare-vpc",
+      "label": "CALLS",
+      "relation": "CALLS",
+      "status": "NOT TESTED",
+      "permission": "UNKNOWN",
+      "evidence": "binding ثبت‌شده؛ مسیر زنده دوباره آزمایش نشده"
+    },
+    {
+      "id": "e-vpc-tunnel",
+      "source": "cloudflare-vpc",
+      "target": "tunnel",
+      "label": "ROUTES_TO",
+      "relation": "ROUTES_TO",
+      "status": "NOT TESTED",
+      "permission": "UNKNOWN",
+      "evidence": "مسیر معماری ثبت‌شده"
+    },
+    {
+      "id": "e-tunnel-vps",
+      "source": "tunnel",
+      "target": "vps",
+      "label": "ROUTES_TO",
+      "relation": "ROUTES_TO",
+      "status": "NOT TESTED",
+      "permission": "UNKNOWN",
+      "evidence": "مسیر معماری ثبت‌شده"
+    },
+    {
+      "id": "e-vps-memory",
+      "source": "vps",
+      "target": "master-memory",
+      "label": "HOSTS",
+      "relation": "HOSTS",
+      "status": "NOT TESTED",
+      "permission": "UNKNOWN",
+      "evidence": "میزبانی ثبت‌شده؛ وضعیت جاری تست نشده"
+    },
+    {
+      "id": "e-vps-vcp",
+      "source": "vps",
+      "target": "vcp",
+      "label": "HOSTS",
+      "relation": "HOSTS",
+      "status": "VERIFIED",
+      "permission": "UNKNOWN",
+      "evidence": "سرویس رابط قبلاً روی VPS اجرا شده"
+    },
+    {
+      "id": "e-vcp-tail",
+      "source": "vcp",
+      "target": "tailscale",
+      "label": "USES",
+      "relation": "USES",
+      "status": "VERIFIED",
+      "permission": "UNKNOWN",
+      "evidence": "مسیر خصوصی قبلاً با HTTP 200 تأیید شده"
+    },
+    {
+      "id": "e-github-vcp",
+      "source": "github",
+      "target": "vcp",
+      "label": "VERSIONED_SOURCE_FOR",
+      "relation": "VERSIONED_SOURCE_FOR",
+      "status": "VERIFIED",
+      "permission": "UNKNOWN",
+      "evidence": "فایل‌های پروژه از شاخهٔ موجود خوانده شدند"
+    },
+    {
+      "id": "e-chatgpt-github",
+      "source": "chatgpt",
+      "target": "github",
+      "label": "USES",
+      "relation": "USES",
+      "status": "VERIFIED",
+      "permission": "UNKNOWN",
+      "evidence": "خواندن GitHub از Connector در این نشست"
+    },
+    {
+      "id": "e-chatgpt-cloudflare",
+      "source": "chatgpt",
+      "target": "cloudflare-gateway",
+      "label": "INSPECTS",
+      "relation": "INSPECTS",
+      "status": "VERIFIED",
+      "permission": "UNKNOWN",
+      "evidence": "خواندن سورس Worker از Cloudflare API؛ نه اتصال runtime ChatGPT به SIMOT"
+    },
+    {
+      "id": "e-gateway-queue",
+      "source": "cloudflare-gateway",
+      "target": "cloudflare-queue",
+      "label": "USES",
+      "relation": "USES",
+      "status": "NOT TESTED",
+      "permission": "UNKNOWN",
+      "evidence": "اتصال زنده بررسی نشده"
+    },
+    {
+      "id": "e-queue-dlq",
+      "source": "cloudflare-queue",
+      "target": "cloudflare-dlq",
+      "label": "ROUTES_TO",
+      "relation": "ROUTES_TO",
+      "status": "NOT TESTED",
+      "permission": "UNKNOWN",
+      "evidence": "مصرف‌کننده/مسیر جاری بررسی نشده"
+    },
+    {
+      "id": "e-openclaw-core",
+      "source": "openclaw",
+      "target": "simot-core",
+      "label": "CALLS",
+      "relation": "CALLS",
+      "status": "NOT TESTED",
+      "permission": "UNKNOWN",
+      "evidence": "اتصال عملیاتی جاری تست نشده"
+    },
+    {
+      "id": "e-phone-openclaw",
+      "source": "phone-client",
+      "target": "openclaw",
+      "label": "CALLS",
+      "relation": "CALLS",
+      "status": "NOT TESTED",
+      "permission": "UNKNOWN",
+      "evidence": "وضعیت جاری گوشی بررسی نشده"
+    },
+    {
+      "id": "e-openclaw-ollama",
+      "source": "openclaw",
+      "target": "ollama",
+      "label": "CALLS",
+      "relation": "CALLS",
+      "status": "NOT TESTED",
+      "permission": "UNKNOWN",
+      "evidence": "وضعیت تاریخی مدل‌ها؛ اتصال جاری تست نشده"
+    },
+    {
+      "id": "e-core-notion",
+      "source": "simot-core",
+      "target": "notion",
+      "label": "USES",
+      "relation": "USES",
+      "status": "NOT TESTED",
+      "permission": "UNKNOWN",
+      "evidence": "اتصال به SIMOT اثبات نشده"
+    },
+    {
+      "id": "e-core-sharepoint",
+      "source": "simot-core",
+      "target": "sharepoint",
+      "label": "USES",
+      "relation": "USES",
+      "status": "NOT TESTED",
+      "permission": "UNKNOWN",
+      "evidence": "اتصال به SIMOT اثبات نشده"
+    },
+    {
+      "id": "e-core-asana",
+      "source": "simot-core",
+      "target": "asana",
+      "label": "USES",
+      "relation": "USES",
+      "status": "NOT TESTED",
+      "permission": "UNKNOWN",
+      "evidence": "اتصال به SIMOT اثبات نشده"
+    },
+    {
+      "id": "e-core-hubspot",
+      "source": "simot-core",
+      "target": "hubspot",
+      "label": "USES",
+      "relation": "USES",
+      "status": "NOT TESTED",
+      "permission": "UNKNOWN",
+      "evidence": "اتصال به SIMOT اثبات نشده"
+    },
+    {
+      "id": "e-core-approval",
+      "source": "simot-core",
+      "target": "approval-gate",
+      "label": "DEPENDS_ON",
+      "relation": "DEPENDS_ON",
+      "status": "PLANNED",
+      "permission": "UNKNOWN",
+      "evidence": "کنترل انسانی پیش از عملیات حساس لازم است"
+    },
+    {
+      "id": "e-chatgpt-claude",
+      "source": "chatgpt",
+      "target": "claude",
+      "label": "USES",
+      "relation": "USES",
+      "status": "BLOCKED",
+      "permission": "UNKNOWN",
+      "evidence": "مسیر بدون PC در ابزارهای فعلی پیدا نشد"
+    },
+    {
+      "id": "e-chatgpt-grok",
+      "source": "chatgpt",
+      "target": "grok",
+      "label": "USES",
+      "relation": "USES",
+      "status": "BLOCKED",
+      "permission": "UNKNOWN",
+      "evidence": "مسیر بدون PC در ابزارهای فعلی پیدا نشد"
+    },
+    {
+      "id": "e-chatgpt-arena",
+      "source": "chatgpt",
+      "target": "arena",
+      "label": "USES",
+      "relation": "USES",
+      "status": "BLOCKED",
+      "permission": "UNKNOWN",
+      "evidence": "مسیر بدون PC در ابزارهای فعلی پیدا نشد"
+    }
   ]
 }
