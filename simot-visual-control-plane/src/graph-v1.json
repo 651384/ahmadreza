@@ -2,8 +2,8 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 32,
-  "updatedAt": "2026-10-12T08:46:18.927Z",
+  "revision": 33,
+  "updatedAt": "2026-10-12T08:47:41.939Z",
   "nodes": [
     {
       "id": "simot-core",
@@ -3571,6 +3571,26 @@
       "status": "PLANNED",
       "evidence": "قرارداد معماری revision 32؛ مسیر هدف است و پیاده‌سازی اثبات نشده",
       "permission": "کلید idempotency پایدار برای یک task؛ fan-out فقط با مجوز صریح قرارداد"
+    },
+    {
+      "id": "e-source-d1-metadata",
+      "source": "source-of-truth-policy",
+      "target": "cloudflare-d1",
+      "label": "D1 فقط برای metadata عملیاتی مجاز",
+      "relation": "RUNTIME_METADATA_ONLY_NOT_CANONICAL_MEMORY",
+      "status": "PLANNED",
+      "evidence": "قرارداد معماری revision 33؛ schema و runtime فعلی D1 هنوز تطبیق داده نشده",
+      "permission": "ذخیره‌سازی محدود به metadata لازم؛ ممنوعیت ایجاد منبع موازی برای وضعیت canonical"
+    },
+    {
+      "id": "e-classification-d1",
+      "source": "data-classification",
+      "target": "cloudflare-d1",
+      "label": "محدودسازی دادهٔ ذخیره‌شده در D1",
+      "relation": "RESTRICTS_PERSISTED_FIELDS_AND_RETENTION",
+      "status": "PLANNED",
+      "evidence": "قرارداد معماری revision 33؛ schema و retention runtime هنوز تطبیق داده نشده",
+      "permission": "حداقل داده، طبقه‌بندی قبل از ذخیره، retention مشخص؛ اسرار و محتوای خام حساس به‌صورت پیش‌فرض ممنوع"
     }
   ]
 }
