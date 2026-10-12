@@ -2,8 +2,8 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 30,
-  "updatedAt": "2026-10-12T08:43:17.837Z",
+  "revision": 31,
+  "updatedAt": "2026-10-12T08:43:53.060Z",
   "nodes": [
     {
       "id": "simot-core",
@@ -3515,6 +3515,16 @@
       "status": "PLANNED",
       "evidence": "قرارداد معماری revision 30؛ مسیر هدف است و پیاده‌سازی اثبات نشده",
       "permission": "متن استخراج‌شده untrusted است؛ طبقه‌بندی و policy قبل از استفاده اعمال شود"
+    },
+    {
+      "id": "e-rollback-memory",
+      "source": "backup-rollback-policy",
+      "target": "master-memory",
+      "label": "بازیابی و پشتیبان‌گیری حافظهٔ canonical",
+      "relation": "GOVERNS_CANONICAL_MEMORY_RECOVERY",
+      "status": "PLANNED",
+      "evidence": "قرارداد معماری revision 31؛ وجود مسیر backup/restore زنده تأیید نشده",
+      "permission": "بازیابی نیازمند مجوز مالک، حفظ داده و ثبت شواهد؛ هیچ restore خودکاری مجاز نیست"
     }
   ]
 }
