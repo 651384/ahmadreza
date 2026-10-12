@@ -27,7 +27,7 @@ The source-of-truth policy must be applied when assembling context and coordinat
 
 1. **Client Channel Adapters** represent desktop/web, Android/OpenClaw, text/voice, and file/image/document channels; each channel remains a client, not a separate brain.
 2. **Request ingress** validates the request and builds the standard envelope.
-2. **SIMOT message envelope** carries correlation/reply identifiers and part sequencing where required.
+3. **SIMOT message envelope** carries correlation/reply identifiers and part sequencing where required.
 3. **Orchestration** coordinates the task lifecycle.
 4. **Context & Memory Assembler** retrieves relevant canonical state and scoped records through the appropriate adapters, applying source-of-truth, classification, retention, and permission policies.
 5. **Planner** produces steps and expected outcomes.
