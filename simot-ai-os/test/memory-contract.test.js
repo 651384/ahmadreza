@@ -44,6 +44,6 @@ test("minimal context fails closed on invalid reference", () => {
 });
 
 test("canonical memory layer is VPS Master Memory", () => {
-  assert.match(MEMORY_CONTRACT.canonical_file_layer, /^VPS Master Memory \\(\/srv\/simot-memory\\/\\)/);
+  assert.ok(MEMORY_CONTRACT.canonical_file_layer.startsWith("VPS Master Memory (/srv/simot-memory/)"));
   assert.match(MEMORY_CONTRACT.canonical_file_layer, /SharePoint\/OneDrive are supporting document and evidence storage/);
 });
