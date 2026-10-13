@@ -1,6 +1,6 @@
 # معماری SIMOT AI OS — مشخصات پیاده‌سازی VCP
 
-**گراف مرجع:** `src/graph-v1.json`، schema v1، revision 40، شامل 77 گره و 190 یال.
+**گراف مرجع:** `src/graph-v1.json`، schema v1، revision 41، شامل 77 گره و 190 یال.
 
 > این سند مشخصات نسخه‌بندی‌شدهٔ رابط معماری است؛ منبع حقیقت وضعیت عملیاتی نیست. منبع حقیقت عملیاتی SIMOT، VPS Master Memory است. وجود هر جزء در این سند یا گراف، به‌تنهایی وجود سرویس، اتصال زنده یا سلامت آن را اثبات نمی‌کند.
 
@@ -215,3 +215,10 @@ Operational-mode transitions require explicit scoped human authorization. The po
 ## Graph schema validation — revision 40
 
 `GRAPH-VALIDATION-AUDIT-REV40.md` records the static schema audit. It corrected `human-escalation.data.capabilities` to an array as required by `scripts/validate-graph.mjs`. Static checks pass; the Node validator command, Vite build, browser test and VPS runtime remain NOT TESTED due to unavailable terminal/network access in this pass.
+
+
+## Read-only runtime reconciliation — revision 41
+
+در ۱۳ اکتبر ۲۰۲۶، دو درخواست خواندنی مالک به `/master-memory/test` و `/master-memory/e2e-read?object_id=E2E-BRIDGE-001` با HTTP 200 و upstream 200 پاسخ دادند؛ بنابراین مسیر آزموده‌شدهٔ Worker → VPC → Tunnel → VPS Master Memory برای همین دو endpoint تأیید شده است. این شاهد، اجرای تسک‌ها یا سلامت همهٔ سرویس‌ها را ثابت نمی‌کند.
+
+بازبینی `src/App.jsx` در شاخهٔ کاری نشان می‌دهد گراف هنوز از `graph-v1.json` به‌صورت ثابت بارگذاری می‌شود و خروجی JSON فقط محلی دانلود می‌شود؛ اتصال زنده به API وضعیت حافظه/تسک‌ها در کد بررسی‌شده وجود ندارد. Revision 41 این مرز شواهد را ثبت می‌کند؛ رابط هنوز به وضعیت زنده متصل نشده و VPS نیز هنوز به revision 41 همگام‌سازی‌شده تأیید نشده است.
