@@ -1,14 +1,14 @@
 # SIMOT Visual Control Plane — Architecture Index & Handoff
 
 **Canonical graph artifact:** `simot-visual-control-plane/src/graph-v1.json`  
-**Graph:** `simot-core-overview`, schema version 1, revision 40  
+**Graph:** `simot-core-overview`, schema version 1, revision 41  
 **Graph size:** 77 nodes, 190 edges  
 **Working branch:** `feat/simot-visual-control-plane-react-flow`  
-**Latest graph commit:** `10b2c435ab4ef6d058ea3dd7607d7d10b7644f20`
+**Latest graph commit:** `a7d18780c1f449bad5247bf9bd9d319dd318b90c`
 
 ## Architecture documents
 
-1. `ARCHITECTURE.md` — VCP implementation specification, reconciled to graph revision 40.
+1. `ARCHITECTURE.md` — VCP implementation specification, reconciled to graph revision 41.
 2. `ARCHITECTURE-OPERATING-MODEL.md` — core roles, source-of-truth hierarchy, request-to-result flow, continuity and safety, reconciled to graph revision 40.
 3. `ARCHITECTURE-CONTRACTS-REV14.md` — API/message envelope, response/acknowledgement, structured error, connector scope.
 4. `CONNECTOR-TRUST-BOUNDARIES-REV15.md` — connector trust matrix and intended deployment boundaries.
@@ -50,19 +50,19 @@
 
 ## Current phase and explicit boundaries
 
-- **Phase:** architecture expansion in progress; the user requested architecture completion before testing/verification.
+- **Phase:** conceptual architecture coverage is PASS; read-only runtime reconciliation is in progress. Build/UI/runtime implementation tests remain separate and are not assumed complete.
 - **Tests/build/runtime probes:** NOT RUN in this phase by design.
 - **Graph and documents:** committed to the existing feature branch only.
 - **Inspector scope:** `src/App.jsx` now supports selecting a relationship to inspect its relation, status, evidence, and permission; manually drawn links also receive explicit contract fields. This is source-level work only and has not been built or tested.
-- **Documentation alignment:** `ARCHITECTURE.md`, `ARCHITECTURE-OPERATING-MODEL.md`, and this index align to graph revision 38 and 77 nodes / 190 edges; all edges carry relation, status, evidence, and permission metadata at top level, with no duplicate nested status/evidence fields.
+- **Documentation alignment:** `ARCHITECTURE.md`, `ARCHITECTURE-OPERATING-MODEL.md`, and this index align to graph revision 41 and 77 nodes / 190 edges. The latest graph retains top-level relation, status, evidence, and permission metadata.
 - **Runtime integration:** graph nodes are not proof of live connectivity or permissions. Keep PLANNED/NOT TESTED where evidence is absent.
 - **Deployment:** no public deployment and no merge to master.
-- **VPS source sync — VERIFIED through revision 36:** User-provided PuTTY output confirms the VPS checkout was synced to revision 36 at commit `af7f20455dc0f5179465cb8184c72a1b9468dd71`, with 75 nodes and 182 edges. Revision 38 is the current architecture target and is **NOT YET SYNCED** to VPS. The local `vite.config.js` modification and untracked `dist/`, `node_modules/`, and `package-lock.json` were preserved by the confirmed sync. UI rendering, build, service health, and live SIMOT integrations remain NOT TESTED.
+- **VPS source sync — last VERIFIED through revision 36:** User-provided PuTTY output confirmed commit `af7f20455dc0f5179465cb8184c72a1b9468dd71` with 75 nodes / 182 edges. Revision 41 is **NOT YET SYNCED** to VPS. Preserve the local `vite.config.js` modification and existing `dist/`, `node_modules/`, and `package-lock.json`; do not overwrite them blindly. Vite build and UI rendering remain NOT TESTED. Worker → VPC → Tunnel → VPS Master Memory was verified for two read-only GET routes on 2026-10-13; the VCP UI itself is still static and not live-connected to canonical status.
 - **Safety:** no new costs, credentials, secrets, or infrastructure were created or changed.
 
 ## Next continuation
 
-Continue architecture-only work on the feature branch until the model is complete. Revisions 29–31 define canonical memory access, artifact intake, and recovery controls; revision 32 makes sync/async dispatch mutually exclusive; revision 33 limits D1 to runtime metadata; revision 34 defines cancellation, deadline propagation, and late-result fencing; revision 35 defines authority and rollback gates; revision 36 defines evidence freshness and read-only reconciliation; revision 37 adds a unified read-first project/service registry; revision 38 formalizes the architecture completion gate; revision 39 records the coverage audit and routes gateway ingress through request validation; revision 40 fixes the `human-escalation.capabilities` schema mismatch and records static validator-equivalent checks. After the user confirms the architecture gate, reconcile the graph and documents with actual code/runtime evidence, then perform tests and verification. Before claiming the phone/VPS UI reflects the newest graph, obtain fresh evidence that the VPS checkout was updated and the interface is serving that revision.
+The conceptual model has passed its ten-domain coverage review. Revision 41 records the owner-run read-only Worker → VPC → Tunnel → VPS Master Memory checks and scopes those claims to the two tested GET routes. Source inspection also confirms that `src/App.jsx` still loads the static graph and downloads JSON locally; it does not read live canonical state. Next, inspect the existing VPS-side proxy/API configuration read-only without printing tokens, then design the smallest authorized read-only integration. Before claiming the phone/VPS UI reflects revision 41, verify the VPS checkout and served UI revision. Do not merge or deploy.
 
 
 Revision 37 adds `project-service-registry` and five planned relationships. Revision 38 adds `architecture-acceptance-gate` and three planned relationships plus the acceptance checklist. No tests, build, runtime probes, deployment, or merge were performed.
@@ -70,9 +70,14 @@ Revision 37 adds `project-service-registry` and five planned relationships. Revi
 
 ## Revision 39 audit result
 
-Architecture coverage is `PASS (conceptual coverage)`; graph static integrity is PASS. Build/tests/runtime and live integrations remain NOT TESTED. The gateway ingress edge correction is in the feature branch only. VPS remains confirmed through revision 36; revision 39 is NOT YET SYNCED. Continue only after explicit owner approval for the test/runtime reconciliation phase.
+Architecture coverage is `PASS (conceptual coverage)`; revision 40 static schema audit passed. Revision 41 adds evidence-backed status updates for the two read-only Worker → VPS routes. Build/UI tests remain NOT TESTED; the VCP is not live-connected. VPS sync remains confirmed only through revision 36. No merge or deployment.
 
 
 ## Revision 40 schema audit result
 
-Graph revision 40 contains 77 nodes and 190 edges. Static validator-equivalent checks PASS after normalizing `human-escalation.data.capabilities` to an array. The actual Node validator command, Vite build, UI test and VPS runtime remain NOT TESTED because no terminal is currently reachable. VPS remains verified only through revision 36; revision 40 is NOT YET SYNCED. Do not merge or deploy.
+Graph revision 40 contains 77 nodes and 190 edges. Static validator-equivalent checks passed after normalizing `human-escalation.data.capabilities` to an array. The actual Node validator command, Vite build, UI test and VPS runtime remained NOT TESTED in that audit. VPS sync was verified only through revision 36; revision 40 was not synced.
+
+
+## Revision 41 read-only runtime reconciliation
+
+See `RUNTIME-READ-ONLY-RECONCILIATION-REV41.md`. Owner-run GETs on 2026-10-13 verified the tested Worker → VPC → Tunnel → VPS Master Memory read path. This evidence does not prove task execution or make the VCP UI live. The VCP source still loads a static graph; current VPS-side proxy contract, Vite build, UI behavior, and revision 41 VPS sync remain NOT TESTED.
