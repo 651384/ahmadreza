@@ -1,7 +1,7 @@
 # SIMOT AI OS — Architecture Operating Model
 
 **Scope:** Companion reference for the React Flow architecture graph.  
-**Graph:** `simot-core-overview`, schema version 1, revision 40.  
+**Graph:** `simot-core-overview`, schema version 1, revision 41.  
 **Current graph size:** 77 nodes, 190 edges.  
 **Branch:** `feat/simot-visual-control-plane-react-flow`.
 
@@ -158,3 +158,8 @@ Before moving from architecture-only work to code/runtime reconciliation, use `A
 ## Graph schema validation (revision 40)
 
 `GRAPH-VALIDATION-AUDIT-REV40.md` records the static check results and the `human-escalation.capabilities` schema correction. This is not evidence of a completed Vite build or runtime test.
+
+
+## Read-only runtime reconciliation — revision 41
+
+The owner-provided GET results on 2026-10-13 verify the tested Worker → VPC → Tunnel → VPS Master Memory read path for `/master-memory/test` and the fixed E2E object read only. They do not establish queue execution or general runtime health. The checked-in VCP `App.jsx` still loads a static graph and exports JSON locally; it does not call the canonical memory API. A server-side/local proxy contract must be inspected before implementing live reads, and secrets must never be exposed to browser code. VPS sync beyond revision 36, Vite build, and UI runtime remain NOT TESTED.
