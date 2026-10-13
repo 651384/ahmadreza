@@ -2,8 +2,8 @@
   "schema": "simot.visual-control-plane.graph",
   "schemaVersion": 1,
   "graphId": "simot-core-overview",
-  "revision": 40,
-  "updatedAt": "2026-10-12T00:00:00.000Z",
+  "revision": 41,
+  "updatedAt": "2026-10-13T07:50:32.085Z",
   "nodes": [
     {
       "id": "simot-core",
@@ -51,10 +51,10 @@
         ],
         "accessMethod": "VPS API محلی از مسیر Worker موجود",
         "permissions": "خواندن/نوشتن در API؛ نوشتن از رابط غیرفعال",
-        "evidence": "سابقهٔ تاریخی E2E با WRITE_READBACK_MATCH طبق brief مالک؛ آزمون تکرار نشد",
-        "lastVerified": "شاهد تاریخی؛ زمان دقیق در منبع فعلی در دسترس نیست",
-        "nextAction": "استفاده از مسیر read-only موجود؛ ثبت Audit قبل از هر نوشتن",
-        "detail": "منبع حقیقت عملیاتی؛ با D1، Notion یا حافظهٔ ChatGPT جایگزین نمی‌شود."
+        "evidence": "Owner-run GET /master-memory/e2e-read?object_id=E2E-BRIDGE-001 on 2026-10-13 returned HTTP 200, upstream 200, object_id E2E-BRIDGE-001, bucket working, version 1, content SIMOT BRIDGE MEMORY PASS. Read-only test; no write performed.",
+        "lastVerified": "2026-10-13",
+        "nextAction": "Use only an existing authorized read API for VCP integration; never expose tokens in browser code.",
+        "detail": "Canonical operational continuity source. A read-only E2E object was retrieved successfully on 2026-10-13; no write was performed."
       }
     },
     {
@@ -76,10 +76,10 @@
         ],
         "accessMethod": "Worker موجود simot-ai-os-gateway",
         "permissions": "وابسته به endpoint و احراز هویت",
-        "evidence": "سورس Worker از Cloudflare API خوانده شد؛ وجود routeها تأیید شد، سلامت endpoint زنده آزمایش نشده",
-        "lastVerified": "2026-10-12؛ بررسی سورس",
-        "nextAction": "استفاده از شواهد تاریخی؛ از آزمون تکراری بی‌دلیل خودداری شود",
-        "detail": "وجود کد و route تأیید شده است؛ سلامت زندهٔ هر endpoint جداگانه است."
+        "evidence": "Owner-run read-only GETs on 2026-10-13: /master-memory/test returned HTTP 200 and /master-memory/e2e-read?object_id=E2E-BRIDGE-001 returned HTTP 200; verification scope is these two routes only.",
+        "lastVerified": "2026-10-13",
+        "nextAction": "Keep route-level scope explicit; do not infer task-execution, worker-health, or connector-health from these reads.",
+        "detail": "Live read-only checks verified /master-memory/test and the fixed E2E object-read route on 2026-10-13. This does not verify task execution or every Worker endpoint."
       }
     },
     {
@@ -92,7 +92,7 @@
       "data": {
         "label": "VPC Service / Binding",
         "kind": "network",
-        "status": "NOT TESTED",
+        "status": "VERIFIED",
         "role": "مسیر خصوصی Worker به API حافظه",
         "capabilities": [
           "SIMOT_MASTER_MEMORY binding",
@@ -100,10 +100,10 @@
         ],
         "accessMethod": "Cloudflare Worker → VPC Service",
         "permissions": "مرز دسترسی خصوصی؛ جزئیات جاری کامل بررسی نشده",
-        "evidence": "نام‌ها در brief معماری ثبت شده‌اند؛ اتصال زنده اکنون تست نشده",
-        "lastVerified": "NOT TESTED",
-        "nextAction": "ثبت شواهد تاریخی موجود بدون اجرای مجدد آزمون موفق",
-        "detail": "binding یا نام سرویس به‌تنهایی سلامت مسیر خصوصی را اثبات نمی‌کند."
+        "evidence": "Owner-run GET /master-memory/test and /master-memory/e2e-read?object_id=E2E-BRIDGE-001 on 2026-10-13 both reported vpc_http_status=200 through the existing SIMOT_MASTER_MEMORY binding.",
+        "lastVerified": "2026-10-13",
+        "nextAction": "Preserve current binding; no configuration changes are authorized by this evidence.",
+        "detail": "The tested Worker-to-Master-Memory path returned upstream HTTP 200 through the existing binding; no configuration was changed."
       }
     },
     {
@@ -116,7 +116,7 @@
       "data": {
         "label": "VPS Runtime",
         "kind": "runtime",
-        "status": "NOT TESTED",
+        "status": "VERIFIED",
         "role": "میزبان Master Memory و سرویس‌های موجود",
         "capabilities": [
           "simot-memory.service",
@@ -125,10 +125,10 @@
         ],
         "accessMethod": "SSH/PuTTY توسط مالک؛ دسترسی مستقیم shell از ابزار فعلی در دسترس نیست",
         "permissions": "NOT AVAILABLE در این نشست",
-        "evidence": "اطلاعات تاریخی VPS در brief؛ وضعیت لحظه‌ای بررسی نشده",
-        "lastVerified": "اطلاعات تاریخی",
-        "nextAction": "در این مرحله فقط از APIها و شواهد قابل‌دسترسی استفاده شود",
-        "detail": "هیچ دستور یا تغییر روی VPS در این مرحله اجرا نشده است."
+        "evidence": "The existing simot-memory service at 127.0.0.1:9100 responded successfully via the owner-run Worker→VPC→Tunnel path on 2026-10-13. This is service-path evidence, not a full VPS host audit.",
+        "lastVerified": "2026-10-13",
+        "nextAction": "Keep the VCP read-only; do not infer shell access or full host health.",
+        "detail": "The Master Memory service responded through the existing path. This is not a full VPS health audit and does not imply shell access."
       }
     },
     {
@@ -141,17 +141,17 @@
       "data": {
         "label": "Cloudflare Tunnel",
         "kind": "network",
-        "status": "NOT TESTED",
+        "status": "VERIFIED",
         "role": "مسیر شبکهٔ خصوصی بین Cloudflare و VPS",
         "capabilities": [
           "انتقال درخواست Worker به VPS"
         ],
         "accessMethod": "مسیر ثبت‌شده در معماری",
         "permissions": "UNKNOWN؛ تغییر زیرساخت انجام نشود",
-        "evidence": "جزئیات معماری ثبت‌شده؛ تست جاری انجام نشده",
-        "lastVerified": "NOT TESTED",
-        "nextAction": "بدون نیاز واقعی، آزمون یا تغییر تکراری انجام نشود",
-        "detail": "وجود Tunnel در معماری معادل اتصال سالم در لحظه نیست."
+        "evidence": "Owner-run GET /master-memory/test on 2026-10-13 returned HTTP 200 with route=WORKER->VPC->TUNNEL->127.0.0.1:9100; this verifies the tested path, not continuous tunnel health.",
+        "lastVerified": "2026-10-13",
+        "nextAction": "Treat as observed path success only; do not infer permanent health.",
+        "detail": "The route string and successful HTTP responses verify this path at test time only; they do not establish continuous availability."
       }
     },
     {
@@ -2020,9 +2020,9 @@
       "target": "cloudflare-vpc",
       "label": "CALLS",
       "relation": "CALLS",
-      "status": "NOT TESTED",
-      "permission": "UNKNOWN",
-      "evidence": "binding ثبت‌شده؛ مسیر زنده دوباره آزمایش نشده"
+      "status": "VERIFIED",
+      "permission": "Observed read path only; no write or general execution permission is implied.",
+      "evidence": "Owner-run GET /master-memory/test and /master-memory/e2e-read on 2026-10-13 both returned HTTP 200 and vpc_http_status=200 through the existing SIMOT_MASTER_MEMORY binding."
     },
     {
       "id": "e-vpc-tunnel",
@@ -2030,9 +2030,9 @@
       "target": "tunnel",
       "label": "ROUTES_TO",
       "relation": "ROUTES_TO",
-      "status": "NOT TESTED",
-      "permission": "UNKNOWN",
-      "evidence": "مسیر معماری ثبت‌شده"
+      "status": "VERIFIED",
+      "permission": "Observed route only; no tunnel configuration changes or broader permissions are implied.",
+      "evidence": "Owner-run GET /master-memory/test on 2026-10-13 returned HTTP 200 and explicitly reported route=WORKER->VPC->TUNNEL->127.0.0.1:9100."
     },
     {
       "id": "e-tunnel-vps",
@@ -2040,9 +2040,9 @@
       "target": "vps",
       "label": "ROUTES_TO",
       "relation": "ROUTES_TO",
-      "status": "NOT TESTED",
-      "permission": "UNKNOWN",
-      "evidence": "مسیر معماری ثبت‌شده"
+      "status": "VERIFIED",
+      "permission": "Observed read-only service path only; no shell access or write authorization is implied.",
+      "evidence": "Owner-run GET /master-memory/test on 2026-10-13 returned HTTP 200 with the reported path terminating at 127.0.0.1:9100; E2E object read also returned upstream HTTP 200."
     },
     {
       "id": "e-vps-memory",
@@ -2050,9 +2050,9 @@
       "target": "master-memory",
       "label": "HOSTS",
       "relation": "HOSTS",
-      "status": "NOT TESTED",
-      "permission": "UNKNOWN",
-      "evidence": "میزبانی ثبت‌شده؛ وضعیت جاری تست نشده"
+      "status": "VERIFIED",
+      "permission": "Read-only evidence only; canonical memory writes remain disabled from this UI.",
+      "evidence": "Owner-run GET /master-memory/test and E2E object read on 2026-10-13 confirmed simot-memory at 127.0.0.1:9100 responded successfully; E2E object E2E-BRIDGE-001 was read with expected content."
     },
     {
       "id": "e-vps-vcp",
