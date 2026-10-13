@@ -11,7 +11,7 @@ function readOnlyProxy(allowedPath) {
       if (pathname !== allowedPath) {
         throw new Error('READ_ONLY_ROUTE_BLOCKED');
       }
-      return path.replace(/^\\/api/, '');
+      return path.slice(4);
     },
     configure: proxy => {
       proxy.on('proxyReq', (proxyReq, req) => {
