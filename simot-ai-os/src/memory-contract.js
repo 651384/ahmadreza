@@ -64,7 +64,7 @@ export function buildMinimalMemoryContext(refs = []) {
 export const MEMORY_CONTRACT = Object.freeze({
   purpose: "reference-first persistent external memory",
   principle: "send references and metadata first; fetch content on demand",
-  canonical_file_layer: "Microsoft OneDrive connector until dedicated SharePoint library is exposed",
+  canonical_file_layer: "VPS Master Memory (/srv/simot-memory/) for canonical operational continuity; SharePoint/OneDrive are supporting document and evidence storage",
   canonical_policy_layer: "Notion",
   no_chat_upload_dependency: true
 });
