@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { normalizeMemoryRef, validateMemoryRef, buildMinimalMemoryContext } from "../src/memory-contract.js";
+import { MEMORY_CONTRACT, normalizeMemoryRef, validateMemoryRef, buildMinimalMemoryContext } from "../src/memory-contract.js";
 
 test("valid memory reference", () => {
   const result = validateMemoryRef({
@@ -41,4 +41,9 @@ test("minimal context strips large content", () => {
 
 test("minimal context fails closed on invalid reference", () => {
   assert.throws(() => buildMinimalMemoryContext([{memory_ref:"BAD"}]), /MISSING_MEMORY_SOURCE/);
+});
+
+test("canonical memory layer is VPS Master Memory", () => {
+  assert.match(MEMORY_CONTRACT.canonical_file_layer, /^VPS Master Memory \\(\/srv\/simot-memory\\/\\)/);
+  assert.match(MEMORY_CONTRACT.canonical_file_layer, /SharePoint\/OneDrive are supporting document and evidence storage/);
 });
