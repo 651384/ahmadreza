@@ -173,6 +173,23 @@ function Workspace() {
       <div className="metric"><div><small>اجزای آزمایش‌نشده</small><strong>{untestedNodes}</strong></div></div>
     </section>
 
+    <section className="domain-overview" aria-label="دسته‌بندی معماری">
+      <button type="button" className={'domain-card domain-card-all' + (selectedDomain === 'all' ? ' active' : '')} onClick={() => { setSelectedDomain('all'); setSelected(null); setSelectedEdgeId(null); }}>
+        <span className="domain-card-top"><strong>نمای کلی معماری</strong><span className="domain-count">{nodes.length}</span></span>
+        <span className="domain-card-description">تمام اجزا و ارتباط‌های سیستم</span>
+        <span className="domain-card-meta">{taxonomy.domains.length} حوزهٔ معماری</span>
+      </button>
+      {taxonomy.domains.map(domain => {
+        const domainNodes = Object.values(taxonomy.nodes).filter(item => item.domain === domain.id);
+        const reviewCount = domainNodes.filter(item => item.reviewRequired).length;
+        return <button type="button" key={domain.id} className={'domain-card' + (selectedDomain === domain.id ? ' active' : '')} onClick={() => { setSelectedDomain(domain.id); setSelected(null); setSelectedEdgeId(null); }}>
+          <span className="domain-card-top"><strong>{domain.label}</strong><span className="domain-count">{domainNodes.length}</span></span>
+          <span className="domain-card-description">{domain.description}</span>
+          <span className={'domain-card-meta' + (reviewCount ? ' needs-review' : '')}>{reviewCount ? reviewCount + ' نگاشت نیازمند بازبینی' : 'نگاشت اولیه ثبت شده'}</span>
+        </button>;
+      })}
+    </section>
+
     <section className="workspace">
       <div className="canvas-panel">
         <div className="canvas-toolbar">
