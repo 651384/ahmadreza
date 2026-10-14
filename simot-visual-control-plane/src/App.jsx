@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { Background, Controls, MiniMap, ReactFlow, ReactFlowProvider, Handle, Position, MarkerType, addEdge, useEdgesState, useNodesState } from '@xyflow/react';
 import { Download, GitBranch, RefreshCw, ShieldAlert, Workflow } from 'lucide-react';
 import initialGraph from './graph-v1.json';
+import taxonomy from './taxonomy-v1.json';
 
 const statusText = {
   VERIFIED: 'تأییدشده',
@@ -41,6 +42,7 @@ function Workspace() {
   const [selected, setSelected] = useState(null);
   const [selectedEdgeId, setSelectedEdgeId] = useState(null);
   const [revision, setRevision] = useState(initialGraph.revision || 1);
+  const [selectedDomain, setSelectedDomain] = useState('all');
   const [notice, setNotice] = useState('');
   const onConnect = useCallback(params => setEdges(es => addEdge({
     ...params,
@@ -54,6 +56,10 @@ function Workspace() {
   }, es)), [setEdges]);
   const chosen = nodes.find(n => n.id === selected);
   const chosenEdge = edges.find(e => e.id === selectedEdgeId);
+  const visibleNodes = useMemo(() => selectedDomain === 'all' ? nodes : nodes.filter(n => taxonomy.nodes[n.id]?.domain === selectedDomain), [nodes, selectedDomain]);
+  const visibleNodeIds = useMemo(() => new Set(visibleNodes.map(n => n.id)), [visibleNodes]);
+  const visibleEdges = useMemo(() => edges.filter(e => visibleNodeIds.has(e.source) && visibleNodeIds.has(e.target)), [edges, visibleNodeIds]);
+  const selectedDomainLabel = selectedDomain === 'all' ? 'همهٔ حوزه‌ها' : taxonomy.domains.find(d => d.id === selectedDomain)?.label || 'حوزهٔ نامشخص';
   const graph = useMemo(() => ({
     schema: initialGraph.schema,
     schemaVersion: initialGraph.schemaVersion,
@@ -68,7 +74,10 @@ function Workspace() {
   const untestedNodes = nodes.filter(n => n.data.status === 'NOT TESTED').length;
   const detailRows = chosen ? [
     ['شناسه پایدار', chosen.id],
-    ['نوع', chosen.data.kind],
+    ['حوزهٔ معماری', taxonomy.domains.find(d => d.id === taxonomy.nodes[chosen.id]?.domain)?.label || 'نیازمند تعیین تکلیف'],
+    ['زیردسته', taxonomy.nodes[chosen.id]?.subcategory || 'ثبت نشده'],
+    ...(taxonomy.nodes[chosen.id]?.reviewRequired ? [['بازبینی دسته‌بندی', 'این نگاشت اولیه است و باید بازبینی شود']] : []),
+    ['نوع فنی', chosen.data.kind],
     ['نقش', chosen.data.role],
     ['روش دسترسی', chosen.data.accessMethod],
     ['مجوزها', chosen.data.permissions],
@@ -132,14 +141,19 @@ function Workspace() {
         <div className="canvas-toolbar">
           <div><strong>گراف معماری</strong><span>گره را انتخاب کن تا نقش، مجوز، شواهد و اقدام بعدی را ببینی.</span></div>
           <div className="toolbar-actions">
+            <label className="domain-filter-label" htmlFor="domain-filter">نمایش حوزه</label>
+            <select id="domain-filter" className="domain-filter" value={selectedDomain} onChange={e => { setSelectedDomain(e.target.value); setSelected(null); setSelectedEdgeId(null); }}>
+              <option value="all">همهٔ حوزه‌ها (۷۷ گره)</option>
+              {taxonomy.domains.map(domain => <option key={domain.id} value={domain.id}>{domain.label} ({Object.values(taxonomy.nodes).filter(item => item.domain === domain.id).length})</option>)}
+            </select>
             <button className="primary" onClick={exportGraph}><Download size={15} /> خروجی JSON</button>
             <button className="secondary" onClick={resetGraph}><RefreshCw size={15} /> بازنشانی</button>
           </div>
         </div>
         <div className="flow-canvas" dir="ltr">
           <ReactFlow
-            nodes={nodes}
-            edges={edges}
+            nodes={visibleNodes}
+            edges={visibleEdges}
             nodeTypes={nodeTypes}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
@@ -157,6 +171,7 @@ function Workspace() {
           </ReactFlow>
         </div>
         <div className="canvas-footer">
+          <span>{selectedDomainLabel}: نمایش {visibleNodes.length} گره و {visibleEdges.length} ارتباط داخلی از گراف اصلی.</span>
           <span><ShieldAlert size={14} /> وجود نود یا اتصال به‌تنهایی سلامت عملیاتی را ثابت نمی‌کند.</span>
           <span>اتصال زنده و نوشتن در حافظه از این رابط فعال نیست.</span>
         </div>
