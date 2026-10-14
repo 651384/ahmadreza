@@ -98,9 +98,11 @@ jobs:
       - name: Verify Cloudflare to VPS Master Memory read path
         env:
           URL: https://simot-ai-os-gateway.vahid-ahmadreza.workers.dev
+          SIMOT_MAILBOX_TOKEN: ${{ secrets.SIMOT_MAILBOX_TOKEN }}
         run: |
           set -euo pipefail
-          curl --fail --silent --show-error "$URL/master-memory/test" -o memory-health.json
+          test -n "$SIMOT_MAILBOX_TOKEN" || { echo "Required GitHub Actions secret SIMOT_MAILBOX_TOKEN is missing"; exit 1; }
+          curl --fail --silent --show-error -H "Authorization: Bearer $SIMOT_MAILBOX_TOKEN" "$URL/master-memory/test" -o memory-health.json
           node - <<'NODE'
           const fs = require("fs");
           const body = JSON.parse(fs.readFileSync("memory-health.json", "utf8"));
@@ -109,7 +111,7 @@ jobs:
           }
           console.log(JSON.stringify({ok:body.ok, route:body.route, vpc_http_status:body.vpc_http_status}));
           NODE
-          curl --fail --silent --show-error "$URL/master-memory/e2e-read?object_id=E2E-BRIDGE-001" -o memory-read.json
+          curl --fail --silent --show-error -H "Authorization: Bearer $SIMOT_MAILBOX_TOKEN" "$URL/master-memory/e2e-read?object_id=E2E-BRIDGE-001" -o memory-read.json
           node - <<'NODE'
           const fs = require("fs");
           const body = JSON.parse(fs.readFileSync("memory-read.json", "utf8"));
