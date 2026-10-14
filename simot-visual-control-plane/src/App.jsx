@@ -51,16 +51,6 @@ function Workspace() {
     let active = true;
     async function loadMemoryGraph() {
       try {
-        const listResponse = await fetch('/api/list/working', { cache: 'no-store' });
-        const list = await listResponse.json();
-        if (!listResponse.ok || list?.ok !== true || !Array.isArray(list.objects)) {
-          throw new Error('MEMORY_LIST_FAILED');
-        }
-        const item = list.objects.find(object => object.object_id === 'simot-core-overview');
-        if (!item) {
-          if (active) setMemoryStatus('گراف در Master Memory پیدا نشد؛ نسخه همراه کد نمایش داده می‌شود');
-          return;
-        }
         const response = await fetch('/api/memory/working/simot-core-overview', { cache: 'no-store' });
         const result = await response.json();
         if (!response.ok || result?.ok !== true || !result.metadata || typeof result.content !== 'string') {
