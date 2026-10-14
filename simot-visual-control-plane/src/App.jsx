@@ -39,6 +39,7 @@ const nodeTypes = { simotNode: SimotNode };
 function Workspace() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialGraph.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialGraph.edges.map(e => ({ ...e, markerEnd: { type: MarkerType.ArrowClosed } })));
+  const [sourceGraph, setSourceGraph] = useState(initialGraph);
   const [selected, setSelected] = useState(null);
   const [selectedEdgeId, setSelectedEdgeId] = useState(null);
   const [revision, setRevision] = useState(initialGraph.revision || 1);
@@ -66,6 +67,7 @@ function Workspace() {
           throw new Error('INVALID_MEMORY_METADATA');
         }
         if (active) {
+          setSourceGraph(saved);
           setNodes(saved.nodes);
           setEdges(saved.edges.map(edge => ({ ...edge, markerEnd: { type: MarkerType.ArrowClosed } })));
           setRevision(saved.revision || initialGraph.revision || 1);
@@ -147,12 +149,15 @@ function Workspace() {
   }
 
   function resetGraph() {
-    setNodes(initialGraph.nodes);
-    setEdges(initialGraph.edges.map(e => ({ ...e, markerEnd: { type: MarkerType.ArrowClosed } })));
+    setNodes(sourceGraph.nodes);
+    setEdges(sourceGraph.edges.map(e => ({ ...e, markerEnd: { type: MarkerType.ArrowClosed } })));
     setSelected(null);
     setSelectedEdgeId(null);
-    setRevision(initialGraph.revision || 1);
-    setNotice('نمای گراف به نسخهٔ اولیهٔ ثبت‌شده بازگشت.');
+    setSelectedDomain('all');
+    setRevision(sourceGraph.revision || initialGraph.revision || 1);
+    setNotice(memoryVersion !== null
+      ? 'نمای گراف به آخرین نسخهٔ خوانده‌شده از Master Memory بازگشت؛ هیچ تغییری در حافظه نوشته نشد.'
+      : 'نمای گراف به نسخهٔ محلی همراه برنامه بازگشت؛ منبع Master Memory تأیید نشده است.');
   }
 
   return <main className="app-shell">
