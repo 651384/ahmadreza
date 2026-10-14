@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Background, Controls, MiniMap, ReactFlow, ReactFlowProvider, Handle, Position, MarkerType, addEdge, useEdgesState, useNodesState } from '@xyflow/react';
 import { Download, GitBranch, RefreshCw, ShieldAlert, Workflow } from 'lucide-react';
 import initialGraph from './graph-v1.json';
@@ -44,6 +44,52 @@ function Workspace() {
   const [revision, setRevision] = useState(initialGraph.revision || 1);
   const [selectedDomain, setSelectedDomain] = useState('all');
   const [notice, setNotice] = useState('');
+  const [memoryStatus, setMemoryStatus] = useState('در حال بررسی اتصال خواندنی');
+  const [memoryVersion, setMemoryVersion] = useState(null);
+
+  useEffect(() => {
+    let active = true;
+    async function loadMemoryGraph() {
+      try {
+        const listResponse = await fetch('/api/list/working', { cache: 'no-store' });
+        const list = await listResponse.json();
+        if (!listResponse.ok || list?.ok !== true || !Array.isArray(list.objects)) {
+          throw new Error('MEMORY_LIST_FAILED');
+        }
+        const item = list.objects.find(object => object.object_id === 'simot-core-overview');
+        if (!item) {
+          if (active) setMemoryStatus('گراف در Master Memory پیدا نشد؛ نسخه همراه کد نمایش داده می‌شود');
+          return;
+        }
+        const response = await fetch('/api/memory/working/simot-core-overview', { cache: 'no-store' });
+        const result = await response.json();
+        if (!response.ok || result?.ok !== true || !result.metadata || typeof result.content !== 'string') {
+          throw new Error('MEMORY_READ_FAILED');
+        }
+        const saved = JSON.parse(result.content);
+        if (saved.schema !== initialGraph.schema || saved.schemaVersion !== initialGraph.schemaVersion ||
+            saved.graphId !== initialGraph.graphId || !Array.isArray(saved.nodes) || !Array.isArray(saved.edges)) {
+          throw new Error('INVALID_SAVED_GRAPH');
+        }
+        if (!Number.isInteger(result.metadata.version) || typeof result.metadata.sha256 !== 'string' ||
+            !/^[a-f0-9]{64}$/i.test(result.metadata.sha256)) {
+          throw new Error('INVALID_MEMORY_METADATA');
+        }
+        if (active) {
+          setNodes(saved.nodes);
+          setEdges(saved.edges.map(edge => ({ ...edge, markerEnd: { type: MarkerType.ArrowClosed } })));
+          setRevision(saved.revision || initialGraph.revision || 1);
+          setMemoryVersion(result.metadata.version);
+          setMemoryStatus('گراف از Master Memory بارگذاری شد');
+          setNotice('گراف از حافظهٔ اصلی خوانده شد؛ این رابط در این نسخه فقط‌خواندنی است.');
+        }
+      } catch {
+        if (active) setMemoryStatus('خواندن Master Memory تأیید نشد؛ گراف همراه کد نمایش داده می‌شود');
+      }
+    }
+    loadMemoryGraph();
+    return () => { active = false; };
+  }, [setNodes, setEdges]);
   const onConnect = useCallback(params => setEdges(es => addEdge({
     ...params,
     id: 'manual-' + Date.now(),
@@ -117,6 +163,7 @@ function Workspace() {
       <div className="top-meta">
         <span className="local-tag"><span /> معماری شواهد‌محور</span>
         <span className="version"><GitBranch size={14} /> Graph v{initialGraph.schemaVersion} · r{revision}</span>
+        <span className="version" role="status"><ShieldAlert size={14} /> {memoryStatus}{memoryVersion !== null ? ` · version ${memoryVersion}` : ''}</span>
       </div>
     </header>
 
