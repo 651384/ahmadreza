@@ -93,4 +93,10 @@ if (errors.length) {
   console.log('UNIQUE_NODE_IDS=' + new Set(graph.nodes.map(n => n.id)).size);
   console.log('UNIQUE_EDGE_IDS=' + new Set(graph.edges.map(e => e.id)).size);
   console.log('ALL_EDGE_REFERENCES_VALID=true');
+  console.log('TAXONOMY_MAPPINGS=' + Object.keys(taxonomy.nodes).length);
+  console.log('TAXONOMY_REVIEW_REQUIRED=' + Object.values(taxonomy.nodes).filter(item => item.reviewRequired).length);
+  for (const domain of taxonomy.domains) {
+    const count = Object.values(taxonomy.nodes).filter(item => item.domain === domain.id).length;
+    console.log('DOMAIN_' + domain.id.toUpperCase().replace(/-/g, '_') + '=' + count);
+  }
 }
