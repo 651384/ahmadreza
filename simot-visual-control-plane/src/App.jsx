@@ -92,7 +92,18 @@ function Workspace() {
   }, es)), [setEdges]);
   const chosen = nodes.find(n => n.id === selected);
   const chosenEdge = edges.find(e => e.id === selectedEdgeId);
-  const visibleNodes = useMemo(() => selectedDomain === 'all' ? nodes : nodes.filter(n => taxonomy.nodes[n.id]?.domain === selectedDomain), [nodes, selectedDomain]);
+  const visibleNodes = useMemo(() => {
+    if (selectedDomain === 'all') return nodes;
+    const filtered = nodes.filter(n => taxonomy.nodes[n.id]?.domain === selectedDomain);
+    const columns = filtered.length > 12 ? 4 : filtered.length > 6 ? 3 : 2;
+    return filtered.map((node, index) => ({
+      ...node,
+      position: {
+        x: 80 + (index % columns) * 360,
+        y: 80 + Math.floor(index / columns) * 170
+      }
+    }));
+  }, [nodes, selectedDomain]);
   const visibleNodeIds = useMemo(() => new Set(visibleNodes.map(n => n.id)), [visibleNodes]);
   const visibleEdges = useMemo(() => edges.filter(e => visibleNodeIds.has(e.source) && visibleNodeIds.has(e.target)), [edges, visibleNodeIds]);
   const selectedDomainLabel = selectedDomain === 'all' ? 'همهٔ حوزه‌ها' : taxonomy.domains.find(d => d.id === selectedDomain)?.label || 'حوزهٔ نامشخص';
@@ -206,12 +217,14 @@ function Workspace() {
         </div>
         <div className="flow-canvas" dir="ltr">
           <ReactFlow
+            key={selectedDomain}
             nodes={visibleNodes}
             edges={visibleEdges}
             nodeTypes={nodeTypes}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
+            nodesDraggable={selectedDomain === 'all'}
             onNodeClick={(_, n) => { setSelected(n.id); setSelectedEdgeId(null); }}
             onEdgeClick={(_, e) => { setSelectedEdgeId(e.id); setSelected(null); }}
             onPaneClick={() => { setSelected(null); setSelectedEdgeId(null); }}
