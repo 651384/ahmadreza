@@ -7,6 +7,15 @@ on:
       - master
       - simot-ai-os/runtime-v2-gateway
   workflow_dispatch:
+    inputs:
+      mode:
+        description: "Read-only verification or full E2E write test"
+        required: true
+        type: choice
+        options:
+          - read-only
+          - full-e2e
+        default: read-only
 
 jobs:
   live-smoke:
@@ -122,6 +131,7 @@ jobs:
           NODE
 
       - name: Verify Cloudflare-to-VPS Master Memory write and readback
+        if: github.event_name != 'workflow_dispatch' || inputs.mode == 'full-e2e'
         env:
           URL: https://simot-ai-os-gateway.vahid-ahmadreza.workers.dev
           SIMOT_MAILBOX_TOKEN: ${{ secrets.SIMOT_MAILBOX_TOKEN }}
