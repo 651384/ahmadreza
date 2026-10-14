@@ -168,15 +168,16 @@ jobs:
           NODE
           object_id="$(node -p "JSON.parse(require('fs').readFileSync('memory-write.json','utf8')).objectId")"
           expected="$(node -p "JSON.parse(require('fs').readFileSync('memory-write.json','utf8')).content")"
-          curl --fail --silent --show-error -H "Authorization: Bearer $SIMOT_MAILBOX_TOKEN" "$URL/master-memory/e2e-read?object_id=$object_id" -o memory-readback.json
-          node - "$expected" <<'NODE'
+          curl --fail --silent --show-error --retry 3 --retry-delay 2 -H "Authorization: Bearer $SIMOT_MAILBOX_TOKEN" "$URL/master-memory/object-read?bucket=working&object_id=$object_id" -o memory-readback.json
+          node - "$expected" "$object_id" <<'NODE'
           const fs = require("fs");
           const expected = process.argv[2];
+          const objectId = process.argv[3];
           const body = JSON.parse(fs.readFileSync("memory-readback.json", "utf8"));
-          if (!body.ok || body.vpc_http_status !== 200 || body.memory?.content !== expected) {
+          if (!body.ok || body.upstream_status !== 200 || body.result?.content !== expected || body.result?.object_id !== objectId) {
             throw new Error("VPS write/readback mismatch: " + JSON.stringify(body));
           }
-          console.log(JSON.stringify({ok:true, object_id:body.object_id, route:body.route, readback_matches:true}));
+          console.log(JSON.stringify({ok:true, object_id:objectId, route:body.route, readback_matches:true}));
           NODE
 
       - name: Verify Telegram webhook remains fail-closed
