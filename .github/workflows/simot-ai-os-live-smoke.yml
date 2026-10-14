@@ -174,7 +174,9 @@ jobs:
           const expected = process.argv[2];
           const objectId = process.argv[3];
           const body = JSON.parse(fs.readFileSync("memory-readback.json", "utf8"));
-          if (!body.ok || body.upstream_status !== 200 || body.result?.content !== expected || body.result?.object_id !== objectId) {
+          if (!body.ok || body.upstream_status !== 200 || body.result?.ok !== true ||
+              body.result?.content !== expected || body.result?.metadata?.object_id !== objectId ||
+              body.result?.metadata?.bucket !== "working") {
             throw new Error("VPS write/readback mismatch: " + JSON.stringify(body));
           }
           console.log(JSON.stringify({ok:true, object_id:objectId, route:body.route, readback_matches:true}));
