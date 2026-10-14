@@ -2,6 +2,8 @@ import fs from 'node:fs';
 
 const file = new URL('../src/graph-v1.json', import.meta.url);
 const graph = JSON.parse(fs.readFileSync(file, 'utf8'));
+const taxonomyFile = new URL('../src/taxonomy-v1.json', import.meta.url);
+const taxonomy = JSON.parse(fs.readFileSync(taxonomyFile, 'utf8'));
 const errors = [];
 const allowedStatuses = new Set([
   'VERIFIED', 'FAILED', 'BLOCKED', 'NOT TESTED', 'PLANNED',
@@ -50,6 +52,32 @@ if (!Array.isArray(graph.nodes) || !Array.isArray(graph.edges)) {
     const key = [edge.source, edge.target, edge.relation || edge.label].join('::');
     if (relationKeys.has(key)) errors.push('Duplicate semantic edge: ' + key);
     relationKeys.add(key);
+  }
+}
+
+
+if (taxonomy.schema !== 'simot.visual-control-plane.taxonomy') errors.push('Unexpected taxonomy schema');
+if (taxonomy.schemaVersion !== 1) errors.push('Unsupported taxonomy schemaVersion');
+if (!Array.isArray(taxonomy.domains) || !taxonomy.nodes || typeof taxonomy.nodes !== 'object') {
+  errors.push('Taxonomy must define domains and a node map');
+} else {
+  const domainIds = taxonomy.domains.map(domain => domain.id);
+  const domainIdSet = new Set(domainIds);
+  if (new Set(domainIds).size !== domainIds.length) errors.push('Duplicate taxonomy domain IDs');
+  const graphNodeIds = new Set((graph.nodes || []).map(node => node.id));
+  const taxonomyNodeIds = Object.keys(taxonomy.nodes);
+  for (const id of graphNodeIds) {
+    if (!(id in taxonomy.nodes)) errors.push('Missing taxonomy mapping for graph node ' + id);
+  }
+  for (const id of taxonomyNodeIds) {
+    if (!graphNodeIds.has(id)) errors.push('Taxonomy mapping has no graph node: ' + id);
+    const item = taxonomy.nodes[id];
+    if (!domainIdSet.has(item.domain)) errors.push('Unknown taxonomy domain on ' + id + ': ' + item.domain);
+    if (typeof item.subcategory !== 'string' || !item.subcategory.trim()) errors.push('Missing taxonomy subcategory on ' + id);
+    if (typeof item.reviewRequired !== 'boolean') errors.push('reviewRequired must be boolean on ' + id);
+  }
+  if (taxonomy.basedOnGraphRevision !== graph.revision) {
+    errors.push('Taxonomy graph revision mismatch: taxonomy=' + taxonomy.basedOnGraphRevision + ', graph=' + graph.revision);
   }
 }
 
