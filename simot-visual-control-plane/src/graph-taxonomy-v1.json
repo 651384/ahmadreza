@@ -347,5 +347,15 @@
       "domain": "governance",
       "subcategory": "architecture-acceptance"
     }
-  }
+  },
+  "domainCounts": {
+    "core": 7,
+    "memory-data": 10,
+    "runtime-infra": 17,
+    "ai-models": 6,
+    "integrations": 8,
+    "interfaces": 5,
+    "governance": 24
+  },
+  "expectedNodeCount": 77
 }
