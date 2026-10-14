@@ -168,7 +168,7 @@ jobs:
           NODE
           object_id="$(node -p "JSON.parse(require('fs').readFileSync('memory-write.json','utf8')).objectId")"
           expected="$(node -p "JSON.parse(require('fs').readFileSync('memory-write.json','utf8')).content")"
-          curl --fail --silent --show-error "$URL/master-memory/e2e-read?object_id=$object_id" -o memory-readback.json
+          curl --fail --silent --show-error -H "Authorization: Bearer $SIMOT_MAILBOX_TOKEN" "$URL/master-memory/e2e-read?object_id=$object_id" -o memory-readback.json
           node - "$expected" <<'NODE'
           const fs = require("fs");
           const expected = process.argv[2];
