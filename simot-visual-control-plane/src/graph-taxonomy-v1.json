@@ -1,0 +1,361 @@
+{
+  "schema": "simot.visual-control-plane.taxonomy",
+  "schemaVersion": 1,
+  "sourceGraphId": "simot-core-overview",
+  "sourceGraphRevision": 41,
+  "notes": [
+    "domain is an architecture grouping; kind remains the technical node type.",
+    "status remains the independent evidence/operational claim and must not be inferred from domain.",
+    "This taxonomy is additive and does not change canonical Master Memory."
+  ],
+  "domains": {
+    "core": {
+      "label": "هسته و هماهنگی",
+      "order": 1
+    },
+    "memory-data": {
+      "label": "حافظه و داده",
+      "order": 2
+    },
+    "runtime-infra": {
+      "label": "زیرساخت و Runtime",
+      "order": 3
+    },
+    "ai-models": {
+      "label": "مدل‌ها و پردازش AI",
+      "order": 4
+    },
+    "integrations": {
+      "label": "ابزارها و یکپارچه‌سازی",
+      "order": 5
+    },
+    "interfaces": {
+      "label": "رابط‌ها و کانال‌های کاربر",
+      "order": 6
+    },
+    "governance": {
+      "label": "حاکمیت، امنیت و شواهد",
+      "order": 7
+    }
+  },
+  "nodes": {
+    "simot-core": {
+      "domain": "core",
+      "subcategory": "orchestration"
+    },
+    "master-memory": {
+      "domain": "memory-data",
+      "subcategory": "canonical-memory"
+    },
+    "cloudflare-gateway": {
+      "domain": "runtime-infra",
+      "subcategory": "cloud-runtime"
+    },
+    "cloudflare-vpc": {
+      "domain": "runtime-infra",
+      "subcategory": "private-network"
+    },
+    "vps": {
+      "domain": "runtime-infra",
+      "subcategory": "compute-host"
+    },
+    "tunnel": {
+      "domain": "runtime-infra",
+      "subcategory": "network-path"
+    },
+    "vcp": {
+      "domain": "interfaces",
+      "subcategory": "visual-control-plane"
+    },
+    "tailscale": {
+      "domain": "runtime-infra",
+      "subcategory": "private-access"
+    },
+    "cloudflare-d1": {
+      "domain": "runtime-infra",
+      "subcategory": "runtime-database"
+    },
+    "cloudflare-queue": {
+      "domain": "runtime-infra",
+      "subcategory": "event-queue"
+    },
+    "cloudflare-dlq": {
+      "domain": "runtime-infra",
+      "subcategory": "failure-queue"
+    },
+    "github": {
+      "domain": "integrations",
+      "subcategory": "source-control"
+    },
+    "chatgpt": {
+      "domain": "interfaces",
+      "subcategory": "assistant-tooling"
+    },
+    "claude": {
+      "domain": "ai-models",
+      "subcategory": "external-model"
+    },
+    "grok": {
+      "domain": "ai-models",
+      "subcategory": "external-model"
+    },
+    "arena": {
+      "domain": "ai-models",
+      "subcategory": "external-model"
+    },
+    "openclaw": {
+      "domain": "interfaces",
+      "subcategory": "assistant-client"
+    },
+    "phone-client": {
+      "domain": "interfaces",
+      "subcategory": "mobile-client"
+    },
+    "ollama": {
+      "domain": "ai-models",
+      "subcategory": "local-model-runtime"
+    },
+    "notion": {
+      "domain": "integrations",
+      "subcategory": "architecture-docs"
+    },
+    "sharepoint": {
+      "domain": "integrations",
+      "subcategory": "document-evidence"
+    },
+    "asana": {
+      "domain": "integrations",
+      "subcategory": "project-execution"
+    },
+    "hubspot": {
+      "domain": "integrations",
+      "subcategory": "crm"
+    },
+    "approval-gate": {
+      "domain": "governance",
+      "subcategory": "human-approval"
+    },
+    "orchestration": {
+      "domain": "core",
+      "subcategory": "workflow-engine"
+    },
+    "tool-registry": {
+      "domain": "integrations",
+      "subcategory": "capability-registry"
+    },
+    "policy-engine": {
+      "domain": "governance",
+      "subcategory": "policy-enforcement"
+    },
+    "model-router": {
+      "domain": "ai-models",
+      "subcategory": "model-selection"
+    },
+    "event-bus": {
+      "domain": "runtime-infra",
+      "subcategory": "event-transport"
+    },
+    "audit-ledger": {
+      "domain": "governance",
+      "subcategory": "audit-evidence"
+    },
+    "data-governance": {
+      "domain": "memory-data",
+      "subcategory": "data-governance"
+    },
+    "integration-adapters": {
+      "domain": "integrations",
+      "subcategory": "adapters"
+    },
+    "secrets-boundary": {
+      "domain": "governance",
+      "subcategory": "secret-boundary"
+    },
+    "continuity-contract": {
+      "domain": "memory-data",
+      "subcategory": "continuity-contract"
+    },
+    "api-contracts": {
+      "domain": "runtime-infra",
+      "subcategory": "api-message-contracts"
+    },
+    "monitoring": {
+      "domain": "runtime-infra",
+      "subcategory": "observability"
+    },
+    "simot-master-api": {
+      "domain": "runtime-infra",
+      "subcategory": "memory-api"
+    },
+    "cloudflare-ai-workers": {
+      "domain": "ai-models",
+      "subcategory": "cloud-ai-execution"
+    },
+    "queue-consumer": {
+      "domain": "runtime-infra",
+      "subcategory": "queue-dispatch"
+    },
+    "simot-message-envelope": {
+      "domain": "memory-data",
+      "subcategory": "message-envelope"
+    },
+    "task-lifecycle": {
+      "domain": "core",
+      "subcategory": "task-state-machine"
+    },
+    "identity-access-boundary": {
+      "domain": "governance",
+      "subcategory": "identity-access"
+    },
+    "process-catalog": {
+      "domain": "memory-data",
+      "subcategory": "process-data-catalog"
+    },
+    "business-workflows": {
+      "domain": "core",
+      "subcategory": "business-workflows"
+    },
+    "request-ingress": {
+      "domain": "runtime-infra",
+      "subcategory": "request-entry"
+    },
+    "context-assembler": {
+      "domain": "memory-data",
+      "subcategory": "context-assembly"
+    },
+    "planner": {
+      "domain": "core",
+      "subcategory": "planning"
+    },
+    "executor": {
+      "domain": "core",
+      "subcategory": "execution"
+    },
+    "result-assembler": {
+      "domain": "runtime-infra",
+      "subcategory": "result-evidence-assembly"
+    },
+    "retry-idempotency": {
+      "domain": "governance",
+      "subcategory": "safe-retries"
+    },
+    "data-classification": {
+      "domain": "memory-data",
+      "subcategory": "classification-retention"
+    },
+    "connector-permissions": {
+      "domain": "governance",
+      "subcategory": "connector-permissions"
+    },
+    "response-delivery": {
+      "domain": "runtime-infra",
+      "subcategory": "response-delivery"
+    },
+    "failure-handler": {
+      "domain": "runtime-infra",
+      "subcategory": "failure-handling"
+    },
+    "model-cost-policy": {
+      "domain": "governance",
+      "subcategory": "model-cost-policy"
+    },
+    "change-release-gate": {
+      "domain": "governance",
+      "subcategory": "change-release-control"
+    },
+    "human-escalation": {
+      "domain": "governance",
+      "subcategory": "human-escalation"
+    },
+    "source-of-truth-policy": {
+      "domain": "governance",
+      "subcategory": "source-of-truth"
+    },
+    "task-cancellation-timeout": {
+      "domain": "core",
+      "subcategory": "cancellation-timeouts"
+    },
+    "evidence-contract": {
+      "domain": "memory-data",
+      "subcategory": "evidence-record-contract"
+    },
+    "connector-trust-matrix": {
+      "domain": "governance",
+      "subcategory": "connector-trust"
+    },
+    "deployment-trust-boundaries": {
+      "domain": "governance",
+      "subcategory": "deployment-boundaries"
+    },
+    "operational-mode-policy": {
+      "domain": "governance",
+      "subcategory": "operating-modes"
+    },
+    "backup-rollback-policy": {
+      "domain": "governance",
+      "subcategory": "backup-recovery"
+    },
+    "graph-schema-registry": {
+      "domain": "governance",
+      "subcategory": "graph-schema"
+    },
+    "graph-change-review": {
+      "domain": "governance",
+      "subcategory": "graph-review"
+    },
+    "graph-validation-policy": {
+      "domain": "governance",
+      "subcategory": "graph-validation"
+    },
+    "graph-history-rollback": {
+      "domain": "governance",
+      "subcategory": "graph-history"
+    },
+    "canonical-memory-write-guard": {
+      "domain": "governance",
+      "subcategory": "canonical-write-guard"
+    },
+    "client-channel-adapters": {
+      "domain": "interfaces",
+      "subcategory": "client-channels"
+    },
+    "human-operator": {
+      "domain": "governance",
+      "subcategory": "human-operator"
+    },
+    "artifact-intake": {
+      "domain": "memory-data",
+      "subcategory": "artifact-intake"
+    },
+    "content-extractor": {
+      "domain": "memory-data",
+      "subcategory": "content-extraction"
+    },
+    "execution-dispatch-policy": {
+      "domain": "governance",
+      "subcategory": "execution-dispatch"
+    },
+    "evidence-freshness-policy": {
+      "domain": "governance",
+      "subcategory": "evidence-freshness"
+    },
+    "project-service-registry": {
+      "domain": "integrations",
+      "subcategory": "project-service-registry"
+    },
+    "architecture-acceptance-gate": {
+      "domain": "governance",
+      "subcategory": "architecture-acceptance"
+    }
+  },
+  "domainCounts": {
+    "core": 7,
+    "memory-data": 10,
+    "runtime-infra": 17,
+    "ai-models": 6,
+    "integrations": 8,
+    "interfaces": 5,
+    "governance": 24
+  },
+  "expectedNodeCount": 77
+}

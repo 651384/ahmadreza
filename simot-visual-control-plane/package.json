@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "validate:taxonomy": "node scripts/validate-graph-taxonomy.mjs"
   },
   "dependencies": {
     "@xyflow/react": "^12.8.6",
