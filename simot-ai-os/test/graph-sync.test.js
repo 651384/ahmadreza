@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { handleGraphSync } from "../src/graph-sync.js";
+import { handleGraphSync, handleGitHubGraphSync } from "../src/graph-sync.js";
 
 const content = JSON.stringify({
   schema: "simot.visual-control-plane.graph",
@@ -69,4 +69,13 @@ test("D1 graph sync rejects a revision conflict", async () => {
   }), { SIMOT_DB: mockDb(existing) });
   assert.equal(response.status, 409);
   assert.equal((await response.json()).error, "D1_REVISION_CONFLICT");
+});
+
+test("GitHub graph sync stays blocked when no approved token/config is present", async () => {
+  const response = await handleGitHubGraphSync(req({
+    bucket: "working", object_id: "simot-core-overview", content,
+    source_memory: { system: "VPS_MASTER_MEMORY", version: 6, sha256: await hash(content) }
+  }), {});
+  assert.equal(response.status, 503);
+  assert.equal((await response.json()).error, "GITHUB_SYNC_NOT_CONFIGURED");
 });
