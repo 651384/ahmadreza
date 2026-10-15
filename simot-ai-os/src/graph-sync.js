@@ -126,3 +126,79 @@ export async function handleGraphSync(request, env) {
     return json({ ok: false, error: "GRAPH_SYNC_UNAVAILABLE" }, 503);
   }
 }
+
+function encodeBase64Utf8(value) {
+  const bytes = new TextEncoder().encode(value);
+  let binary = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  }
+  return btoa(binary);
+}
+
+export async function handleGitHubGraphSync(request, env) {
+  if (request.method !== "POST") return json({ ok: false, error: "METHOD_NOT_ALLOWED" }, 405);
+  if (typeof env?.SIMOT_GITHUB_TOKEN !== "string" || !env.SIMOT_GITHUB_TOKEN ||
+      typeof env?.SIMOT_GITHUB_REPOSITORY !== "string" || !/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(env.SIMOT_GITHUB_REPOSITORY) ||
+      typeof env?.SIMOT_GITHUB_BRANCH !== "string" || !/^[A-Za-z0-9._/-]{1,200}$/.test(env.SIMOT_GITHUB_BRANCH) ||
+      env.SIMOT_GITHUB_BRANCH.includes("..")) {
+    return json({ ok: false, error: "GITHUB_SYNC_NOT_CONFIGURED" }, 503);
+  }
+  let body;
+  try { body = await request.json(); } catch { return json({ ok: false, error: "INVALID_JSON" }, 400); }
+  if (!body || typeof body !== "object" || typeof body.content !== "string" ||
+      body.bucket !== "working" || body.object_id !== GRAPH_ID ||
+      body.source_memory?.system !== "VPS_MASTER_MEMORY" ||
+      !Number.isInteger(body.source_memory?.version) || body.source_memory.version < 1 ||
+      !isSha256(body.source_memory?.sha256)) {
+    return json({ ok: false, error: "INVALID_GRAPH_SYNC_PAYLOAD" }, 400);
+  }
+  if (new TextEncoder().encode(body.content).byteLength > MAX_CONTENT_BYTES) return json({ ok: false, error: "GRAPH_PAYLOAD_TOO_LARGE" }, 413);
+  const digest = await sha256Hex(body.content);
+  if (digest !== body.source_memory.sha256.toLowerCase()) return json({ ok: false, error: "SOURCE_MEMORY_HASH_MISMATCH" }, 409);
+  let graph;
+  try { graph = JSON.parse(body.content); } catch { return json({ ok: false, error: "INVALID_GRAPH_JSON" }, 400); }
+  const validationError = validateGraph(graph);
+  if (validationError) return json({ ok: false, error: validationError }, 400);
+
+  const repository = env.SIMOT_GITHUB_REPOSITORY;
+  const branch = env.SIMOT_GITHUB_BRANCH;
+  const path = "simot-ai-os/data/control-plane-graphs/simot-core-overview.json";
+  const api = "https://api.github.com/repos/" + repository + "/contents/" + path;
+  const headers = {
+    "authorization": "Bearer " + env.SIMOT_GITHUB_TOKEN,
+    "accept": "application/vnd.github+json",
+    "content-type": "application/json",
+    "user-agent": "SIMOT-Visual-Control-Plane",
+    "x-github-api-version": "2022-11-28"
+  };
+  try {
+    const currentResponse = await fetch(api + "?ref=" + encodeURIComponent(branch), { headers });
+    let current = null;
+    if (currentResponse.status === 200) current = await currentResponse.json();
+    else if (currentResponse.status !== 404) return json({ ok: false, error: "GITHUB_READ_FAILED", upstream_status: currentResponse.status }, 502);
+    const payload = {
+      message: "sync: update canonical SIMOT graph from VPS Master Memory",
+      branch,
+      content: encodeBase64Utf8(body.content),
+      ...(current?.sha ? { sha: current.sha } : {})
+    };
+    const writeResponse = await fetch(api, { method: "PUT", headers, body: JSON.stringify(payload) });
+    const writeResult = await writeResponse.json().catch(() => null);
+    if (!writeResponse.ok || !writeResult?.content?.sha || !writeResult?.commit?.sha) {
+      return json({ ok: false, error: "GITHUB_WRITE_FAILED", upstream_status: writeResponse.status }, 502);
+    }
+    return json({
+      ok: true, verified: true, destination: "GITHUB",
+      repository, branch, path,
+      graph_id: GRAPH_ID, revision: graph.revision,
+      source_memory_version: body.source_memory.version,
+      source_memory_sha256: digest,
+      content_sha: writeResult.content.sha,
+      commit_sha: writeResult.commit.sha,
+      updated_at: writeResult.commit.committer?.date || null
+    });
+  } catch {
+    return json({ ok: false, error: "GITHUB_SYNC_UNAVAILABLE" }, 503);
+  }
+}
