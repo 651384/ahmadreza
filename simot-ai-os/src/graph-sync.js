@@ -150,6 +150,12 @@ function encodeBase64Utf8(value) {
   return btoa(binary);
 }
 
+function decodeBase64Utf8(value) {
+  const binary = atob(String(value).replace(/\\s/g, ""));
+  const bytes = Uint8Array.from(binary, character => character.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
+}
+
 export async function handleGitHubGraphSync(request, env) {
   if (request.method !== "POST") return json({ ok: false, error: "METHOD_NOT_ALLOWED" }, 405);
   if (typeof env?.SIMOT_GITHUB_TOKEN !== "string" || !env.SIMOT_GITHUB_TOKEN ||
@@ -191,6 +197,20 @@ export async function handleGitHubGraphSync(request, env) {
     let current = null;
     if (currentResponse.status === 200) current = await currentResponse.json();
     else if (currentResponse.status !== 404) return json({ ok: false, error: "GITHUB_READ_FAILED", upstream_status: currentResponse.status }, 502);
+    if (current?.sha && current?.encoding === "base64" && typeof current.content === "string") {
+      try {
+        if (decodeBase64Utf8(current.content) === body.content) {
+          return json({
+            ok: true, verified: true, idempotent: true, destination: "GITHUB",
+            repository, branch, path, graph_id: GRAPH_ID, revision: graph.revision,
+            source_memory_version: body.source_memory.version, source_memory_sha256: digest,
+            content_sha: current.sha, commit_sha: null, updated_at: null
+          });
+        }
+      } catch {
+        // A malformed read response is not treated as a matching snapshot.
+      }
+    }
     const payload = {
       message: "sync: update canonical SIMOT graph from VPS Master Memory",
       branch,
@@ -201,6 +221,22 @@ export async function handleGitHubGraphSync(request, env) {
     const writeResult = await writeResponse.json().catch(() => null);
     if (!writeResponse.ok || !writeResult?.content?.sha || !writeResult?.commit?.sha) {
       return json({ ok: false, error: "GITHUB_WRITE_FAILED", upstream_status: writeResponse.status }, 502);
+    }
+    const readbackResponse = await fetch(api + "?ref=" + encodeURIComponent(branch), { headers });
+    if (!readbackResponse.ok) {
+      return json({ ok: false, error: "GITHUB_READBACK_FAILED", upstream_status: readbackResponse.status }, 502);
+    }
+    const readback = await readbackResponse.json().catch(() => null);
+    let readbackContent = null;
+    try {
+      if (readback?.encoding === "base64" && typeof readback.content === "string") {
+        readbackContent = decodeBase64Utf8(readback.content);
+      }
+    } catch {
+      readbackContent = null;
+    }
+    if (readback?.sha !== writeResult.content.sha || readbackContent !== body.content) {
+      return json({ ok: false, error: "GITHUB_READBACK_MISMATCH" }, 502);
     }
     return json({
       ok: true, verified: true, destination: "GITHUB",
