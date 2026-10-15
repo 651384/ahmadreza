@@ -114,10 +114,10 @@ export async function handleGraphSync(request, env) {
     }
     const syncedAt = new Date().toISOString();
     const write = await db.prepare(`INSERT INTO control_plane_graphs(graph_id,schema_version,revision,content_sha256,content_json,source_memory_version,source_memory_sha256,synced_at)
-      VALUES(?,?,?,?,?,?,?,?)
+      SELECT ?,?,?,?,?,?,?,? WHERE ? = 0
       ON CONFLICT(graph_id) DO UPDATE SET schema_version=excluded.schema_version,revision=excluded.revision,content_sha256=excluded.content_sha256,content_json=excluded.content_json,source_memory_version=excluded.source_memory_version,source_memory_sha256=excluded.source_memory_sha256,synced_at=excluded.synced_at
       WHERE control_plane_graphs.revision = ?`)
-      .bind(GRAPH_ID, graph.schemaVersion, graph.revision, contentHash, body.content, body.source_memory.version, contentHash, syncedAt, body.expected_d1_revision).run();
+      .bind(GRAPH_ID, graph.schemaVersion, graph.revision, contentHash, body.content, body.source_memory.version, contentHash, syncedAt, body.expected_d1_revision, body.expected_d1_revision).run();
     if (Number(write?.meta?.changes ?? 0) === 0) {
       const latest = await db.prepare("SELECT revision FROM control_plane_graphs WHERE graph_id=?").bind(GRAPH_ID).first();
       return json({
