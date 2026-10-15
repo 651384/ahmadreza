@@ -13,6 +13,7 @@ All endpoints require `Authorization: Bearer <SIMOT_MAILBOX_TOKEN>`. The token v
 - `GET /control-plane/graph-sync`: read D1 mirror metadata/content.
 - `POST /control-plane/graph-sync`: sync a graph snapshot into D1.
 - `POST /control-plane/graph-sync/github`: commit the same canonical snapshot to GitHub.
+- `POST /control-plane/graph-sync/run`: read the current canonical graph directly from VPS Master Memory, verify the exact SHA-256, sync to D1 with revision conflict protection, then attempt GitHub sync. This is the intended one-call operation for a trusted server-side client; the graph content is not accepted from the browser for this route.
 
 POST body:
 ```json
@@ -35,4 +36,4 @@ GitHub sync is disabled unless the existing Worker environment supplies `SIMOT_G
 
 ## Operational rollout
 
-This branch is implementation-only. It has not been merged or deployed. Do not configure a GitHub token or deploy the Worker until explicitly approved. The current VPS-hosted VCP UI still needs a small integration patch to invoke D1 then GitHub sync after a successful canonical VPS read/save; this branch does not claim that UI wiring is complete.
+This branch is implementation-only. It has not been merged or deployed. Do not configure a GitHub token or deploy the Worker until explicitly approved. The current VPS-hosted VCP UI still needs a small integration patch to invoke `POST /control-plane/graph-sync/run` through a trusted server-side proxy; never expose `SIMOT_MAILBOX_TOKEN` in browser code. UI wiring is not complete. The orchestration returns a partial result if D1 succeeds but GitHub is not configured; callers must show per-destination status rather than treating HTTP 200 alone as full success.
