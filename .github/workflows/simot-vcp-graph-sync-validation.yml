@@ -1,0 +1,29 @@
+name: SIMOT VCP Graph Sync Validation
+
+on:
+  pull_request:
+    paths:
+      - "simot-visual-control-plane/**"
+      - ".github/workflows/simot-vcp-graph-sync-validation.yml"
+
+jobs:
+  validate-vcp:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: simot-visual-control-plane
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Validate proxy syntax
+        run: node --check vite-graph-sync-proxy.js
+      - name: Validate graph taxonomy
+        run: npm run validate:taxonomy
+      - name: Build VCP
+        run: npm run build
