@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "test": "node --test test/*.test.js",
-    "build": "node --check src/worker.js && node --check src/mcp.js && node --check src/jarvis-bridge.js"
+    "build": "node --check src/worker.js && node --check src/graph-sync.js && node --check src/mcp.js && node --check src/jarvis-bridge.js"
   },
   "devDependencies": {
     "wrangler": "4.136.3"
