@@ -202,3 +202,66 @@ export async function handleGitHubGraphSync(request, env) {
     return json({ ok: false, error: "GITHUB_SYNC_UNAVAILABLE" }, 503);
   }
 }
+
+export async function handleCanonicalGraphSync(request, env) {
+  if (request.method !== "POST") return json({ ok: false, error: "METHOD_NOT_ALLOWED" }, 405);
+  if (!env?.SIMOT_MASTER_MEMORY || typeof env?.SIMOT_MASTER_MEMORY_TOKEN !== "string" || !env.SIMOT_MASTER_MEMORY_TOKEN) {
+    return json({ ok: false, error: "MASTER_MEMORY_BRIDGE_NOT_CONFIGURED" }, 503);
+  }
+  try {
+    const upstream = await env.SIMOT_MASTER_MEMORY.fetch(
+      "http://127.0.0.1:9100/memory/working/" + encodeURIComponent(GRAPH_ID),
+      { headers: { "Authorization": "Bearer " + env.SIMOT_MASTER_MEMORY_TOKEN } }
+    );
+    const memory = await upstream.json().catch(() => null);
+    if (!upstream.ok || memory?.ok !== true || typeof memory.content !== "string" ||
+        !Number.isInteger(memory.metadata?.version) || !isSha256(memory.metadata?.sha256)) {
+      return json({ ok: false, error: "CANONICAL_MEMORY_READ_FAILED", upstream_status: upstream.status }, 502);
+    }
+    const contentHash = await sha256Hex(memory.content);
+    if (contentHash !== memory.metadata.sha256.toLowerCase()) {
+      return json({ ok: false, error: "CANONICAL_MEMORY_HASH_MISMATCH" }, 409);
+    }
+    let graph;
+    try { graph = JSON.parse(memory.content); } catch { return json({ ok: false, error: "CANONICAL_GRAPH_INVALID_JSON" }, 409); }
+    const validationError = validateGraph(graph);
+    if (validationError) return json({ ok: false, error: "CANONICAL_" + validationError }, 409);
+
+    const d1Read = await handleGraphSync(new Request("https://worker.internal/control-plane/graph-sync", { method: "GET" }), env);
+    const d1State = await d1Read.json();
+    if (!d1Read.ok || d1State.ok !== true) return json({ ok: false, error: "D1_STATE_READ_FAILED", d1: d1State }, 502);
+    const d1Write = await handleGraphSync(new Request("https://worker.internal/control-plane/graph-sync", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        bucket: "working", object_id: GRAPH_ID, expected_d1_revision: d1State.revision || 0,
+        content: memory.content,
+        source_memory: { system: "VPS_MASTER_MEMORY", version: memory.metadata.version, sha256: contentHash }
+      })
+    }), env);
+    const d1 = await d1Write.json();
+    if (!d1Write.ok || d1.ok !== true) {
+      return json({ ok: false, partial: false, source: { system: "VPS_MASTER_MEMORY", version: memory.metadata.version, sha256: contentHash }, d1, github: { status: "NOT_ATTEMPTED" } }, d1Write.status);
+    }
+
+    const githubRequest = new Request("https://worker.internal/control-plane/graph-sync/github", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        bucket: "working", object_id: GRAPH_ID, content: memory.content,
+        source_memory: { system: "VPS_MASTER_MEMORY", version: memory.metadata.version, sha256: contentHash }
+      })
+    });
+    const githubResponse = await handleGitHubGraphSync(githubRequest, env);
+    const github = await githubResponse.json();
+    return json({
+      ok: d1.verified === true && githubResponse.ok && github.ok === true,
+      partial: !(d1.verified === true && githubResponse.ok && github.ok === true),
+      source: { system: "VPS_MASTER_MEMORY", version: memory.metadata.version, sha256: contentHash, graph_revision: graph.revision },
+      d1,
+      github: githubResponse.ok && github.ok ? github : { status: "BLOCKED_OR_FAILED", http_status: githubResponse.status, error: github.error || "GITHUB_SYNC_FAILED" }
+    }, 200);
+  } catch {
+    return json({ ok: false, error: "CANONICAL_GRAPH_SYNC_FAILED" }, 503);
+  }
+}
