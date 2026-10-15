@@ -115,3 +115,78 @@ test("canonical orchestration fails closed when VPS Master Memory binding is abs
   assert.equal(response.status, 503);
   assert.equal((await response.json()).error, "MASTER_MEMORY_BRIDGE_NOT_CONFIGURED");
 });
+
+test("GitHub graph sync verifies exact readback and is idempotent for identical content", async () => {
+  const originalFetch = globalThis.fetch;
+  const calls = [];
+  globalThis.fetch = async (url, init = {}) => {
+    calls.push({ url: String(url), method: init.method || "GET" });
+    if (!init.method && calls.filter(call => call.method === "GET").length === 1) {
+      return new Response("not found", { status: 404 });
+    }
+    if (init.method === "PUT") {
+      return new Response(JSON.stringify({
+        content: { sha: "blob-verified" },
+        commit: { sha: "commit-verified", committer: { date: "2026-10-15T00:00:00Z" } }
+      }), { status: 201, headers: { "content-type": "application/json" } });
+    }
+    return new Response(JSON.stringify({
+      sha: "blob-verified",
+      encoding: "base64",
+      content: Buffer.from(content, "utf8").toString("base64")
+    }), { status: 200, headers: { "content-type": "application/json" } });
+  };
+  try {
+    const response = await handleGitHubGraphSync(req({
+      bucket: "working", object_id: "simot-core-overview", content,
+      source_memory: { system: "VPS_MASTER_MEMORY", version: 6, sha256: await hash(content) }
+    }), {
+      SIMOT_GITHUB_TOKEN: "test-token",
+      SIMOT_GITHUB_REPOSITORY: "651384/ahmadreza",
+      SIMOT_GITHUB_BRANCH: "feat/simot-graph-sync-d1"
+    });
+    const body = await response.json();
+    assert.equal(response.status, 200);
+    assert.equal(body.ok, true);
+    assert.equal(body.verified, true);
+    assert.equal(body.content_sha, "blob-verified");
+    assert.equal(calls.filter(call => call.method === "PUT").length, 1);
+    assert.equal(calls.filter(call => call.method === "GET").length, 2);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("GitHub graph sync fails closed when readback content differs", async () => {
+  const originalFetch = globalThis.fetch;
+  let gets = 0;
+  globalThis.fetch = async (_url, init = {}) => {
+    if (!init.method) {
+      gets += 1;
+      if (gets === 1) return new Response("not found", { status: 404 });
+      return new Response(JSON.stringify({
+        sha: "blob-verified",
+        encoding: "base64",
+        content: Buffer.from(content + "tampered", "utf8").toString("base64")
+      }), { status: 200, headers: { "content-type": "application/json" } });
+    }
+    return new Response(JSON.stringify({
+      content: { sha: "blob-verified" },
+      commit: { sha: "commit-verified" }
+    }), { status: 201, headers: { "content-type": "application/json" } });
+  };
+  try {
+    const response = await handleGitHubGraphSync(req({
+      bucket: "working", object_id: "simot-core-overview", content,
+      source_memory: { system: "VPS_MASTER_MEMORY", version: 6, sha256: await hash(content) }
+    }), {
+      SIMOT_GITHUB_TOKEN: "test-token",
+      SIMOT_GITHUB_REPOSITORY: "651384/ahmadreza",
+      SIMOT_GITHUB_BRANCH: "feat/simot-graph-sync-d1"
+    });
+    assert.equal(response.status, 502);
+    assert.equal((await response.json()).error, "GITHUB_READBACK_MISMATCH");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
