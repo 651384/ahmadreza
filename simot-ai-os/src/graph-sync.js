@@ -54,8 +54,11 @@ async function ensureTable(db) {
 export async function handleGraphSync(request, env) {
   if (!env?.SIMOT_DB) return json({ ok: false, error: "RUNTIME_NOT_CONFIGURED" }, 503);
   try {
-    await ensureTable(env.SIMOT_DB);
     if (request.method === "GET") {
+      const table = await env.SIMOT_DB.prepare(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name='control_plane_graphs'"
+      ).first();
+      if (!table) return json({ ok: true, synced: false, graph_id: GRAPH_ID, d1_revision: 0 });
       const row = await env.SIMOT_DB.prepare(
         "SELECT graph_id,schema_version,revision,content_sha256,content_json,source_memory_version,source_memory_sha256,synced_at FROM control_plane_graphs WHERE graph_id=?"
       ).bind(GRAPH_ID).first();
@@ -73,6 +76,7 @@ export async function handleGraphSync(request, env) {
       });
     }
     if (request.method !== "POST") return json({ ok: false, error: "METHOD_NOT_ALLOWED" }, 405);
+    await ensureTable(env.SIMOT_DB);
     const length = Number(request.headers.get("content-length") || 0);
     if (length > MAX_CONTENT_BYTES + 100_000) return json({ ok: false, error: "GRAPH_PAYLOAD_TOO_LARGE" }, 413);
     let body;
@@ -109,10 +113,20 @@ export async function handleGraphSync(request, env) {
       return json({ ok: false, error: "SAME_REVISION_DIFFERENT_CONTENT" }, 409);
     }
     const syncedAt = new Date().toISOString();
-    await db.prepare(`INSERT INTO control_plane_graphs(graph_id,schema_version,revision,content_sha256,content_json,source_memory_version,source_memory_sha256,synced_at)
+    const write = await db.prepare(`INSERT INTO control_plane_graphs(graph_id,schema_version,revision,content_sha256,content_json,source_memory_version,source_memory_sha256,synced_at)
       VALUES(?,?,?,?,?,?,?,?)
-      ON CONFLICT(graph_id) DO UPDATE SET schema_version=excluded.schema_version,revision=excluded.revision,content_sha256=excluded.content_sha256,content_json=excluded.content_json,source_memory_version=excluded.source_memory_version,source_memory_sha256=excluded.source_memory_sha256,synced_at=excluded.synced_at`)
-      .bind(GRAPH_ID, graph.schemaVersion, graph.revision, contentHash, body.content, body.source_memory.version, contentHash, syncedAt).run();
+      ON CONFLICT(graph_id) DO UPDATE SET schema_version=excluded.schema_version,revision=excluded.revision,content_sha256=excluded.content_sha256,content_json=excluded.content_json,source_memory_version=excluded.source_memory_version,source_memory_sha256=excluded.source_memory_sha256,synced_at=excluded.synced_at
+      WHERE control_plane_graphs.revision = ?`)
+      .bind(GRAPH_ID, graph.schemaVersion, graph.revision, contentHash, body.content, body.source_memory.version, contentHash, syncedAt, body.expected_d1_revision).run();
+    if (Number(write?.meta?.changes ?? 0) === 0) {
+      const latest = await db.prepare("SELECT revision FROM control_plane_graphs WHERE graph_id=?").bind(GRAPH_ID).first();
+      return json({
+        ok: false,
+        error: "D1_REVISION_CONFLICT",
+        expected_d1_revision: body.expected_d1_revision,
+        current_d1_revision: Number(latest?.revision || 0)
+      }, 409);
+    }
     const verified = await db.prepare("SELECT revision,content_sha256,content_json,source_memory_version FROM control_plane_graphs WHERE graph_id=?").bind(GRAPH_ID).first();
     if (!verified || verified.revision !== graph.revision || verified.content_sha256 !== contentHash || verified.content_json !== body.content || verified.source_memory_version !== body.source_memory.version) {
       return json({ ok: false, error: "D1_WRITE_READBACK_MISMATCH" }, 502);
