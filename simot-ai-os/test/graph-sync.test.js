@@ -79,3 +79,12 @@ test("GitHub graph sync stays blocked when no approved token/config is present",
   assert.equal(response.status, 503);
   assert.equal((await response.json()).error, "GITHUB_SYNC_NOT_CONFIGURED");
 });
+
+test("canonical orchestration fails closed when VPS Master Memory binding is absent", async () => {
+  const response = await (await import("../src/graph-sync.js")).handleCanonicalGraphSync(
+    new Request("https://worker.test/control-plane/graph-sync/run", { method: "POST" }),
+    { SIMOT_DB: mockDb() }
+  );
+  assert.equal(response.status, 503);
+  assert.equal((await response.json()).error, "MASTER_MEMORY_BRIDGE_NOT_CONFIGURED");
+});
