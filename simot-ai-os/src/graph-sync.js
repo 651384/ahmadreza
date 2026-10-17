@@ -37,12 +37,15 @@ function validateGraph(graph) {
 async function ensureTable(db) {
   await db.prepare(`CREATE TABLE IF NOT EXISTS ${TABLE} (
     graph_id TEXT PRIMARY KEY,
+    schema_name TEXT NOT NULL,
+    schema_version INTEGER NOT NULL,
     revision INTEGER NOT NULL,
-    sha256 TEXT NOT NULL,
-    content TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    source_object_id TEXT NOT NULL,
     source_memory_version INTEGER NOT NULL,
-    source_memory_sha256 TEXT NOT NULL,
-    synced_at TEXT NOT NULL
+    sha256 TEXT NOT NULL,
+    graph_json TEXT NOT NULL,
+    synced_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
   )`).run();
 }
 
@@ -77,13 +80,13 @@ export async function handleCanonicalGraphSync(request, env) {
 
     const db = env.SIMOT_DB;
     await ensureTable(db);
-    const existing = await db.prepare("SELECT graph_id,revision,sha256,content,source_memory_version,source_memory_sha256,synced_at FROM " + TABLE + " WHERE graph_id=?").bind(GRAPH_ID).first();
+    const existing = await db.prepare("SELECT graph_id,schema_name,schema_version,revision,updated_at,source_object_id,source_memory_version,sha256,graph_json,synced_at FROM " + TABLE + " WHERE graph_id=?").bind(GRAPH_ID).first();
     const currentRevision = Number(existing?.revision || 0);
     if (existing && graph.revision < currentRevision) {
       return json({ ok: false, error: "STALE_GRAPH_REVISION", current_revision: currentRevision, incoming_revision: graph.revision }, 409);
     }
     if (existing && graph.revision === currentRevision) {
-      if (existing.sha256 === digest && existing.content === memory.content && existing.source_memory_sha256 === digest) {
+      if (existing.sha256 === digest && existing.graph_json === memory.content && existing.source_object_id === GRAPH_ID && existing.schema_name === graph.schema && existing.schema_version === graph.schemaVersion) {
         return json({
           ok: true, verified: true, idempotent: true,
           source: { system: "VPS_MASTER_MEMORY", version: memory.metadata.version, sha256: digest, graph_revision: graph.revision },
@@ -95,12 +98,12 @@ export async function handleCanonicalGraphSync(request, env) {
     }
 
     const syncedAt = new Date().toISOString();
-    await db.prepare("INSERT INTO " + TABLE + "(graph_id,revision,sha256,content,source_memory_version,source_memory_sha256,synced_at) VALUES(?,?,?,?,?,?,?) ON CONFLICT(graph_id) DO UPDATE SET revision=excluded.revision,sha256=excluded.sha256,content=excluded.content,source_memory_version=excluded.source_memory_version,source_memory_sha256=excluded.source_memory_sha256,synced_at=excluded.synced_at WHERE " + TABLE + ".revision < excluded.revision")
-      .bind(GRAPH_ID, graph.revision, digest, memory.content, memory.metadata.version, digest, syncedAt).run();
-    const readback = await db.prepare("SELECT graph_id,revision,sha256,content,source_memory_version,source_memory_sha256,synced_at FROM " + TABLE + " WHERE graph_id=?").bind(GRAPH_ID).first();
+    await db.prepare("INSERT INTO " + TABLE + "(graph_id,schema_name,schema_version,revision,updated_at,source_object_id,source_memory_version,sha256,graph_json,synced_at) VALUES(?,?,?,?,?,?,?,?,?,?) ON CONFLICT(graph_id) DO UPDATE SET schema_name=excluded.schema_name,schema_version=excluded.schema_version,revision=excluded.revision,updated_at=excluded.updated_at,source_object_id=excluded.source_object_id,source_memory_version=excluded.source_memory_version,sha256=excluded.sha256,graph_json=excluded.graph_json,synced_at=excluded.synced_at WHERE " + TABLE + ".revision < excluded.revision")
+      .bind(GRAPH_ID, graph.schema, graph.schemaVersion, graph.revision, memory.metadata.updated_at || syncedAt, GRAPH_ID, memory.metadata.version, digest, memory.content, syncedAt).run();
+    const readback = await db.prepare("SELECT graph_id,schema_name,schema_version,revision,updated_at,source_object_id,source_memory_version,sha256,graph_json,synced_at FROM " + TABLE + " WHERE graph_id=?").bind(GRAPH_ID).first();
     if (!readback || readback.revision !== graph.revision || readback.sha256 !== digest ||
-        readback.content !== memory.content || readback.source_memory_version !== memory.metadata.version ||
-        readback.source_memory_sha256 !== digest) {
+        readback.graph_json !== memory.content || readback.source_memory_version !== memory.metadata.version ||
+        readback.source_object_id !== GRAPH_ID || readback.schema_name !== graph.schema || readback.schema_version !== graph.schemaVersion) {
       return json({ ok: false, error: "D1_WRITE_READBACK_MISMATCH" }, 502);
     }
     return json({
