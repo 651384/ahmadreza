@@ -1,0 +1,85 @@
+name: SIMOT Graph Sync
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "preflight = no writes; sync = read VPS canonical graph and upsert verified D1 snapshot"
+        required: true
+        type: choice
+        options:
+          - preflight
+          - sync
+        default: sync
+
+permissions:
+  contents: read
+
+jobs:
+  graph-sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Call canonical graph sync endpoint
+        env:
+          URL: https://simot-ai-os-gateway.vahid-ahmadreza.workers.dev
+          SIMOT_MAILBOX_TOKEN: ${{ secrets.SIMOT_MAILBOX_TOKEN }}
+          MODE: ${{ inputs.mode }}
+        run: |
+          set -euo pipefail
+          test -n "$SIMOT_MAILBOX_TOKEN" || { echo "Required GitHub Actions secret SIMOT_MAILBOX_TOKEN is missing."; exit 1; }
+
+          if [ "$MODE" = "sync" ]; then
+            payload='{"confirm":true}'
+            expected_status="200"
+          else
+            payload='{"confirm":false}'
+            expected_status="400"
+          fi
+
+          status="$(curl --silent --show-error --max-time 45 \
+            --output response.json --write-out '%{http_code}' \
+            --request POST \
+            --header "Authorization: Bearer ${SIMOT_MAILBOX_TOKEN}" \
+            --header 'Content-Type: application/json' \
+            --data "$payload" \
+            "$URL/control-plane/graph-sync/run")"
+
+          if [ "$status" != "$expected_status" ]; then
+            echo "Unexpected HTTP status: $status"
+            node -e 'const fs=require("node:fs"); try { const b=JSON.parse(fs.readFileSync("response.json","utf8")); console.log(JSON.stringify({ok:b.ok,error:b.error||null,upstream_status:b.upstream_status||null})); } catch {}'
+            exit 1
+          fi
+
+          MODE="$MODE" node - <<'NODE'
+          const fs = require("node:fs");
+          const body = JSON.parse(fs.readFileSync("response.json", "utf8"));
+          const mode = process.env.MODE;
+          if (mode === "preflight") {
+            if (body.ok !== false || body.error !== "EXPLICIT_SYNC_CONFIRMATION_REQUIRED") {
+              throw new Error("Unexpected preflight response");
+            }
+            console.log(JSON.stringify({status:"PASS",mode,http_status:400,confirmed:false,write_performed:false}));
+          } else {
+            if (body.ok !== true || body.verified !== true ||
+                !body.source || !body.d1 ||
+                body.source.graph_revision !== body.d1.revision ||
+                body.source.sha256 !== body.d1.sha256 ||
+                body.d1.verified !== true ||
+                typeof body.content !== "string") {
+              throw new Error("Graph sync did not return verified matching source and D1 metadata");
+            }
+            console.log(JSON.stringify({
+              status:"PASS",
+              mode,
+              http_status:200,
+              verified:true,
+              idempotent:body.idempotent === true || body.d1.idempotent === true,
+              graph_id:body.d1.graph_id,
+              graph_revision:body.d1.revision,
+              source_memory_version:body.source.version,
+              sha256:body.d1.sha256,
+              synced_at:body.d1.synced_at
+            }));
+          }
+          NODE
