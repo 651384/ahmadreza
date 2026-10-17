@@ -3,8 +3,51 @@ import { submitJarvisMessage, readJarvisMailbox } from "./jarvis-bridge.js";
 import { executeToolRequest } from "./tool-execution-bridge.js";
 import { writeCloudflareMasterMemorySecret } from "./adapters/cloudflare-secrets-write.js";
 import { writeMasterMemoryE2E } from "./adapters/master-memory-write.js";
+import { validateContinuityState } from "./continuity-contract.js";
+import { writeContinuityState } from "./adapters/continuity-state-write.js";
 const PROTOCOL_VERSION = "2025-11-25";
 const MODERN_PROTOCOL_VERSION = "2026-07-28";
+
+async function readContinuityState(env) {
+  if (!env.SIMOT_MASTER_MEMORY) return { ok: false, status: "UNAVAILABLE", error_code: "MASTER_MEMORY_VPC_NOT_BOUND" };
+  if (!env.SIMOT_MASTER_MEMORY_TOKEN) return { ok: false, status: "UNAVAILABLE", error_code: "MASTER_MEMORY_TOKEN_NOT_CONFIGURED" };
+
+  try {
+    const r = await env.SIMOT_MASTER_MEMORY.fetch(
+      "http://127.0.0.1:9100/continuity/state",
+      { headers: { Authorization: "Bearer " + env.SIMOT_MASTER_MEMORY_TOKEN } }
+    );
+    const body = await r.json().catch(() => null);
+    if (!r.ok || !body?.ok || !body?.state) {
+      return {
+        ok: false,
+        status: "UNAVAILABLE",
+        error_code: body?.error || "CONTINUITY_STATE_READ_FAILED",
+        http_status: r.status
+      };
+    }
+
+    const validation = validateContinuityState(body.state);
+    if (!validation.ok) {
+      return { ok: false, status: "UNAVAILABLE", error_code: validation.error };
+    }
+
+    return {
+      ok: true,
+      status: "AVAILABLE",
+      source: "MASTER_MEMORY_VPS",
+      route: "MCP->WORKER->VPC->TUNNEL->/srv/simot-memory/CURRENT_STATE.json",
+      verified: {
+        readback: true,
+        canonical_standard: "SIMOT-CANONICAL-001@3.0.0",
+        state_valid: true
+      },
+      state: body.state
+    };
+  } catch {
+    return { ok: false, status: "UNAVAILABLE", error_code: "CONTINUITY_STATE_TRANSPORT_OR_PARSE_FAILED" };
+  }
+}
 
 function response(body, status = 200, headers = {}) {
   return new Response(body == null ? null : JSON.stringify(body), {
@@ -16,6 +59,8 @@ function rpcResult(id, result) { return response({ jsonrpc: "2.0", id, result })
 function rpcError(id, code, message) { return response({ jsonrpc: "2.0", id, error: { code, message } }, 200); }
 
 const TOOLS = [
+  { name: "simot_continuity_state", description: "Read and validate the canonical SIMOT Continuity current state. Read-only; no writes or execution.", inputSchema: { type: "object", properties: {}, additionalProperties: false } },
+  { name: "simot_continuity_state_write", description: "Write canonical continuity state with optimistic version control, required task/evidence records, and read-back verification. Requires explicit approval=true and SYSTEM_WRITE_ALLOWED authority.", inputSchema: { type: "object", properties: { approval: { type: "boolean" }, authority: { type: "string", enum: ["SYSTEM_WRITE_ALLOWED"] }, expected_version: { type: "integer", minimum: 1 }, state: { type: "object" }, task_record: { type: "object" }, evidence_records: { type: "array", minItems: 1, items: { type: "object" } } }, required: ["approval", "authority", "expected_version", "state", "task_record", "evidence_records"], additionalProperties: false } },
   { name: "simot_health", description: "Read SIMOT AI OS runtime health.", inputSchema: { type: "object", properties: {}, additionalProperties: false } },
   { name: "simot_tasks_status", description: "Read autonomous task counts and task state from SIMOT D1.", inputSchema: { type: "object", properties: {}, additionalProperties: false } },
   { name: "simot_workers_status", description: "Read registered SIMOT worker runtime status.", inputSchema: { type: "object", properties: {}, additionalProperties: false } },
@@ -27,6 +72,8 @@ const TOOLS = [
 ];
 
 async function toolCall(name, args, env) {
+  if (name === "simot_continuity_state") return await readContinuityState(env);
+  if (name === "simot_continuity_state_write") return await writeContinuityState(env, args || {});
   if (name === "simot_health") return { service: "simot-ai-os-gateway", version: env.SIMOT_RUNTIME_VERSION || "unknown", state: env.SIMOT_DEFAULT_STATE || "MANUAL", controller_mode: env.SIMOT_CONTROLLER_MODE || "EXTERNAL" };
   if (name === "simot_tasks_status") {
     const rows = await env.SIMOT_DB.prepare("SELECT status,COUNT(*) AS count FROM autonomous_tasks GROUP BY status").all();
