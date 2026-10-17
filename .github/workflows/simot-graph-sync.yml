@@ -4,12 +4,13 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "preflight = no writes; sync = read VPS canonical graph and upsert verified D1 snapshot"
+        description: "preflight = no writes; sync = normal verified sync; repair = explicitly repair an eligible corrupt same-revision D1 snapshot"
         required: true
         type: choice
         options:
           - preflight
           - sync
+          - repair
         default: sync
 
 permissions:
@@ -29,7 +30,10 @@ jobs:
           set -euo pipefail
           test -n "$SIMOT_MAILBOX_TOKEN" || { echo "Required GitHub Actions secret SIMOT_MAILBOX_TOKEN is missing."; exit 1; }
 
-          if [ "$MODE" = "sync" ]; then
+          if [ "$MODE" = "repair" ]; then
+            payload='{"confirm":true,"repair_corrupt_snapshot":true}'
+            expected_status="200"
+          elif [ "$MODE" = "sync" ]; then
             payload='{"confirm":true}'
             expected_status="200"
           else
@@ -75,6 +79,7 @@ jobs:
               http_status:200,
               verified:true,
               idempotent:body.idempotent === true || body.d1.idempotent === true,
+              repaired:body.repaired === true || body.d1.repaired === true,
               graph_id:body.d1.graph_id,
               graph_revision:body.d1.revision,
               source_memory_version:body.source.version,
