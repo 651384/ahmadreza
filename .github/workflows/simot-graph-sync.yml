@@ -47,7 +47,7 @@ jobs:
 
           if [ "$status" != "$expected_status" ]; then
             echo "Unexpected HTTP status: $status"
-            node -e 'const fs=require("node:fs"); try { const b=JSON.parse(fs.readFileSync("response.json","utf8")); console.log(JSON.stringify({ok:b.ok,error:b.error||null,upstream_status:b.upstream_status||null})); } catch {}'
+            node -e 'const fs=require("node:fs"); try { const b=JSON.parse(fs.readFileSync("response.json","utf8")); console.log(JSON.stringify({ok:b.ok,error:b.error||null,upstream_status:b.upstream_status||null,diagnostic:b.diagnostic||null})); } catch {}'
             exit 1
           fi
 
