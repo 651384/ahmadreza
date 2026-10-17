@@ -86,7 +86,16 @@ export async function handleCanonicalGraphSync(request, env) {
       return json({ ok: false, error: "STALE_GRAPH_REVISION", current_revision: currentRevision, incoming_revision: graph.revision }, 409);
     }
     if (existing && graph.revision === currentRevision) {
-      if (existing.sha256 === digest && existing.graph_json === memory.content && existing.source_object_id === GRAPH_ID && existing.schema_name === graph.schema && existing.schema_version === graph.schemaVersion) {
+      const storedJsonSha256 = typeof existing.graph_json === "string" ? await sha256Hex(existing.graph_json) : null;
+      const sameSourceMemoryVersion = existing.source_memory_version === memory.metadata.version;
+      const sameMetadata = existing.source_object_id === GRAPH_ID &&
+        existing.schema_name === graph.schema && existing.schema_version === graph.schemaVersion &&
+        sameSourceMemoryVersion;
+      const storedJsonHashMatchesStoredSha256 = storedJsonSha256 === existing.sha256;
+      const sameSnapshot = existing.sha256 === digest && existing.graph_json === memory.content &&
+        storedJsonHashMatchesStoredSha256 && sameMetadata;
+
+      if (existing.sha256 === digest && existing.graph_json === memory.content && sameSnapshot) {
         return json({
           ok: true, verified: true, idempotent: true,
           source: { system: "VPS_MASTER_MEMORY", version: memory.metadata.version, sha256: digest, graph_revision: graph.revision },
@@ -94,9 +103,61 @@ export async function handleCanonicalGraphSync(request, env) {
           content: memory.content
         });
       }
+
+      const repairEligible = existing.sha256 === digest && sameMetadata && !storedJsonHashMatchesStoredSha256;
+      if (body.repair_corrupt_snapshot === true) {
+        if (!repairEligible) {
+          return json({
+            ok: false,
+            error: "D1_SNAPSHOT_REPAIR_NOT_SAFE",
+            write_performed: false,
+            diagnostic: {
+              graph_id: GRAPH_ID,
+              current_revision: currentRevision,
+              incoming_revision: graph.revision,
+              same_sha256: existing.sha256 === digest,
+              same_graph_json: existing.graph_json === memory.content,
+              stored_json_hash_matches_stored_sha256: storedJsonHashMatchesStoredSha256,
+              expected_source_object: existing.source_object_id === GRAPH_ID,
+              same_schema_name: existing.schema_name === graph.schema,
+              same_schema_version: existing.schema_version === graph.schemaVersion,
+              same_source_memory_version: sameSourceMemoryVersion,
+              repair_eligible: false
+            }
+          }, 409);
+        }
+
+        const repairedAt = new Date().toISOString();
+        await db.prepare("UPDATE " + TABLE + " SET graph_json=?,updated_at=?,synced_at=? WHERE graph_id=? AND revision=? AND sha256=? AND source_object_id=? AND schema_name=? AND schema_version=? AND source_memory_version=?")
+          .bind(memory.content, memory.metadata.updated_at || repairedAt, repairedAt, GRAPH_ID, graph.revision, digest, GRAPH_ID, graph.schema, graph.schemaVersion, memory.metadata.version).run();
+        const repaired = await db.prepare("SELECT graph_id,schema_name,schema_version,revision,updated_at,source_object_id,source_memory_version,sha256,graph_json,synced_at FROM " + TABLE + " WHERE graph_id=?").bind(GRAPH_ID).first();
+        const repairedJsonSha256 = typeof repaired?.graph_json === "string" ? await sha256Hex(repaired.graph_json) : null;
+        if (!repaired || repaired.revision !== graph.revision || repaired.sha256 !== digest ||
+            repairedJsonSha256 !== digest || repaired.graph_json !== memory.content ||
+            repaired.source_memory_version !== memory.metadata.version || repaired.source_object_id !== GRAPH_ID ||
+            repaired.schema_name !== graph.schema || repaired.schema_version !== graph.schemaVersion) {
+          return json({
+            ok: false, error: "D1_REPAIR_READBACK_MISMATCH", write_performed: true,
+            diagnostic: {
+              graph_id: GRAPH_ID,
+              revision: graph.revision,
+              stored_sha256_matches_source: repaired?.sha256 === digest,
+              stored_json_hash_matches_source: repairedJsonSha256 === digest,
+              stored_json_matches_source: repaired?.graph_json === memory.content
+            }
+          }, 502);
+        }
+        return json({
+          ok: true, verified: true, repaired: true,
+          source: { system: "VPS_MASTER_MEMORY", version: memory.metadata.version, sha256: digest, graph_revision: graph.revision },
+          d1: { verified: true, graph_id: GRAPH_ID, revision: repaired.revision, sha256: repaired.sha256, synced_at: repaired.synced_at, repaired: true },
+          content: memory.content
+        });
+      }
+
       return json({
         ok: false,
-        error: "SAME_REVISION_DIFFERENT_CONTENT",
+        error: storedJsonHashMatchesStoredSha256 ? "SAME_REVISION_DIFFERENT_CONTENT" : "D1_SNAPSHOT_CONTENT_HASH_MISMATCH",
         diagnostic: {
           graph_id: GRAPH_ID,
           current_revision: currentRevision,
@@ -105,11 +166,15 @@ export async function handleCanonicalGraphSync(request, env) {
           incoming_sha256: digest,
           same_sha256: existing.sha256 === digest,
           same_graph_json: existing.graph_json === memory.content,
+          stored_json_sha256: storedJsonSha256,
+          stored_json_hash_matches_stored_sha256: storedJsonHashMatchesStoredSha256,
           expected_source_object: existing.source_object_id === GRAPH_ID,
           same_schema_name: existing.schema_name === graph.schema,
           same_schema_version: existing.schema_version === graph.schemaVersion,
+          same_source_memory_version: sameSourceMemoryVersion,
           current_source_memory_version: existing.source_memory_version,
-          incoming_source_memory_version: memory.metadata.version
+          incoming_source_memory_version: memory.metadata.version,
+          repair_eligible: repairEligible
         }
       }, 409);
     }
