@@ -1,3 +1,4 @@
+import { handleCanonicalGraphSync } from "./graph-sync.js";
 ﻿import { normalizeTelegramUpdate, buildTelegramEnvelope } from "./adapters/telegram.js";
 import { getWorkerProfile, EXECUTABLE_WORKERS } from "./worker_profiles.js";
 import { validateExecutionStandard, EXECUTION_STANDARD_ID } from "./execution_standard.js";
@@ -484,6 +485,12 @@ function safeBody(body){const copy={...body};if(copy.SECRET)delete copy.SECRET;i
 async function recordEvent(env,event){await env.SIMOT_DB.prepare("INSERT INTO events(id,msg_id,corr_id,type,status,created_at,updated_at,payload_json,error_code,error_message) VALUES(?,?,?,?,?,?,?,?,?,?)").bind(event.id,event.msg_id,event.corr_id,event.type,event.status,event.created_at,event.updated_at,event.payload_json||null,event.error_code||null,event.error_message||null).run();}
 export default {
 async fetch(request,env){const url=new URL(request.url);
+if(url.pathname==="/control-plane/graph-sync/run"){
+  if(!authorizeMasterMemoryBridge(request,env)) return json({ok:false,error:"MASTER_MEMORY_BRIDGE_UNAUTHORIZED"},401);
+  try { if(env.SIMOT_DB) await mandatoryPreflight(env,"HTTP:"+url.pathname); else return json({ok:false,error:"RUNTIME_NOT_CONFIGURED"},503); }
+  catch { return json({ok:false,error:"EXECUTION_STANDARD_BLOCKED"},503); }
+  return handleCanonicalGraphSync(request,env);
+}
 try { if(env.SIMOT_DB) await mandatoryPreflight(env,"HTTP:"+url.pathname); else return json({ok:false,error:"RUNTIME_NOT_CONFIGURED"},503); } catch (error) { return json({ok:false,error:"EXECUTION_STANDARD_BLOCKED"},503); }if(url.pathname==="/master-memory/test"&&request.method==="GET"){
   try{
     if(!env.SIMOT_MASTER_MEMORY) return json({ok:false,error:"MASTER_MEMORY_VPC_NOT_BOUND"},503);
