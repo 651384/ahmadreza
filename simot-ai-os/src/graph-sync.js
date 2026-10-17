@@ -94,7 +94,24 @@ export async function handleCanonicalGraphSync(request, env) {
           content: memory.content
         });
       }
-      return json({ ok: false, error: "SAME_REVISION_DIFFERENT_CONTENT" }, 409);
+      return json({
+        ok: false,
+        error: "SAME_REVISION_DIFFERENT_CONTENT",
+        diagnostic: {
+          graph_id: GRAPH_ID,
+          current_revision: currentRevision,
+          incoming_revision: graph.revision,
+          current_sha256: existing.sha256,
+          incoming_sha256: digest,
+          same_sha256: existing.sha256 === digest,
+          same_graph_json: existing.graph_json === memory.content,
+          expected_source_object: existing.source_object_id === GRAPH_ID,
+          same_schema_name: existing.schema_name === graph.schema,
+          same_schema_version: existing.schema_version === graph.schemaVersion,
+          current_source_memory_version: existing.source_memory_version,
+          incoming_source_memory_version: memory.metadata.version
+        }
+      }, 409);
     }
 
     const syncedAt = new Date().toISOString();
