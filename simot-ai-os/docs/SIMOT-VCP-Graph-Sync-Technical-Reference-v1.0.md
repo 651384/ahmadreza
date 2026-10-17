@@ -44,7 +44,7 @@
 - تعداد گره‌های خوانده‌شده از GitHub: `77`
 - تعداد یال‌های خوانده‌شده از GitHub: `190`
 
-پاسخ رابط برای چرخهٔ آخر این وضعیت‌ها را گزارش کرد: `ok=true`، `partial=false)، `d1.verified=true)، `github.ok=true)، `github.verified=true)، و HTTP 200.
+پاسخ رابط برای چرخهٔ آخر این وضعیت‌ها را گزارش کرد: `ok=true`، `partial=false`، `d1.verified=true)، `github.ok=true)، `github.verified=true)، و HTTP 200.
 
 ## 3. معماری و جریان داده
 
@@ -141,8 +141,8 @@ GitHub Contents API
 
 ### endpointهای حافظهٔ ثبت‌شده
 
-- `GET /health): سلامت پایه؛ در سابقه بدون احراز هویت
-- `POST /memory): نوشتن رکورد حافظه
+- `GET /health`: سلامت پایه؛ در سابقه بدون احراز هویت
+- `POST /memory`: نوشتن رکورد حافظه
 - `GET /memory/{bucket}/{id}`: خواندن رکورد
 - `GET /list/{bucket}`: فهرست رکوردهای یک bucket
 - `POST /archive`: آرشیو
