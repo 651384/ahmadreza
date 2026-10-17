@@ -22,31 +22,28 @@ function makeEnv({ sourceContent, existing }) {
   const calls = { memoryReads: 0, updates: 0, inserts: 0 };
   const db = {
     prepare(sql) {
-      return {
-        bind(...params) {
-          return {
-            async run() {
-              if (sql.startsWith("CREATE TABLE")) return { success: true };
-              if (sql.startsWith("UPDATE control_plane_graph_snapshots")) {
-                calls.updates++;
-                const [graphJson, updatedAt, syncedAt, graphId, revision, sha256, sourceId, schemaName, schemaVersion, sourceVersion] = params;
-                if (existing && existing.graph_id === graphId && existing.revision === revision &&
-                    existing.sha256 === sha256 && existing.source_object_id === sourceId &&
-                    existing.schema_name === schemaName && existing.schema_version === schemaVersion &&
-                    existing.source_memory_version === sourceVersion) {
-                  Object.assign(existing, { graph_json: graphJson, updated_at: updatedAt, synced_at: syncedAt });
-                }
-                return { success: true, meta: { changes: calls.updates ? 1 : 0 } };
-              }
-              if (sql.startsWith("INSERT")) calls.inserts++;
-              return { success: true };
-            },
-            async first() {
-              return existing ? structuredClone(existing) : null;
+      const statement = params => ({
+        async run() {
+          if (sql.startsWith("CREATE TABLE")) return { success: true };
+          if (sql.startsWith("UPDATE control_plane_graph_snapshots")) {
+            calls.updates++;
+            const [graphJson, updatedAt, syncedAt, graphId, revision, sha256, sourceId, schemaName, schemaVersion, sourceVersion] = params;
+            if (existing && existing.graph_id === graphId && existing.revision === revision &&
+                existing.sha256 === sha256 && existing.source_object_id === sourceId &&
+                existing.schema_name === schemaName && existing.schema_version === schemaVersion &&
+                existing.source_memory_version === sourceVersion) {
+              Object.assign(existing, { graph_json: graphJson, updated_at: updatedAt, synced_at: syncedAt });
             }
-          };
+            return { success: true, meta: { changes: calls.updates ? 1 : 0 } };
+          }
+          if (sql.startsWith("INSERT")) calls.inserts++;
+          return { success: true };
+        },
+        async first() {
+          return existing ? structuredClone(existing) : null;
         }
-      };
+      });
+      return { ...statement([]), bind(...params) { return statement(params); } };
     }
   };
   return {
